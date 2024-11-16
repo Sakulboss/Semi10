@@ -19,3 +19,4 @@ print('Programmene')
 #	file.write(str(myrecording))
 	
 print('Jetzt reichst mir jetzt rede ich! ES IST OBST IM HAUS ')	
+print("^ Solche Sätze denkt sich auch nur Lukas aus")
