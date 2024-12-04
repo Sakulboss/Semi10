@@ -1,14 +1,16 @@
-#r"C:\Users\sfz-a\Documents\Soundverarbeitung\test.wav"
+#r"C:\Users\sfz-a\Documents\GitHub\Semi10\Soundverarbeitung\test.wav"
 
 import numpy as np
 import librosa
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
+from scipy.fftpack import dct
 
 # Load the audio file
 audio_path = librosa.example('trumpet')
-y, sr = librosa.load(audio_path)
-sr, y = wavfile.read(r"C:\Users\sfz-a\Documents\Soundverarbeitung\test.wav")
+#y, sr = librosa.load(audio_path)
+sr, y = wavfile.read(r"C:\Users\sfz-a\Documents\GitHub\Semi10\Soundverarbeitung\test.wav")
+
 # Apply pre-emphasis filter
 pre_emphasis = 0.97
 y_preemphasized = np.append(y[0], y[1:] - pre_emphasis * y[:-1])
@@ -35,7 +37,7 @@ frames *= np.hamming(frame_length)
 
 NFFT = 512
 mag_frames = np.absolute(np.fft.rfft(frames, NFFT))  # Magnitude of the FFT
-pow_frames = ((1.0 / NFFT) * ((mag_frames) ** 2))  # Power Spectrum
+pow_frames = ((1.0 / NFFT) * (mag_frames ** 2))  # Power Spectrum
 
 nfilt = 40
 low_freq_mel = 0
@@ -59,6 +61,18 @@ filter_banks = np.dot(pow_frames, fbank.T)
 filter_banks = np.where(filter_banks == 0, np.finfo(float).eps, filter_banks)  # Numerical stability
 filter_banks = 20 * np.log10(filter_banks)  # dB
 
+num_ceps = 12
+mfcc = dct(filter_banks, type=2, axis=1, norm='ortho')[:, :num_ceps]
+
+# Plot the MFCCs
+plt.figure(figsize=(14, 5))
+plt.imshow(mfcc.T, cmap='hot', aspect='auto')
+plt.title('MFCC')
+plt.xlabel('Frame Index')
+plt.ylabel('Cepstral Coefficient Index')
+plt.show()
+
+#print(*filter_banks)
 # Plot the filter bank energies
 plt.figure(figsize=(14, 5))
 plt.imshow(filter_banks.T, cmap='hot', aspect='auto')
@@ -67,7 +81,7 @@ plt.xlabel('Frame Index')
 plt.ylabel('Filter Index')
 plt.show()
 
-print(mag_frames[0])
+#print(mag_frames[0])
 # Plot the magnitude spectrum of the first frame
 plt.figure(figsize=(14, 5))
 plt.plot(mag_frames[0])
