@@ -6,7 +6,6 @@ import numpy as np
 abstand_spectogramm = 500
 
 # Signal ausgeben, sr= Samplerate
-y, sr = librosa.load('bienensummen.wav')
 y, sr = librosa.load('CJ001 - Missing Queen - Day - (101).wav')
 
 """
@@ -55,11 +54,7 @@ plt.show()"""
 fmax = 1000
 hoppelhase = 512
 #Mel Spectrogramm wird extrahiert
-<<<<<<< HEAD
 mel_spectrogram = librosa.feature.melspectrogram(y = y, sr = sr, fmax = fmax)
-=======
-mel_spectrogram = librosa.feature.melspectrogram(y = y, sr = sr, fmax = fmax, hop_length= hoppelhase)
->>>>>>> 15ac0aa59b5d13b3f6fd07cb7450c48d1a51d317
 
 # ref = Weißt daraufhin Amplitude zu nutzen, wenn Umwandlung in Decibel
 #Lineares Spectrogramm wird zu Decibel (logarithmus) umgewandelt
