@@ -1,7 +1,7 @@
 import librosa
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.fftpack
+#import scipy.fftpack
 import spect
 
 def main():
@@ -18,27 +18,26 @@ def main():
     spec = np.abs(librosa.stft(y, hop_length=abstand_spectogramm))
     spec = librosa.amplitude_to_db(spec, ref=np.max)
 
-    #librosa.display.specshow(spec, sr=sr, x_axis='time', y_axis='log')
-
     # Mel_spectogram_1
 
-    # mel_spect = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=2048, hop_length=1024)
-    # mel_spect = librosa.power_to_db(spect, ref=np.max)
+    mel_spect = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=2048, hop_length=1024)
+    mel_spect = librosa.power_to_db(spect, ref = np.max)
 
     # Mel_Spectogramm_2
 
-    # n_fft = Anzahl der Werte in jeder STFT (standard: 2048)
-    # hop_length = Number of samples between successive STFT frames (default: n_fft // 2) (wie viele abschnitte wollen wir haben?
-    # n_mels = Anzahl der Mel-Banden die generiert werden (standart 128)
-    # fmin & fmax = minimum und maximum der frequenzen in den Mel-Koeffizienten (standard durch librosa.filters.mel())
+    # n_fft = Anzahl der Werte in jeder STFT (standard: 2048) hop_length = Number of samples between successive STFT
+    # frames (default: n_fft // 2) (wie viele abschnitte wollen wir haben? n_mels = Anzahl der Mel-Banden die
+    # generiert werden (standart 128) fmin & fmax = minimum und maximum der frequenzen in den Mel-Koeffizienten (standard durch librosa.filters.mel())
+    fmin = 0
     fmax = 1500
     #Mel Spectrogramm wird extrahiert
-    mel_spectrogram = librosa.feature.melspectrogram(y = y, sr = sr, fmax = fmax)
+    mel_spectrogram = librosa.feature.melspectrogram(y = y, sr = sr, fmax = fmax, fmin = fmin)
 
     # ref = Weißt daraufhin Amplitude zu nutzen, wenn Umwandlung in Decibel
     #Lineares Spectrogramm wird zu Decibel (logarithmus) umgewandelt
+    # cmap = colormap die genutzt wird (cmap='viridis')
     mel_spectrogram_db = librosa.power_to_db(mel_spectrogram, ref = np.max)
-    #cmap = colormap die genutzt wird (cmap='viridis')
+
 
     #Diagramme
     """
@@ -59,23 +58,17 @@ def main():
 
     """
     #Spektogramm
+    librosa.display.specshow(spec, sr=sr, x_axis='time', y_axis='log')
     plt.colorbar(format='%+2.0f dB')
     plt.title('Spectrogram')
     plt.show()"""
 
-    """
-    #Mel Spectogram 1?
-    librosa.display.specshow(mel_spect, y_axis='mel', fmax=8000, x_axis='time');
-    plt.title('Mel Spectrogram');
-    plt.colorbar(format='%+2.0f dB');
-    plt.show()"""
 
-    """
-    #Mel Spectogram 2?
-    librosa.display.specshow(mel_spect, y_axis='mel', fmax=8000, x_axis='time');
-    plt.title('Mel Spectrogram');
-    plt.colorbar(format='%+2.0f dB');
-    plt.show()"""
+    #Mel Spectogram 1?
+    librosa.display.specshow(mel_spect, y_axis='mel', fmax=8000, x_axis='time')
+    plt.title('Mel Spectrogram')
+    plt.colorbar(format='%+2.0f dB')
+    plt.show()
 
     # Mel Spectrogramm plotten
     plt.figure(figsize=(8, 8))
