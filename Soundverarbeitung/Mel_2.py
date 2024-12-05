@@ -7,6 +7,7 @@ abstand_spectogramm = 500
 
 # Signal ausgeben, sr= Samplerate
 y, sr = librosa.load('bienensummen.wav')
+y, sr = librosa.load('CJ001 - Missing Queen - Day - (101).wav')
 
 """
 plt.plot(y)

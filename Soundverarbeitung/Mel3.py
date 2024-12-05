@@ -8,7 +8,7 @@ def main():
     abstand_spectogramm = 500
 
     # Signal ausgeben, sr= Samplerate
-    y, sr = librosa.load('bienensummen.wav')
+    y, sr = librosa.load('CF003 - Active - Day - (220).wav')
 
     # Signal FFT
     n_fft = 2048
