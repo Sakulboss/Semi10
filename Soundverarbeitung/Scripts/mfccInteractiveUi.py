@@ -5,6 +5,8 @@ from IPython.display import Audio
 from scipy.fftpack import dct
 import matplotlib.pyplot as plt
 import numpy as np
+from pathfinder import soundpath
+
 
 # File uploader widget
 uploader = widgets.FileUpload(accept='.wav', multiple=False)

@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 #import scipy.fftpack
 import spect
+from pathfinder import soundpath
 
 def main():
     abstand_spectogramm = 500
 
     # Signal ausgeben, sr= Samplerate
-    y, sr = librosa.load('CF003 - Active - Day - (220).wav')
-
+    y, sr = librosa.load(soundpath('CF003 - Active - Day - (220).wav'))
     # Signal FFT
     n_fft = 2048
     ft = np.abs(librosa.stft(y[:n_fft], hop_length=n_fft + 1))
@@ -20,8 +20,8 @@ def main():
 
     # Mel_spectogram_1
 
-    mel_spect = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=2048, hop_length=1024)
-    mel_spect = librosa.power_to_db(spect, ref = np.max)
+    #mel_spect = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=2048, hop_length=1024)
+    #mel_spect = librosa.power_to_db(spect, ref = np.max)
 
     # Mel_Spectogramm_2
 
@@ -63,12 +63,13 @@ def main():
     plt.title('Spectrogram')
     plt.show()"""
 
-
+    """
     #Mel Spectogram 1?
     librosa.display.specshow(mel_spect, y_axis='mel', fmax=8000, x_axis='time')
     plt.title('Mel Spectrogram')
     plt.colorbar(format='%+2.0f dB')
     plt.show()
+    """
 
     # Mel Spectrogramm plotten
     plt.figure(figsize=(8, 8))

@@ -5,11 +5,13 @@ import librosa
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
 from scipy.fftpack import dct
+from pathfinder import soundpath
+
 
 # Load the audio file
 audio_path = librosa.example('trumpet')
 #y, sr = librosa.load(audio_path)
-sr, y = wavfile.read(r"C:\Users\sfz-a\Documents\GitHub\Semi10\Soundverarbeitung\test.wav")
+sr, y = wavfile.read(soundpath("test.wav"))
 
 # Apply pre-emphasis filter
 pre_emphasis = 0.97

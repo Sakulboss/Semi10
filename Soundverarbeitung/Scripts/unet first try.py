@@ -4,6 +4,8 @@ from tensorflow.keras import layers
 import tensorflow_datasets as tfds
 import matplotlib.pyplot as plt
 import numpy as np
+from pathfinder import soundpath
+
 
 #https://pyimagesearch.com/2022/02/21/u-net-image-segmentation-in-keras/
 
