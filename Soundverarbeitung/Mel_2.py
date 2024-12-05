@@ -54,7 +54,7 @@ plt.show()"""
 # fmin & fmax = minimum und maximum der frequenzen in den Mel-Koeffizienten (standard durch librosa.filters.mel())
 fmax = 1500
 #Mel Spectrogramm wird extrahiert
-mel_spectrogram = librosa.feature.melspectrogram(y = y, sr = sr, fmax = fmax, hop_length= )
+mel_spectrogram = librosa.feature.melspectrogram(y = y, sr = sr, fmax = fmax)
 
 # ref = Weißt daraufhin Amplitude zu nutzen, wenn Umwandlung in Decibel
 #Lineares Spectrogramm wird zu Decibel (logarithmus) umgewandelt
