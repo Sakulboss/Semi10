@@ -1,5 +1,3 @@
-#r"C:\Users\sfz-a\Documents\GitHub\Semi10\Soundverarbeitung\test.wav"
-
 import numpy as np
 import librosa
 import matplotlib.pyplot as plt
