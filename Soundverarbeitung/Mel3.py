@@ -4,7 +4,7 @@ import numpy as np
 #import scipy.fftpack
 import spect
 
-def main():
+def main(*args):
     abstand_spectogramm = 500
 
     # Signal ausgeben, sr= Samplerate
@@ -21,7 +21,7 @@ def main():
     # Mel_spectogram_1
 
     mel_spect = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=2048, hop_length=1024)
-    mel_spect = librosa.power_to_db(spect, ref = np.max)
+    mel_spect = librosa.power_to_db(mel_spect, ref = np.max)
 
     # Mel_Spectogramm_2
 
@@ -40,35 +40,36 @@ def main():
 
 
     #Diagramme
-    """
-    #Signalamplituden
-    plt.plot(y)
-    plt.title('Signal')
-    plt.xlabel('Time (samples)')
-    plt.ylabel('Amplitude')
-    plt.show() """
 
-    """
-    #FFT erster Frame
-    plt.plot(ft)
-    plt.title('Spectrum')
-    plt.xlabel('Frequency Bin')
-    plt.ylabel('Amplitude')
-    plt.show()"""
+    if 1 in args:
+        #Signalamplituden
+        plt.plot(y)
+        plt.title('Signal')
+        plt.xlabel('Time (samples)')
+        plt.ylabel('Amplitude')
+        plt.show()
 
-    """
-    #Spektogramm
-    librosa.display.specshow(spec, sr=sr, x_axis='time', y_axis='log')
-    plt.colorbar(format='%+2.0f dB')
-    plt.title('Spectrogram')
-    plt.show()"""
+    if 2 in args:
+        #FFT erster Frame
+        plt.plot(ft)
+        plt.title('Spectrum')
+        plt.xlabel('Frequency Bin')
+        plt.ylabel('Amplitude')
+        plt.show()
 
+    if 2 in args:
+        #Spektogramm
+        librosa.display.specshow(spec, sr=sr, x_axis='time', y_axis='log')
+        plt.colorbar(format='%+2.0f dB')
+        plt.title('Spectrogram')
+        plt.show()
 
-    #Mel Spectogram 1?
-    librosa.display.specshow(mel_spect, y_axis='mel', fmax=8000, x_axis='time')
-    plt.title('Mel Spectrogram')
-    plt.colorbar(format='%+2.0f dB')
-    plt.show()
+    if 2 in args:
+        #Mel Spectogram 1?
+        librosa.display.specshow(mel_spect, y_axis='mel', fmax=8000, x_axis='time')
+        plt.title('Mel Spectrogram')
+        plt.colorbar(format='%+2.0f dB')
+        plt.show()
 
     # Mel Spectrogramm plotten
     plt.figure(figsize=(8, 8))
@@ -78,4 +79,4 @@ def main():
     plt.show()
 
 if __name__ == "__main__":
-    main()
+    main(1)
