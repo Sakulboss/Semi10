@@ -3,12 +3,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 #import scipy.fftpack
 import spect
+from pathfinder import soundpath
 
 def main(*args):
     abstand_spectogramm = 500
 
     # Signal ausgeben, sr= Samplerate
-    y, sr = librosa.load('bienensummen.wav')
+    y, sr = librosa.load(soundpath('bienensummen.wav'))
 
     # Signal FFT
     n_fft = 2048
@@ -57,14 +58,14 @@ def main(*args):
         plt.ylabel('Amplitude')
         plt.show()
 
-    if 2 in args:
+    if 3 in args:
         #Spektogramm
         librosa.display.specshow(spec, sr=sr, x_axis='time', y_axis='log')
         plt.colorbar(format='%+2.0f dB')
         plt.title('Spectrogram')
         plt.show()
 
-    if 2 in args:
+    if 4 in args:
         #Mel Spectogram 1?
         librosa.display.specshow(mel_spect, y_axis='mel', fmax=8000, x_axis='time')
         plt.title('Mel Spectrogram')
