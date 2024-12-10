@@ -1,3 +1,8 @@
 https://www.geeksforgeeks.org/mel-frequency-cepstral-coefficients-mfcc-for-speech-recognition/
 https://machinelistening.github.io/casm/lectures/CASM_0_Introduction.pdf (Folie 11)
 https://www.mdpi.com/2624-6120/3/4/48
+
+Malte:
+#   https://wasmer.io/amberjblue/estratto@0.2.5
+https://docs.rs/wavers/latest/wavers/
+https://crates.io/crates/mel_spec
