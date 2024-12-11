@@ -7,18 +7,26 @@ def get_new_filename(file_extension: str) -> str:
 	count = len([i for i in os.listdir() if i.endswith(file_extension)])
 	return f'output_{count}.{file_extension}'
 
-fs = 44100  # Sample rate
-seconds = 3  # Duration of recording
+def aufnahmen(seconds: float, fs = 44100) -> None:
+	myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
+	print('Aufnahme gestartet.')
+	sleep(seconds + 1)
+	#sd.wait()  # Wait until recording is finished
+	print('Aufnahme fertig')
+	return myrecording
 
-myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
-print('Aufnahme gestartet.')
-sleep(4)	
-#sd.wait()  # Wait until recording is finished
-print('Aufnahme fertig')
-write(get_new_filename("wav"), fs, myrecording)  # Save as WAV file
-#write(get_new_filename("npy"), fs, myrecording)  # Save as npy??? file
-print('Programmende')
+def speichern(myrecording, fs =  44100):
+	write(get_new_filename("wav"), fs, myrecording)  # Save as WAV file
+	print('Programmende')
 
-	
-print('Jetzt reichst mir jetzt rede ich! ES IST OBST IM HAUS ')	
-print("^ Solche Sätze denkt sich auch nur Lukas aus")
+def main():
+	dauer = 3
+	speichern(aufnahmen(dauer))
+
+if __name__ == '__main__':
+	main()
+	# fs: Sample rate
+	# seconds: Duration of recording
+
+	#print('Jetzt reichst mir jetzt rede ich! ES IST OBST IM HAUS ')
+	#print("^ Solche Sätze denkt sich auch nur Lukas aus")
