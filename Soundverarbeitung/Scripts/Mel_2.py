@@ -7,15 +7,15 @@ from pathfinder import soundpath
 abstand_spectogramm = 500
 
 # Signal ausgeben, sr= Samplerate
-y, sr = librosa.load(soundpath('CJ001 - Missing Queen - Day - (101).wav'))
+y, sr = librosa.load(soundpath('bienensummen.wav'))
 
 """
 plt.plot(y)
 plt.title('Signal')
 plt.xlabel('Time (samples)')
 plt.ylabel('Amplitude')
-plt.show() """
-
+plt.show()
+"""
 # Signal FFT
 n_fft = 2048
 ft = np.abs(librosa.stft(y[:n_fft], hop_length=n_fft + 1))
@@ -24,7 +24,8 @@ plt.plot(ft)
 plt.title('Spectrum')
 plt.xlabel('Frequency Bin')
 plt.ylabel('Amplitude')
-plt.show()"""
+plt.show()
+"""
 
 # Spectrogramm ohne Mel's
 spec = np.abs(librosa.stft(y, hop_length=abstand_spectogramm))
