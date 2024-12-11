@@ -210,7 +210,7 @@ def teesz():
 
 
 # test.py ------------------------------------------------------------------------
-def test():
+def irgendwas():
     spf = wave.open(soundpath("test.wav"), 'r')
 
     # Extract Raw Audio from Wav File
@@ -230,3 +230,20 @@ def test():
     plt.plot(Time, signal)
     plt.show()
 
+def PrimFaktorZerlegung1(n):
+    #Primen enthält Primzahlen. Wir hoffen, dass
+    #alle Primteiler in diese List zu finden sind.
+    #Sie kann ein Parameter, oder ein Klasskonstant sein
+    teiler = []
+    for p in range(n):
+        while n % p == 0:
+            teiler.append(p)
+            n = n/p
+    return teiler
+
+def jahreszahlen1():
+    for i in range(2025):
+        print(i, PrimFaktorZerlegung1(i))
+
+if __name__ == '__main__':
+    jahreszahlen1()
