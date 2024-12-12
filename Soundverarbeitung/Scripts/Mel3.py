@@ -2,7 +2,7 @@ import librosa
 import matplotlib.pyplot as plt
 import numpy as np
 #import scipy.fftpack
-import spect
+#import spect
 from pathfinder import soundpath
 
 def main(*args):
@@ -80,4 +80,4 @@ def main(*args):
     plt.show()
 
 if __name__ == "__main__":
-    main(1)
+    main(1,2)
