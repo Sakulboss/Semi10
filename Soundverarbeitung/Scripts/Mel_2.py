@@ -7,7 +7,7 @@ from pathfinder import soundpath
 abstand_spectogramm = 500
 
 # Signal ausgeben, sr= Samplerate
-y, sr = librosa.load(soundpath('DR0000_0151.mp3'))
+y, sr = librosa.load(soundpath('bienensummen.mp3'))
 
 """
 plt.plot(y)
