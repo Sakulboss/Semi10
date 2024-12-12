@@ -8,3 +8,5 @@ https://docs.rs/wavers/latest/wavers/
 https://crates.io/crates/mel_spec
 FULL SVM DOCK: https://github.com/cjlin1/libsvm
 Rust Crate for usage of trained SVM: https://docs.rs/ffsvm/latest/ffsvm/
+
+CNN: https://github.com/mikecvet/cnn-rs
