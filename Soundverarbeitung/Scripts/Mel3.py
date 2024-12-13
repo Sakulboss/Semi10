@@ -9,7 +9,8 @@ def main(*args):
     abstand_spectogramm = 500
 
     # Signal ausgeben, sr= Samplerate
-    y, sr = librosa.load(soundpath('bienensummen.wav'))
+    #y, sr = librosa.load(soundpath('bienensummen.wav'))
+    y, sr = librosa.load(soundpath('output_2024-12-12-23_3A39_3A00-319132_2.wav'))
 
     # Signal FFT
     n_fft = 2048
