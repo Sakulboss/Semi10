@@ -33,11 +33,13 @@ def main(*args):
     fmin = 0
     fmax = 1500
     #Mel Spectrogramm wird extrahiert
-    mel_spectrogram = librosa.feature.melspectrogram(y = y, sr = sr, fmax = fmax, fmin = fmin)
+    #mel_spectrogram = librosa.feature.melspectrogram(y = y, sr = sr, fmax = fmax, fmin = fmin)
+    mel_spectrogram = librosa.feature.melspectrogram(y=y, sr=sr, fmax=fmax, fmin=fmin)
 
     # ref = Weißt daraufhin Amplitude zu nutzen, wenn Umwandlung in Decibel
     #Lineares Spectrogramm wird zu Decibel (logarithmus) umgewandelt
     # cmap = colormap die genutzt wird (cmap='viridis')
+    #--------------------------------------------------------
     mel_spectrogram_db = librosa.power_to_db(mel_spectrogram, ref = np.max)
 
 
@@ -78,7 +80,8 @@ def main(*args):
     librosa.display.specshow(mel_spectrogram_db, x_axis = 'time', y_axis = 'mel', sr = sr, fmax = fmax) #'time'
     plt.colorbar(format='%+2.0f dB')
     plt.title('Mel Spectrogram')
-    plt.show()
+    plt.show() #Breite x Höhe in Werten: 128 x 916
+
 
 if __name__ == "__main__":
     main(1,2)

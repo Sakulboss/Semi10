@@ -13,9 +13,18 @@ uploader = widgets.FileUpload(accept='.wav', multiple=False)
 
 # Load and compute MFCCs for a given audio file
 def compute_mfcc(file):
-    y, sr = librosa.load(file, sr=None)
+    y, sr = librosa.load(soundpath(file), sr=None)
+    pre_emphasis = 0.97
     y_preemphasized = np.append(y[0], y[1:] - pre_emphasis * y[:-1])
     signal_length = len(y_preemphasized)
+    frame_size = 0.025  # 25 ms
+    frame_stride = 0.01  # 10 ms
+    frame_length, frame_step = frame_size * sr, frame_stride * sr
+    NFFT = 512
+    nfilt = 40
+    fbank = np.zeros((nfilt, int(np.floor(NFFT / 2 + 1))))
+    num_ceps = 12
+
     num_frames = int(np.ceil(float(np.abs(signal_length - frame_length)) / frame_step))
     pad_signal_length = num_frames * frame_step + frame_length
     z = np.zeros((pad_signal_length - signal_length))
