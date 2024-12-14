@@ -33,8 +33,7 @@ def main(*args):
     fmin = 0
     fmax = 1500
     #Mel Spectrogramm wird extrahiert
-    #mel_spectrogram = librosa.feature.melspectrogram(y = y, sr = sr, fmax = fmax, fmin = fmin)
-    mel_spectrogram = librosa.feature.melspectrogram(y=y, sr=sr, fmax=fmax, fmin=fmin)
+    mel_spectrogram = librosa.feature.melspectrogram(y = y, sr = sr, fmax = fmax, fmin = fmin)
 
     # ref = Weißt daraufhin Amplitude zu nutzen, wenn Umwandlung in Decibel
     #Lineares Spectrogramm wird zu Decibel (logarithmus) umgewandelt
