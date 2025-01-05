@@ -3,6 +3,7 @@ import numpy as np
 import os
 import wget
 import zipfile
+import shutil
 
 def download_dataset():
     if not os.path.isfile('animal_sounds.zip'):
@@ -26,6 +27,31 @@ def download_dataset():
             f.extractall('.')
         assert os.path.isdir('animal_sounds')
         print("All done :)", '\n')
+
+def big_dataset():
+    source_folder = 'viele_sounds'
+    target_base_folder = 'viele_sounds_geordnet'
+    eintraege = []
+    directories = []
+    with open('esc50.csv', 'r') as f:
+        for line in f:
+            if line.startswith('#'):
+                continue
+            else:
+                eintraege.append(line.split(','))
+    if not os.path.isdir(target_base_folder):
+        os.mkdir(target_base_folder)
+    for i in range(len(eintraege)):
+        target_folder = os.path.join(target_base_folder, eintraege[i][3])
+        if not os.path.isdir(target_folder):
+            os.mkdir(target_folder)
+        target_file = os.path.join(target_folder, eintraege[i][0])
+        if not os.path.isfile(target_file):
+            source_file = os.path.join(source_folder, eintraege[i][0])
+            shutil.copy(source_file, target_file)
+        directories.append(eintraege[i][3] + '/' + eintraege[i][0])
+    print(len(directories))
+
 
 def compute_mel_spec_for_audio_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=64):
     """ Compute mel spectrogram
@@ -59,3 +85,6 @@ def compute_mel_spec_for_audio_file(fn_wav_name, n_fft=1024, hop_length=441, fss
     x_new = librosa.amplitude_to_db(x_new)
 
     return x_new
+
+if __name__ == '__main__':
+    big_dataset()

@@ -6,16 +6,16 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import accuracy_score, confusion_matrix
 import mel_spec_calculator as msc
+import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input
 
 #Herunterladen der Sounddateien und entpacken --------------------------------------------------------------------------
 
-msc.download_dataset()
-
-dir_dataset = 'animal_sounds'
+#msc.download_dataset() #für den kleinen Datensatz
+msc.big_dataset()
+dir_dataset = 'viele_sounds_geordnet'
 sub_directories = glob.glob(os.path.join(dir_dataset, '*'))
-
 
 #Classification --------------------------------------------------------------------------------------------------------
 
@@ -41,9 +41,8 @@ n_files = len(class_label)
 file_num_in_class = np.array(file_num_in_class)
 
 unique_classes = sorted(list(set(class_label)))
-print("All unique class labels (sorted alphabetically)", unique_classes)
+print("All unique class labels (sorted alphabetically): ", unique_classes)
 class_id = np.array([unique_classes.index(_) for _ in class_label])
-
 
 #mel_specs erstellen ---------------------------------------------------------------------------------------------------
 
@@ -76,7 +75,7 @@ for i in range(n_spectrograms):
     # create [n_segments_per_spectrogram] segments
     for s in range(n_segments_per_spectrogram):
         # random segment start frame
-        segment_start_frames = int(np.random.rand(1) * max_segment_start_offset)
+        segment_start_frames = int(np.random.rand(1).item() * max_segment_start_offset)
 
         segment_list.append(all_mel_specs[i, :, segment_start_frames:segment_start_frames + segment_length_frames])
 
@@ -112,11 +111,11 @@ pl.title('Original spectrogram')
 pl.tight_layout()
 pl.show()
 
-pl.figure(figsize=(15,5))
+pl.figure(figsize=(15, 5))
 ny = 2
 nx = int(n_segments_per_spectrogram // ny)
 for s in range(n_segments_per_spectrogram):
-    pl.subplot(ny, nx, s+1)
+    pl.subplot(ny, nx, s + 1)
     pl.imshow(segment_list[s, :, :], origin="lower", aspect="auto", interpolation="None")
     if s == 0:
         pl.title('Extracted segments')
@@ -153,7 +152,6 @@ for i in range(X_test.shape[0]):
 y_train_transformed = OneHotEncoder(categories='auto', sparse_output=False).fit_transform(y_train.reshape(-1, 1))
 y_test_transformed = OneHotEncoder(categories='auto', sparse_output=False).fit_transform(y_test.reshape(-1, 1))
 
-
 if len(X_train_norm.shape) == 3:
     X_train_norm = np.expand_dims(X_train_norm, -1)
     X_test_norm = np.expand_dims(X_test_norm, -1)
@@ -162,8 +160,6 @@ else:
     print("We already have four dimensions")
 
 print(f"Let's check if we have four dimensions. New shapes: {X_train_norm.shape} & {X_test_norm.shape}")
-
-
 
 # The input shape is the "time-frequency shape" of our segments + the number of channels
 # Make sure to NOT include the first (batch) dimension!
@@ -174,18 +170,18 @@ n_classes = y_train_transformed.shape[1]
 
 # Define the model
 model = Sequential()
-
+model.add(Input(shape=input_shape))
 # 1st Convolutional Layer
-model.add(Conv2D(filters=32, kernel_size=(3, 3), activation='relu', padding='same', input_shape=input_shape))
-model.add(MaxPooling2D(pool_size=(3,3)))
+model.add(Conv2D(filters=32, kernel_size=(3, 3), activation='relu', padding='same'))
+model.add(MaxPooling2D(pool_size=(3, 3)))
 
 # 2nd Convolutional Layer
 model.add(Conv2D(filters=64, kernel_size=(3, 3), activation='relu', padding='same'))
-model.add(MaxPooling2D(pool_size=(3,3)))
+model.add(MaxPooling2D(pool_size=(3, 3)))
 
 # 3rd Convolutional Layer
 model.add(Conv2D(filters=128, kernel_size=(3, 3), activation='relu', padding='same'))
-model.add(MaxPooling2D(pool_size=(3,3)))
+model.add(MaxPooling2D(pool_size=(3, 3)))
 
 # Flatten the output to feed into the Dense layer
 model.add(Flatten())
@@ -205,13 +201,21 @@ model.compile(loss='categorical_crossentropy',
               optimizer='adam',
               metrics=['accuracy'])
 
-history = model.fit(X_train_norm, y_train_transformed, epochs=50, batch_size=32, verbose=2)
+checkpoint_path = "training_1/.weights.h5"
+checkpoint_dir = os.path.dirname(checkpoint_path)
+
+# Create a callback that saves the model's weights
+cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                 save_weights_only=True,
+                                                 verbose=1)
+
+history = model.fit(X_train_norm, y_train_transformed, epochs=800, batch_size=64, verbose=2)
 
 pl.figure(figsize=(8, 4))
-pl.subplot(2,1,1)
+pl.subplot(2, 1, 1)
 pl.plot(history.history['loss'])
 pl.ylabel('Loss')
-pl.subplot(2,1,2)
+pl.subplot(2, 1, 2)
 pl.plot(history.history['accuracy'])
 pl.ylabel('Accuracy (Training Set)')
 pl.xlabel('Epoch')
@@ -231,16 +235,22 @@ print("Shape of the predictions now: {}".format(y_test_pred.shape))
 accuracy = accuracy_score(y_test, y_test_pred)
 print("Accuracy score = ", accuracy)
 
-pl.figure(figsize=(3,3))
+pl.figure(figsize=(50, 50))
 cm = confusion_matrix(y_test, y_test_pred).astype(np.float32)
 # normalize to probabilities
 for i in range(cm.shape[0]):
     if np.sum(cm[i, :]) > 0:
         cm[i, :] /= np.sum(cm[i, :])  # by dividing through the sum, we convert counts to probabilities
 pl.imshow(cm)
-ticks = np.arange(5)
+ticks = np.arange(n_sub)
 pl.xticks(ticks, unique_classes)
 pl.yticks(ticks, unique_classes)
 pl.show()
 
+
+def get_new_filename(file_extension: str) -> str:
+    count = len([counter for counter in os.listdir('C:\\modelle') if counter.endswith(file_extension)]) + 1
+    return f'full_model_{count}.{file_extension}'
+get_new_filename('keras')
+model.save(f'C:\\modelle\\{get_new_filename('keras')}')
 print("Done :)")
