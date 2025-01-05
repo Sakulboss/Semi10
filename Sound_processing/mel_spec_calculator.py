@@ -86,5 +86,9 @@ def compute_mel_spec_for_audio_file(fn_wav_name, n_fft=1024, hop_length=441, fss
 
     return x_new
 
+def get_new_filename(file_extension: str) -> str:
+    count = len([counter for counter in os.listdir('.\\modelle') if counter.endswith(file_extension)]) + 1
+    return f'full_model_{count}.{file_extension}'
+
 if __name__ == '__main__':
-    big_dataset()
+    print(get_new_filename('keras'))

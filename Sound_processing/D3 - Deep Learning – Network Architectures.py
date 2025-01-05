@@ -247,10 +247,6 @@ pl.xticks(ticks, unique_classes)
 pl.yticks(ticks, unique_classes)
 pl.show()
 
+model.save(f'C:\\modelle\\{msc.get_new_filename('keras')}') #saves the model into modelle
 
-def get_new_filename(file_extension: str) -> str:
-    count = len([counter for counter in os.listdir('C:\\modelle') if counter.endswith(file_extension)]) + 1
-    return f'full_model_{count}.{file_extension}'
-get_new_filename('keras')
-model.save(f'C:\\modelle\\{get_new_filename('keras')}')
 print("Done :)")
