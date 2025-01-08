@@ -7,14 +7,17 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import accuracy_score, confusion_matrix
 import mel_spec_calculator as msc
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input
+from tensorflow.keras.models import Sequential, load_model, Model
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input, GlobalMaxPooling2D, BatchNormalization
+
+from Sound_processing.model_trainer import cp_callback
 
 #Herunterladen der Sounddateien und entpacken --------------------------------------------------------------------------
 
-#msc.download_dataset() #für den kleinen Datensatz
-msc.big_dataset()
-dir_dataset = 'viele_sounds_geordnet'
+msc.download_dataset() #für den kleinen Datensatz
+#msc.big_dataset()
+dir_dataset = 'animal_sounds'
+#dir_dataset = 'viele_sounds_geordnet'
 sub_directories = glob.glob(os.path.join(dir_dataset, '*'))
 
 #Classification --------------------------------------------------------------------------------------------------------
@@ -209,7 +212,20 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                  save_weights_only=True,
                                                  verbose=1)
 
-history = model.fit(X_train_norm, y_train_transformed, epochs=800, batch_size=64, verbose=2)
+checkpoint_path = "C:\\modelle"
+checkpoint_dir = os.path.dirname(checkpoint_path)
+
+# Create a callback that saves the model's weights
+cp_callback = [tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                 save_weights_only=True,
+                                                 verbose=2)]
+
+history = model.fit(X_train_norm,
+                    y_train_transformed,
+                    epochs=1,
+                    batch_size=4,
+                    verbose=2,
+                    callbacks=cp_callback)
 
 pl.figure(figsize=(8, 4))
 pl.subplot(2, 1, 1)
