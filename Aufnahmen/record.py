@@ -26,10 +26,10 @@ def speichern(myrecording, fs =  44100) -> None:
 	print('Programmende')
 
 def main():
-	dauer = 3
+	dauer = 3 #in Sekunden
 	speichern(aufnahmen(dauer))
 
 if __name__ == '__main__':
-	#main()
+	main()
 	# fs: Sample rate
 	# seconds: Duration of recording

@@ -10,14 +10,15 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential, load_model, Model
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input, GlobalMaxPooling2D, BatchNormalization
 
-from Sound_processing.model_trainer import cp_callback, segment_file_id, segment_file_mod_id, input_shape
 
 
 #Herunterladen der Sounddateien und entpacken --------------------------------------------------------------------------
 
 def dataset(**kwargs):
     big = kwargs.get('big', False)
-    if big:
+    print(big, kwargs.get('big'))
+
+    if not big:
         msc.big_dataset()
         dir_dataset = 'animal_sounds'
     else:
@@ -256,10 +257,6 @@ def model_training(**kwargs):
     n_classes = kwargs.get('n_classes', data[1])
     X_train_norm = kwargs.get('X_train_norm', data[2])
     y_train_transformed = kwargs.get('y_train_transformed', data[3])
-    X_test_norm = kwargs.get('X_test_norm', data[4])
-    y_test = kwargs.get('y_test', data[6])
-    unique_classes = kwargs.get('unique_classes', data[7])
-    n_sub = kwargs.get('n_sub', data[8])
     epochs = kwargs.get('epochs', 1)
     batch_size = kwargs.get('batch_size', 4)
 
@@ -282,14 +279,26 @@ def model_training(**kwargs):
         pl.xlabel('Epoch')
         pl.show()
 
-    y_test_pred = model.predict(X_test_norm)
+    return model, history, data
 
+def model_evaluation(**kwargs):
+    data = model_training(**kwargs)
+    model = kwargs.get('trained_model', data[0])
+    X_test_norm = kwargs.get('X_test_norm', data[2][4])
+    y_test = kwargs.get('y_test', data[2][6])
+    unique_classes = kwargs.get('unique_classes', data[2][7])
+    n_sub = kwargs.get('n_sub', data[2][8])
+
+
+    print("Shape of the test data: {}".format(X_test_norm.shape))
+    y_test_pred = model.predict(X_test_norm)
     print("Shape of the predictions: {}".format(y_test_pred.shape))
 
     # The model outputs in each row 5 probability values (they always add to 1!) for each class.
     # We want take the class with the highest probability as prediction!
 
     y_test_pred = np.argmax(y_test_pred, axis=1)
+    print(y_test_pred)
     print("Shape of the predictions now: {}".format(y_test_pred.shape))
 
     # Accuracy
@@ -311,5 +320,5 @@ def model_training(**kwargs):
     model.save(f'C:\\modelle\\{msc.get_new_filename('keras')}') #saves the model into modelle
 
 if __name__ == "__main__":
-    model_training(big=False, plot_history=True, epochs=1, batch_size=4)
+    model_training(plot_history=True, epochs=1, batch_size=4)
     print("Done :)")
