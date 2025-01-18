@@ -2,8 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Rost/audio_to_spec" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Rost/sounderkennung" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Rost/sounderkennung_2" vcs="Git" />
   </component>
 </project>

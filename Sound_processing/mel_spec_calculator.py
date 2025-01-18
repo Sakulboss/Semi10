@@ -5,30 +5,30 @@ import wget
 import zipfile
 import shutil
 
-def download_dataset():
+def download_dataset(printing=False):
     if not os.path.isfile('animal_sounds.zip'):
-        print('\nPlease wait a couple of seconds ...')
+        if printing: print('\nPlease wait a couple of seconds ...')
         try:
             wget.download(
                 'https://github.com/machinelistening/machinelistening.github.io/blob/master/animal_sounds.zip?raw=true',
                 out='animal_sounds.zip', bar=None)
-            print('animal_sounds.zip downloaded successfully ...')
+            if printing: print('animal_sounds.zip downloaded successfully ...')
         except Exception as e:
-            print(f"Error downloading file: {str(e)}")
+            if printing: print(f"Error downloading file: {str(e)}")
 
     else:
-        print('\nFiles already exist!', '\n')
+        if printing: print('\nFiles already exist!', '\n')
 
     if not os.path.isdir('animal_sounds'):
-        print("\nLet's unzip the file ... ")
+        if printing: print("\nLet's unzip the file ... ")
         assert os.path.isfile('animal_sounds.zip')
         with zipfile.ZipFile('animal_sounds.zip', 'r') as f:
             # unzip all files into current folder
             f.extractall('.')
         assert os.path.isdir('animal_sounds')
-        print("All done :)", '\n')
+        if printing: print("All done :)", '\n')
 
-def big_dataset():
+def big_dataset(printing=False):
     source_folder = 'viele_sounds'
     target_base_folder = 'viele_sounds_geordnet'
     eintraege = []
@@ -50,7 +50,7 @@ def big_dataset():
             source_file = os.path.join(source_folder, eintraege[i][0])
             shutil.copy(source_file, target_file)
         directories.append(eintraege[i][3] + '/' + eintraege[i][0])
-    print(len(directories))
+    if printing: print(len(directories))
 
 
 def compute_mel_spec_for_audio_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=64):

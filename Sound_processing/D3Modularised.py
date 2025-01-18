@@ -11,18 +11,17 @@ from tensorflow.keras.models import Sequential, load_model, Model
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input, GlobalMaxPooling2D, BatchNormalization
 
 
-
 #Herunterladen der Sounddateien und entpacken --------------------------------------------------------------------------
 
 def dataset(**kwargs):
     big = kwargs.get('big', False)
-    print(big, kwargs.get('big'))
+    printing = kwargs.get('printing', False)
 
     if not big:
-        msc.big_dataset()
+        msc.big_dataset(printing=printing)
         dir_dataset = 'animal_sounds'
     else:
-        msc.download_dataset()  # für den kleinen Datensatz
+        msc.download_dataset(printing=printing)  # für den kleinen Datensatz
         dir_dataset = 'viele_sounds_geordnet'
     return glob.glob(os.path.join(dir_dataset, '*'))
 
@@ -39,6 +38,7 @@ def classificator(**kwargs):
     big = kwargs.get('big', False)
     sub_directories = kwargs.get('sub_directories', dataset(big=big))
     n_sub = len(sub_directories)
+    printing = kwargs.get('printing', False)
     # let's collect the files in each subdirectory
     # the folder name is the class name
     fn_wav_list = []
@@ -59,7 +59,7 @@ def classificator(**kwargs):
     file_num_in_class = np.array(file_num_in_class)
 
     unique_classes = sorted(list(set(class_label)))
-    print("All unique class labels (sorted alphabetically): ", unique_classes)
+    if printing: print("All unique class labels (sorted alphabetically): ", unique_classes)
     class_id = np.array([unique_classes.index(_) for _ in class_label])
     return fn_wav_list, class_id, unique_classes, n_files, file_num_in_class, n_sub
 
@@ -75,18 +75,19 @@ def mel_specs(**kwargs):
         class_id: optional
     """
 
-    data = (classificator(**kwargs))
+    data = kwargs.get('classified_samples', classificator(**kwargs))
     fn_wav_list = kwargs.get('fn_wav_list', data[0])
     class_id = kwargs.get('class_id', data[1])
     all_mel_specs = []
+    printing = kwargs.get('printing', False)
 
     for count, fn_wav in enumerate(fn_wav_list):
         all_mel_specs.append(msc.compute_mel_spec_for_audio_file(fn_wav_list[count]))
 
-    print("We have {} spectrograms of shape: {}".format(len(all_mel_specs), all_mel_specs[0].shape))
+    if printing: print("We have {} spectrograms of shape: {}".format(len(all_mel_specs), all_mel_specs[0].shape))
 
     all_mel_specs = np.array(all_mel_specs)
-    print(f"Shape of our data tensor:         {all_mel_specs.shape}")
+    if printing: print(f"Shape of our data tensor:         {all_mel_specs.shape}")
 
     segment_list = []
     segment_file_id = []
@@ -124,7 +125,7 @@ def mel_specs(**kwargs):
     segment_class_id = np.array(segment_class_id)
     segment_spec_id = np.array(segment_spec_id)
 
-    print(f"New data tensor shape:            {segment_list.shape}")
+    if printing: print(f"New data tensor shape:            {segment_list.shape}")
 
     if kwargs.get('file_ID_diagram', False):
         pl.figure(figsize=(12, 4))
@@ -169,22 +170,23 @@ def training_data(**kwargs):
     segment_file_mod_id = kwargs.get('segment_file_mod_id', data[0])
     segment_list = kwargs.get('segment_list', data[1])
     segment_class_id = kwargs.get('segment_class_id', data[2])
+    printing = kwargs.get('printing', False)
 
     is_train = np.where(segment_file_mod_id <= 2)[0]
     is_test = np.where(segment_file_mod_id >= 3)[0]
 
-    print("Our feature matrix is split into {} training examples and {} test examples".format(len(is_train), len(is_test)))
+    if printing: print("Our feature matrix is split into {} training examples and {} test examples".format(len(is_train), len(is_test)))
 
     X_train = segment_list[is_train, :, :]
     y_train = segment_class_id[is_train]
     X_test = segment_list[is_test, :, :]
     y_test = segment_class_id[is_test]
 
-    print("Let's look at the dimensions")
-    print(X_train.shape)
-    print(y_train.shape)
-    print(X_test.shape)
-    print(y_test.shape)
+    if printing: print("Let's look at the dimensions")
+    if printing: print(X_train.shape)
+    if printing: print(y_train.shape)
+    if printing: print(X_test.shape)
+    if printing: print(y_test.shape)
 
     X_train_norm = np.zeros_like(X_train)
     X_test_norm = np.zeros_like(X_test)
@@ -203,9 +205,9 @@ def training_data(**kwargs):
         X_test_norm = np.expand_dims(X_test_norm, -1)
 
     else:
-        print("We already have four dimensions")
+        if printing: print("We already have four dimensions")
 
-    print(f"Let's check if we have four dimensions. New shapes: {X_train_norm.shape} & {X_test_norm.shape}")
+    if printing: print(f"Let's check if we have four dimensions. New shapes: {X_train_norm.shape} & {X_test_norm.shape}")
 
     # The input shape is the "time-frequency shape" of our segments + the number of channels
     # Make sure to NOT include the first (batch) dimension!
@@ -217,7 +219,7 @@ def training_data(**kwargs):
     return input_shape, n_classes, X_train_norm, y_train_transformed, X_test_norm, y_test_transformed, y_test, data[3], data[4]
 
 
-def model_creation(input_shape, n_classes):
+def model_creation(input_shape, n_classes, printing=False):
     # Define the model
     model = Sequential()
     model.add(Input(shape=input_shape))
@@ -247,7 +249,7 @@ def model_creation(input_shape, n_classes):
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
 
-    model.summary()
+    if printing: model.summary()
 
     return model
 
@@ -259,8 +261,9 @@ def model_training(**kwargs):
     y_train_transformed = kwargs.get('y_train_transformed', data[3])
     epochs = kwargs.get('epochs', 1)
     batch_size = kwargs.get('batch_size', 4)
+    printing = kwargs.get('printing', False)
 
-    model = kwargs.get('model', model_creation(input_shape, n_classes))
+    model = kwargs.get('model', model_creation(input_shape, n_classes, printing=printing))
 
     history = model.fit(X_train_norm,
                         y_train_transformed,
@@ -282,28 +285,31 @@ def model_training(**kwargs):
     return model, history, data
 
 def model_evaluation(**kwargs):
-    data = model_training(**kwargs)
-    model = kwargs.get('trained_model', data[0])
-    X_test_norm = kwargs.get('X_test_norm', data[2][4])
-    y_test = kwargs.get('y_test', data[2][6])
-    unique_classes = kwargs.get('unique_classes', data[2][7])
-    n_sub = kwargs.get('n_sub', data[2][8])
+    data = training_data(**kwargs)
+    trained_model = kwargs.get('trained_model', None)
+    if trained_model is None:
+        model = model_training(**kwargs)[0]
+    else: model = trained_model
+    X_test_norm = kwargs.get('X_test_norm', data[4])
+    y_test = kwargs.get('y_test', data[6])
+    unique_classes = kwargs.get('unique_classes', data[7])
+    n_sub = kwargs.get('n_sub', data[8])
+    printing = kwargs.get('printinge', False)
 
-
-    print("Shape of the test data: {}".format(X_test_norm.shape))
+    if printing: print("Shape of the test data: {}".format(X_test_norm.shape))
     y_test_pred = model.predict(X_test_norm)
-    print("Shape of the predictions: {}".format(y_test_pred.shape))
+    if printing: print("Shape of the predictions: {}".format(y_test_pred.shape))
 
     # The model outputs in each row 5 probability values (they always add to 1!) for each class.
     # We want take the class with the highest probability as prediction!
 
     y_test_pred = np.argmax(y_test_pred, axis=1)
-    print(y_test_pred)
-    print("Shape of the predictions now: {}".format(y_test_pred.shape))
+    if printing: print(y_test_pred)
+    if printing: print("Shape of the predictions now: {}".format(y_test_pred.shape))
 
     # Accuracy
     accuracy = accuracy_score(y_test, y_test_pred)
-    print("Accuracy score = ", accuracy)
+    if printing: print("Accuracy score = ", accuracy)
 
     pl.figure(figsize=(50, 50))
     cm = confusion_matrix(y_test, y_test_pred).astype(np.float32)
@@ -318,7 +324,67 @@ def model_evaluation(**kwargs):
     pl.show()
 
     model.save(f'C:\\modelle\\{msc.get_new_filename('keras')}') #saves the model into modelle
+    return unique_classes
+
+'''
+def classify_audio_file(filepath, model_path, class_labels):
+    """
+    Diese Funktion klassifiziert eine Audiodatei basierend auf einem geladen Modell.
+
+    Args:
+        filepath (str): Der Pfad zur zu klassifizierenden Audio-Datei.
+        model_path (str): Der Pfad zum gespeicherten Modell.
+        class_labels (list): Die Liste von Klassennamen (z. B. ["Hund", "Katze"]).
+
+    Returns:
+        str: Die vorhergesagte Klasse für die Eingabe-Audiodatei.
+    """
+
+    # 1. Lade das trainierte Modell
+    print("Lade das Modell ...")
+    model = load_model(model_path)
+    print("Das Modell wurde geladen.")
+
+    # 2. Bereite die Eingabedaten vor
+    print("Berechne das Mel-Spektrogramm für die Audiodatei ...")
+    mel_spec = msc.compute_mel_spec_for_audio_file(filepath)
+
+    # Prüfe die Form des Mel-Spektrogramms und erweitere Dimensionen, falls nötig
+    mel_spec = np.expand_dims(mel_spec, axis=-1)  # Kanal-Dimension hinzufügen (falls nicht vorhanden)
+    mel_spec = np.expand_dims(mel_spec, axis=0)  # Batch-Dimension hinzufügen, da das Modell eine Batch-Größe erwartet
+
+    # 3. Normalisiere die Daten wie beim Training
+    print("Normalisiere die Eingabedaten ...")
+    scaler = StandardScaler()
+    # Reshape mel_spec[0] to be 2D for scaling
+    original_shape = mel_spec[0].shape  # Save shape for restoring later
+    mel_spec_2d = mel_spec[0].reshape(-1, original_shape[-1])  # Reshape to 2D
+    mel_spec_scaled = scaler.fit_transform(mel_spec_2d)  # Apply scaler
+    mel_spec[0] = mel_spec_scaled.reshape(original_shape)  # Reshape back to 3D
+
+    #mel_spec[0] = scaler.fit_transform(mel_spec[0])  # Normalisierung nur für das erste Element
+
+    # 4. Mache eine Vorhersage
+    print("Führe die Klassifizierung durch ...")
+    predictions = model.predict(mel_spec)  # Gibt Wahrscheinlichkeiten für jede Klasse zurück
+    predicted_class = np.argmax(predictions)  # Index der Klasse mit der höchsten Wahrscheinlichkeit
+
+    # 5. Gebe die vorhergesagte Klasse zurück
+    return class_labels[predicted_class]  # Mappe die Klasse zur entsprechenden Bezeichnung
+
+'''
+# Beispiel für die Verwendung der Funktion
+
 
 if __name__ == "__main__":
-    model_training(plot_history=True, epochs=1, batch_size=4)
+    printing = True
+    model_training(big=False, plot_history=True, epochs=2, batch_size=4, printing=printing)
     print("Done :)")
+    classify = True
+    if classify:
+        audio_file_path = "viele_sounds_geordnet/clock_tick/1-21934-A-38.wav"  # Pfad zu deiner Audiodatei
+        model_path = "full_model_3_new.keras"  # Pfad zu deinem gespeicherten Modell
+        class_labels = ['airplane', 'breathing', 'brushing_teeth', 'can_opening', 'car_horn', 'cat', 'chainsaw', 'chirping_birds', 'church_bells', 'clapping', 'clock_alarm', 'clock_tick', 'coughing', 'cow', 'crackling_fire', 'crickets', 'crow', 'crying_baby', 'dog', 'door_wood_creaks', 'door_wood_knock', 'drinking_sipping', 'engine', 'fireworks', 'footsteps', 'frog', 'glass_breaking', 'hand_saw', 'helicopter', 'hen', 'insects', 'keyboard_typing', 'laughing', 'mouse_click', 'pig', 'pouring_water', 'rain', 'rooster', 'sea_waves', 'sheep', 'siren', 'sneezing', 'snoring', 'thunderstorm', 'toilet_flush', 'train', 'vacuum_cleaner', 'washing_machine', 'water_drops', 'wind']  # Passen Sie dies an Ihre Datensätze an
+
+        predicted_label = classify_audio_file(audio_file_path, model_path, class_labels)
+        print(f"Die Datei '{audio_file_path}' wurde als '{predicted_label}' klassifiziert.")
