@@ -287,14 +287,15 @@ def model_training(**kwargs):
 def model_evaluation(**kwargs):
     data = training_data(**kwargs)
     trained_model = kwargs.get('trained_model', None)
-    if trained_model is None:
-        model = model_training(**kwargs)[0]
-    else: model = trained_model
     X_test_norm = kwargs.get('X_test_norm', data[4])
     y_test = kwargs.get('y_test', data[6])
     unique_classes = kwargs.get('unique_classes', data[7])
     n_sub = kwargs.get('n_sub', data[8])
     printing = kwargs.get('printinge', False)
+
+    if trained_model is None:
+        model = model_training(**kwargs)[0]
+    else: model = trained_model
 
     if printing: print("Shape of the test data: {}".format(X_test_norm.shape))
     y_test_pred = model.predict(X_test_norm)
@@ -323,68 +324,11 @@ def model_evaluation(**kwargs):
     pl.yticks(ticks, unique_classes)
     pl.show()
 
-    model.save(f'C:\\modelle\\{msc.get_new_filename('keras')}') #saves the model into modelle
+    #model.save(f'C:\\modelle\\{msc.get_new_filename('keras')}') #saves the model into modelle
     return unique_classes
-
-'''
-def classify_audio_file(filepath, model_path, class_labels):
-    """
-    Diese Funktion klassifiziert eine Audiodatei basierend auf einem geladen Modell.
-
-    Args:
-        filepath (str): Der Pfad zur zu klassifizierenden Audio-Datei.
-        model_path (str): Der Pfad zum gespeicherten Modell.
-        class_labels (list): Die Liste von Klassennamen (z. B. ["Hund", "Katze"]).
-
-    Returns:
-        str: Die vorhergesagte Klasse für die Eingabe-Audiodatei.
-    """
-
-    # 1. Lade das trainierte Modell
-    print("Lade das Modell ...")
-    model = load_model(model_path)
-    print("Das Modell wurde geladen.")
-
-    # 2. Bereite die Eingabedaten vor
-    print("Berechne das Mel-Spektrogramm für die Audiodatei ...")
-    mel_spec = msc.compute_mel_spec_for_audio_file(filepath)
-
-    # Prüfe die Form des Mel-Spektrogramms und erweitere Dimensionen, falls nötig
-    mel_spec = np.expand_dims(mel_spec, axis=-1)  # Kanal-Dimension hinzufügen (falls nicht vorhanden)
-    mel_spec = np.expand_dims(mel_spec, axis=0)  # Batch-Dimension hinzufügen, da das Modell eine Batch-Größe erwartet
-
-    # 3. Normalisiere die Daten wie beim Training
-    print("Normalisiere die Eingabedaten ...")
-    scaler = StandardScaler()
-    # Reshape mel_spec[0] to be 2D for scaling
-    original_shape = mel_spec[0].shape  # Save shape for restoring later
-    mel_spec_2d = mel_spec[0].reshape(-1, original_shape[-1])  # Reshape to 2D
-    mel_spec_scaled = scaler.fit_transform(mel_spec_2d)  # Apply scaler
-    mel_spec[0] = mel_spec_scaled.reshape(original_shape)  # Reshape back to 3D
-
-    #mel_spec[0] = scaler.fit_transform(mel_spec[0])  # Normalisierung nur für das erste Element
-
-    # 4. Mache eine Vorhersage
-    print("Führe die Klassifizierung durch ...")
-    predictions = model.predict(mel_spec)  # Gibt Wahrscheinlichkeiten für jede Klasse zurück
-    predicted_class = np.argmax(predictions)  # Index der Klasse mit der höchsten Wahrscheinlichkeit
-
-    # 5. Gebe die vorhergesagte Klasse zurück
-    return class_labels[predicted_class]  # Mappe die Klasse zur entsprechenden Bezeichnung
-
-'''
-# Beispiel für die Verwendung der Funktion
 
 
 if __name__ == "__main__":
-    printing = True
-    model_training(big=False, plot_history=True, epochs=2, batch_size=4, printing=printing)
+    printing = False
+    model_evaluation(big=False, plot_history=True, epochs=2, batch_size=4, printing=printing)
     print("Done :)")
-    classify = True
-    if classify:
-        audio_file_path = "viele_sounds_geordnet/clock_tick/1-21934-A-38.wav"  # Pfad zu deiner Audiodatei
-        model_path = "full_model_3_new.keras"  # Pfad zu deinem gespeicherten Modell
-        class_labels = ['airplane', 'breathing', 'brushing_teeth', 'can_opening', 'car_horn', 'cat', 'chainsaw', 'chirping_birds', 'church_bells', 'clapping', 'clock_alarm', 'clock_tick', 'coughing', 'cow', 'crackling_fire', 'crickets', 'crow', 'crying_baby', 'dog', 'door_wood_creaks', 'door_wood_knock', 'drinking_sipping', 'engine', 'fireworks', 'footsteps', 'frog', 'glass_breaking', 'hand_saw', 'helicopter', 'hen', 'insects', 'keyboard_typing', 'laughing', 'mouse_click', 'pig', 'pouring_water', 'rain', 'rooster', 'sea_waves', 'sheep', 'siren', 'sneezing', 'snoring', 'thunderstorm', 'toilet_flush', 'train', 'vacuum_cleaner', 'washing_machine', 'water_drops', 'wind']  # Passen Sie dies an Ihre Datensätze an
-
-        predicted_label = classify_audio_file(audio_file_path, model_path, class_labels)
-        print(f"Die Datei '{audio_file_path}' wurde als '{predicted_label}' klassifiziert.")
