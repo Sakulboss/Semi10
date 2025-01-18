@@ -39,3 +39,4 @@ def predict(filepath: str, model_path: str, class_labels: list, printing=True):
     if printing: print("Predicted class: ", class_labels[predicted_class], predicted_class)
     return predicted_class
 
+predicted_class = predict(filepath, model_path, class_labels, True)
