@@ -11,7 +11,7 @@ from tensorflow.keras.models import Sequential, load_model, Model
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input, GlobalMaxPooling2D, BatchNormalization
 
 
-#Herunterladen der Sounddateien und entpacken --------------------------------------------------------------------------
+#Herunterladen der Sounddateien und entpacken -------------------------------------------------------------------------- Fertig
 
 def dataset(**kwargs):
     big = kwargs.get('big', False)
@@ -27,7 +27,7 @@ def dataset(**kwargs):
 
 #Classification --------------------------------------------------------------------------------------------------------
 
-def classificator(**kwargs):
+def labeler(**kwargs):
     """
     Args:
         **kwargs:
@@ -75,7 +75,7 @@ def mel_specs(**kwargs):
         class_id: optional
     """
 
-    data = kwargs.get('classified_samples', classificator(**kwargs))
+    data = kwargs.get('classified_samples', labeler(**kwargs))
     fn_wav_list = kwargs.get('fn_wav_list', data[0])
     class_id = kwargs.get('class_id', data[1])
     all_mel_specs = []

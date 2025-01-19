@@ -1,3 +1,5 @@
+import sys
+
 import mel_spec_calculator as msc
 from tensorflow.keras.models import load_model
 import numpy as np
@@ -7,36 +9,84 @@ import D3Modularised as D3M
 #Datenformat: (1, 64, 100, 1) - (Dateien, bins in mfcc, werte pro bin, werte als liste)
 
 filepath = 'viele_sounds_geordnet/chainsaw/1-19898-A-41.wav'
+filepath = 'viele_sounds_geordnet/cat/1-47819-A-5.wav'
 model_path = 'full_model_3_new.keras'
 class_labels = ['airplane', 'breathing', 'brushing_teeth', 'can_opening', 'car_horn', 'cat', 'chainsaw', 'chirping_birds', 'church_bells', 'clapping', 'clock_alarm', 'clock_tick', 'coughing', 'cow', 'crackling_fire', 'crickets', 'crow', 'crying_baby', 'dog', 'door_wood_creaks', 'door_wood_knock', 'drinking_sipping', 'engine', 'fireworks', 'footsteps', 'frog', 'glass_breaking', 'hand_saw', 'helicopter', 'hen', 'insects', 'keyboard_typing', 'laughing', 'mouse_click', 'pig', 'pouring_water', 'rain', 'rooster', 'sea_waves', 'sheep', 'siren', 'sneezing', 'snoring', 'thunderstorm', 'toilet_flush', 'train', 'vacuum_cleaner', 'washing_machine', 'water_drops', 'wind']  # Passen Sie dies an Ihre Datensätze an
 
 
 # 1. Load the trained model
 def predict(filepath: str, model_path: str, class_labels: list, printing=True):
+    verb = 0
     model = load_model(model_path)
-    if printing: print("Model loaded")
-
+    if printing:
+        print("Model loaded")
+        verb = 2
     mel_spec = msc.compute_mel_spec_for_audio_file(filepath)
-    mel_spec = np.array([i[:100] for i in mel_spec]) #Da CNN nur 100 Werte nehmen kann
+    results = []
 
-    if printing: print("Mel spectrogram: ", mel_spec.shape)
+    for mel in chunks(mel_spec, 100):
 
-    mel_spec = np.expand_dims(mel_spec, axis=-1)  # werte als liste
-    mel_spec = np.expand_dims(mel_spec, axis=0)  # dateien
+        if printing: print("Mel spectrogram: ", mel.shape)
 
-    scaler = StandardScaler()
+        mel = np.expand_dims(mel, axis=-1)  # werte als liste
+        mel = np.expand_dims(mel, axis=0)  # datei dimension
 
-    original_shape = mel_spec[0].shape
-    mel_spec_2d = mel_spec[0].reshape(-1, original_shape[-1])
-    mel_spec_scaled = scaler.fit_transform(mel_spec_2d)
-    mel_spec[0] = mel_spec_scaled.reshape(original_shape)
+        scaler = StandardScaler()
+        original_shape = mel[0].shape
+        mel_2d = mel[0].reshape(-1, original_shape[-1])
+        mel_scaled = scaler.fit_transform(mel_2d)
+        mel[0] = mel_scaled.reshape(original_shape)
+        results.append(predict_result(mel, model, verb=verb))
 
+    index = calculate_highest(results)
+    return class_labels[index], index
 
-    # 4. Make a prediction
-    if printing: print("Performing classification ...")
-    predictions = model.predict(mel_spec)  # Predict probabilities for each class
-    predicted_class = np.argmax(predictions)
-    if printing: print("Predicted class: ", class_labels[predicted_class], predicted_class)
-    return predicted_class
+def predict_result(mel_spec, model, verb=0):
+    predictions = model.predict(mel_spec, verbose=verb)
+    return np.argmax(predictions)
 
-predicted_class = predict(filepath, model_path, class_labels, True)
+def chunks(l, n):
+    """Yield successive n-sized chunks from sublists of l."""
+    for i in range(0, len(l) - 1, n): assert len(l[i]) == len(l[i + 1])
+
+    for i in range(0, len(l[0]), n):
+        parts = []
+        for k in l:
+            if i + n < len(k):
+                parts.append(k[i:i + n])
+            else:
+                parts.append(k[-n:])
+        yield np.array(parts)
+
+def calculate_highest(results):
+    results = [int(i) for i in results]
+    results.sort()
+    sublists = {}
+
+    if len(results) == 2: return results[0]
+
+    for item in results:
+        if item not in sublists:
+            sublists[item] = []
+        sublists[item].append(item)
+
+    new_results = list(sublists.values())
+    new_results.sort(key=len, reverse=True)
+
+    return new_results[0][0]
+
+if __name__ == '__main__':
+    #filepath = 'viele_sounds_geordnet/chainsaw/1-19898-A-41.wav'
+    #filepath = 'viele_sounds_geordnet/cat/1-47819-A-5.wav'
+    filepath = 'viele_sounds_geordnet/airplane/1-36929-A-47.wav'
+    model_path = 'full_model_3_new.keras'
+    class_labels_big = ['airplane', 'breathing', 'brushing_teeth', 'can_opening', 'car_horn', 'cat', 'chainsaw',
+                    'chirping_birds', 'church_bells', 'clapping', 'clock_alarm', 'clock_tick', 'coughing', 'cow',
+                    'crackling_fire', 'crickets', 'crow', 'crying_baby', 'dog', 'door_wood_creaks', 'door_wood_knock',
+                    'drinking_sipping', 'engine', 'fireworks', 'footsteps', 'frog', 'glass_breaking', 'hand_saw',
+                    'helicopter', 'hen', 'insects', 'keyboard_typing', 'laughing', 'mouse_click', 'pig',
+                    'pouring_water', 'rain', 'rooster', 'sea_waves', 'sheep', 'siren', 'sneezing', 'snoring',
+                    'thunderstorm', 'toilet_flush', 'train', 'vacuum_cleaner', 'washing_machine', 'water_drops',
+                    'wind']
+
+    print(predict(filepath, model_path, class_labels_big, False))
