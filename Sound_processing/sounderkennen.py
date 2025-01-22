@@ -22,6 +22,7 @@ def predict(filepath: str, model_path: str, class_labels: list, printing=True):
         print("Model loaded")
         verb = 2
     mel_spec = msc.compute_mel_spec_for_audio_file(filepath)
+    if printing: print('Mel specs erstellt')
     results = []
 
     for mel in chunks(mel_spec, 100):
@@ -89,4 +90,4 @@ if __name__ == '__main__':
                     'thunderstorm', 'toilet_flush', 'train', 'vacuum_cleaner', 'washing_machine', 'water_drops',
                     'wind']
 
-    print(predict(filepath, model_path, class_labels_big, False))
+    print(predict(filepath, model_path, class_labels_big, True))

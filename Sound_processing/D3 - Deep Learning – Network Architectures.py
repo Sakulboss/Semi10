@@ -14,7 +14,7 @@ from Sound_processing.model_trainer import cp_callback
 
 #Herunterladen der Sounddateien und entpacken --------------------------------------------------------------------------
 
-msc.download_dataset() #für den kleinen Datensatz
+msc.download_dataset() # für den kleinen Datensatz
 #msc.big_dataset()
 dir_dataset = 'animal_sounds'
 #dir_dataset = 'viele_sounds_geordnet'
@@ -242,7 +242,7 @@ y_test_pred = model.predict(X_test_norm)
 print("Shape of the predictions: {}".format(y_test_pred.shape))
 
 # The model outputs in each row 5 probability values (they always add to 1!) for each class.
-# We want take the class with the highest probability as prediction!
+# We want to take the class with the highest probability as prediction!
 
 y_test_pred = np.argmax(y_test_pred, axis=1)
 print("Shape of the predictions now: {}".format(y_test_pred.shape))
