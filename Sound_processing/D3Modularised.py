@@ -332,6 +332,6 @@ def model_evaluation(**kwargs):
 
 if __name__ == "__main__":
     printing = False
-    model_training(big=False, plot_history=True, epochs=2, batch_size=4, printing=printing)
+    model_training(big=False, plot_history=True, epochs=2, batch_size=4, printing=printing, file_ID_diagram=True)
     #model_evaluation(big=False, plot_history=True, epochs=2, batch_size=4, printing=printing)
     print("Done :)")

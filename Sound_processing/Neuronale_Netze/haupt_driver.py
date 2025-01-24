@@ -1,14 +1,19 @@
 from datensatz import directory, dataset
 from labeler import labeler
 from training_data import training_data
-from model_processing import model_training
+from model_processing import model_training, model_evaluation
+from mel_specs import mel_specs
 
 def main(settings):
     directory()
+
     dir_list = dataset(big = False)
     labels = labeler(dir_list)
-    trained_data = training_data(labels)
-    model_training(trained_data)
+    mels = mel_specs(labels)
+    trained_data = training_data(mels)
+    trained = model_training(trained_data)
+    model_evaluation(trained_data, trained_model=trained[0])
+
 
 
 args = {

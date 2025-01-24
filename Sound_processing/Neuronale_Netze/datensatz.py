@@ -11,6 +11,7 @@ def directory():
 
 
 
+
 def download_dataset(printing=False):
     directory()
 
@@ -35,6 +36,7 @@ def download_dataset(printing=False):
             f.extractall('.')
         assert os.path.isdir('animal_sounds')
         if printing: print("All done :)", '\n')
+
 
 def download_big_dataset(printing=False):
     source_folder = 'viele_sounds'
