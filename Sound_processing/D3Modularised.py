@@ -25,7 +25,7 @@ def dataset(**kwargs):
         dir_dataset = 'viele_sounds_geordnet'
     return glob.glob(os.path.join(dir_dataset, '*'))
 
-#Classification --------------------------------------------------------------------------------------------------------
+#Classification -------------------------------------------------------------------------------------------------------- Fertig
 
 def labeler(**kwargs):
     """
@@ -64,7 +64,7 @@ def labeler(**kwargs):
     return fn_wav_list, class_id, unique_classes, n_files, file_num_in_class, n_sub
 
 
-#mel_specs erstellen ---------------------------------------------------------------------------------------------------
+#mel_specs erstellen --------------------------------------------------------------------------------------------------- Fertig
 
 
 def mel_specs(**kwargs):
@@ -282,6 +282,7 @@ def model_training(**kwargs):
         pl.xlabel('Epoch')
         pl.show()
 
+    model.save(f'C:\\modelle\\{msc.get_new_filename("keras")}')  # saves the model into modelle
     return model, history, data
 
 def model_evaluation(**kwargs):
@@ -302,7 +303,7 @@ def model_evaluation(**kwargs):
     if printing: print("Shape of the predictions: {}".format(y_test_pred.shape))
 
     # The model outputs in each row 5 probability values (they always add to 1!) for each class.
-    # We want take the class with the highest probability as prediction!
+    # We want to take the class with the highest probability as prediction!
 
     y_test_pred = np.argmax(y_test_pred, axis=1)
     if printing: print(y_test_pred)
@@ -312,23 +313,25 @@ def model_evaluation(**kwargs):
     accuracy = accuracy_score(y_test, y_test_pred)
     if printing: print("Accuracy score = ", accuracy)
 
-    pl.figure(figsize=(50, 50))
-    cm = confusion_matrix(y_test, y_test_pred).astype(np.float32)
-    # normalize to probabilities
-    for i in range(cm.shape[0]):
-        if np.sum(cm[i, :]) > 0:
-            cm[i, :] /= np.sum(cm[i, :])  # by dividing through the sum, we convert counts to probabilities
-    pl.imshow(cm)
-    ticks = np.arange(n_sub)
-    pl.xticks(ticks, unique_classes)
-    pl.yticks(ticks, unique_classes)
-    pl.show()
+    if kwargs.get('confusion_matrix', False):
+        pl.figure(figsize=(50, 50))
+        cm = confusion_matrix(y_test, y_test_pred).astype(np.float32)
+        # normalize to probabilities
+        for i in range(cm.shape[0]):
+            if np.sum(cm[i, :]) > 0:
+                cm[i, :] /= np.sum(cm[i, :])  # by dividing through the sum, we convert counts to probabilities
+        pl.imshow(cm)
+        ticks = np.arange(n_sub)
+        pl.xticks(ticks, unique_classes)
+        pl.yticks(ticks, unique_classes)
+        pl.show()
 
-    #model.save(f'C:\\modelle\\{msc.get_new_filename('keras')}') #saves the model into modelle
+
     return unique_classes
 
 
 if __name__ == "__main__":
     printing = False
-    model_evaluation(big=False, plot_history=True, epochs=2, batch_size=4, printing=printing)
+    model_training(big=False, plot_history=True, epochs=2, batch_size=4, printing=printing)
+    #model_evaluation(big=False, plot_history=True, epochs=2, batch_size=4, printing=printing)
     print("Done :)")

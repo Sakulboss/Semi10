@@ -5,11 +5,13 @@ from scipy import signal
 import os
 from datensatz import directory, dataset
 from labeler import labeler
+from training_data import training_data
 
 def main(settings):
     directory()
     dir_list = dataset(settings)
-    labeler(dir_list, settings)
+    labels = labeler(dir_list, settings)
+    trained_data = training_data(labels, settings)
 
 
 args = {

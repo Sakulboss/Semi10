@@ -12,6 +12,8 @@ def directory():
 
 
 def download_dataset(printing=False):
+    directory()
+
     if not os.path.isfile('animal_sounds.zip'):
         if printing: print('\nPlease wait a couple of seconds ...')
         try:
@@ -39,6 +41,9 @@ def download_big_dataset(printing=False):
     target_base_folder = 'viele_sounds_geordnet'
     eintraege = []
     directories = []
+
+    directory()
+
     with open('esc50.csv', 'r') as f:
         for line in f:
             if line.startswith('#'):
@@ -59,6 +64,7 @@ def download_big_dataset(printing=False):
     if printing: print(len(directories))
 
 def dataset(**kwargs):
+    directory()
     big = kwargs.get('big', False)
     printing = kwargs.get('printing', False)
 

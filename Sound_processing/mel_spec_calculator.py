@@ -1,4 +1,5 @@
 import librosa
+#import tflibrosa
 import numpy as np
 import os
 import wget
@@ -63,12 +64,13 @@ def compute_mel_spec_for_audio_file(fn_wav_name, n_fft=1024, hop_length=441, fss
         n_mels (int): Number of mel bands
     """
     # load audio samples
+    print('1')
     x_new, fss = librosa.load(fn_wav_name, sr=fss, mono=True)
-
+    print('2')
     # normalize to the audio file to an maximum absolute value of 1
     if np.max(np.abs(x_new)) > 0:
         x_new = x_new / np.max(np.abs(x_new))
-
+    print('3')
     # mel-spectrogram
     x_new = librosa.feature.melspectrogram(y=x_new,
                                        sr=fss,
@@ -80,7 +82,7 @@ def compute_mel_spec_for_audio_file(fn_wav_name, n_fft=1024, hop_length=441, fss
                                        power=1.0,
                                        htk=True,
                                        norm=None)
-
+    print('4')
     # apply dB normalization
     x_new = librosa.amplitude_to_db(x_new)
 
@@ -92,3 +94,4 @@ def get_new_filename(file_extension: str) -> str:
 
 if __name__ == '__main__':
     print(get_new_filename('keras'))
+    print(compute_mel_spec_for_audio_file('bird.wav').shape)
