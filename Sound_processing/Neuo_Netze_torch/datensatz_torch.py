@@ -1,6 +1,5 @@
 import os
 import sys
-
 import wget
 import zipfile
 import shutil
@@ -20,7 +19,7 @@ def directory():
     if not os.path.basename(paths) == 'Sound_processing':
         os.chdir('..')
 
-def download_dataset(printing=False):
+def download_dataset():
     directory()
 
     if not os.path.isfile('animal_sounds.zip'):
@@ -46,7 +45,7 @@ def download_dataset(printing=False):
         printer("All done :)", '\n')
 
 
-def download_big_dataset(printing=False):
+def download_big_dataset():
     source_folder: str = 'viele_sounds'
     target_base_folder: str = 'viele_sounds_geordnet'
     eintraege: list = []
@@ -82,10 +81,10 @@ def dataset(setting: dict):
     big: bool = setting.get('big', False)
 
     if big:
-        download_big_dataset(printing=printing)
+        download_big_dataset()
         dir_dataset: str = 'viele_sounds_geordnet'
     else:
-        download_dataset(printing=printing)  # für den kleinen Datensatz
+        download_dataset()  # für den kleinen Datensatz
         dir_dataset: str = 'animal_sounds'
     return glob.glob(os.path.join(dir_dataset, '*'))
 

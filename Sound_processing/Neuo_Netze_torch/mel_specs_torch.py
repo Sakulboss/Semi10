@@ -10,7 +10,7 @@ def printer(*text, sep=' ', end='\n', file=None):
     global printing
     global file_
     file = file or file_
-    printer(*text, sep=sep, end=end, file=file)
+    if printing: print(*text, sep=sep, end=end, file=file)
 
 
 def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=64):
@@ -47,11 +47,11 @@ def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=
     return x_new
 
 
-def mel_specs(labels, **setting):
+def mel_specs(labels, setting):
     """
     Args:
         labels:
-        **setting:
+        setting:
     """
     global printing, file_
     printing = setting.get('print', False)

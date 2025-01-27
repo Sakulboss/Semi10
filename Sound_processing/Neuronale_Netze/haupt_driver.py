@@ -1,7 +1,7 @@
 from datensatz import directory, dataset
 from labeler import labeler
 from training_data import training_data
-from model_processing import model_training, model_evaluation
+from Sound_processing.Neuo_Netze_torch.model_processing_torch import model_training, model_evaluation
 from mel_specs import mel_specs
 
 def main(settings):

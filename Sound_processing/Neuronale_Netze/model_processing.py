@@ -4,12 +4,22 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropou
 import os
 import numpy as np
 from sklearn.metrics import accuracy_score, confusion_matrix
+import sys
+
+printing: bool = False
+file_ = sys.stdout
+
+def printer(*text, sep=' ', end='\n', file=None):
+    global printing
+    global file_
+    file = file or file_
+    printer(*text, sep=sep, end=end, file=file)
 
 def get_new_filename(file_extension: str) -> str:
     count = len([counter for counter in os.listdir('C:\\modelle') if counter.endswith(file_extension)]) + 1
     return f'full_model_{count}.{file_extension}'
 
-def model_creation(input_shape, n_classes, printing=False):
+def model_creation(input_shape, n_classes):
     # Define the model
     model = Sequential()
     model.add(Input(shape=input_shape))
@@ -39,20 +49,22 @@ def model_creation(input_shape, n_classes, printing=False):
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
 
-    if printing: model.summary()
-
     return model
 
-def model_training(data, **kwargs):
-    input_shape = kwargs.get('input_shape', data[0])
-    n_classes = kwargs.get('n_classes', data[1])
-    X_train_norm = kwargs.get('X_train_norm', data[2])
-    y_train_transformed = kwargs.get('y_train_transformed', data[3])
-    epochs = kwargs.get('epochs', 1)
-    batch_size = kwargs.get('batch_size', 4)
-    printing = kwargs.get('printing', False)
+def model_training(data, setting):
+    global printing, file_
+    printing = setting.get('print', False)
+    file_ = setting.get('file', sys.stdout)
 
-    model = kwargs.get('model', model_creation(input_shape, n_classes, printing=printing))
+    input_shape = setting.get('input_shape', data[0])
+    n_classes = setting.get('n_classes', data[1])
+    X_train_norm = setting.get('X_train_norm', data[2])
+    y_train_transformed = setting.get('y_train_transformed', data[3])
+    epochs = setting.get('epochs', 1)
+    batch_size = setting.get('batch_size', 4)
+
+
+    model = setting.get('model', model_creation(input_shape, n_classes))
 
     history = model.fit(X_train_norm,
                         y_train_transformed,
@@ -60,7 +72,7 @@ def model_training(data, **kwargs):
                         batch_size=batch_size,
                         verbose=2)
 
-    if kwargs.get('plot_history', False):
+    if setting.get('plot_history', False):
         pl.figure(figsize=(8, 4))
         pl.subplot(2, 1, 1)
         pl.plot(history.history['loss'])
@@ -75,34 +87,38 @@ def model_training(data, **kwargs):
     return model, history, data
 
 
-def model_evaluation(data, **kwargs):
-    trained_model = kwargs.get('trained_model', None)
-    X_test_norm = kwargs.get('X_test_norm', data[4])
-    y_test = kwargs.get('y_test', data[6])
-    unique_classes = kwargs.get('unique_classes', data[7])
-    n_sub = kwargs.get('n_sub', data[8])
-    printing = kwargs.get('printinge', False)
+def model_evaluation(data, setting):
+    global printing, file_
+    printing = setting.get('print', False)
+    file_ = setting.get('file', sys.stdout)
+
+    trained_model = setting.get('trained_model', None)
+    X_test_norm = setting.get('X_test_norm', data[4])
+    y_test = setting.get('y_test', data[6])
+    unique_classes = setting.get('unique_classes', data[7])
+    n_sub = setting.get('n_sub', data[8])
+    printing = setting.get('printinge', False)
 
     if trained_model is None:
-        model = model_training(**kwargs)[0]
+        model = model_training(**setting)[0]
     else: model = trained_model
 
-    if printing: print("Shape of the test data: {}".format(X_test_norm.shape))
+    printer("Shape of the test data: {}".format(X_test_norm.shape))
     y_test_pred = model.predict(X_test_norm)
-    if printing: print("Shape of the predictions: {}".format(y_test_pred.shape))
+    printer("Shape of the predictions: {}".format(y_test_pred.shape))
 
     # The model outputs in each row 5 probability values (they always add to 1!) for each class.
     # We want to take the class with the highest probability as prediction!
 
     y_test_pred = np.argmax(y_test_pred, axis=1)
-    if printing: print(y_test_pred)
-    if printing: print("Shape of the predictions now: {}".format(y_test_pred.shape))
+    printer(y_test_pred)
+    printer("Shape of the predictions now: {}".format(y_test_pred.shape))
 
     # Accuracy
     accuracy = accuracy_score(y_test, y_test_pred)
-    if printing: print("Accuracy score = ", accuracy)
+    printer("Accuracy score = ", accuracy)
 
-    if kwargs.get('confusion_matrix', False):
+    if setting.get('confusion_matrix', False):
         pl.figure(figsize=(50, 50))
         cm = confusion_matrix(y_test, y_test_pred).astype(np.float32)
         # normalize to probabilities

@@ -1,4 +1,4 @@
-from Sound_processing.Neuo_Netze_torch.model_processing_torch import *
+from Sound_processing.Neuronale_Netze.model_processing import *
 import sys
 import numpy as np
 from sklearn.metrics import accuracy_score, confusion_matrix
@@ -12,12 +12,12 @@ def printer(*text, sep=' ', end='\n', file=None):
     global printing
     global file_
     file = file or file_
-    printer(*text, sep=sep, end=end, file=file)
+    if printing: print(*text, sep=sep, end=end, file=file)
 
 def model_evaluation(data, model, setting):
     global printing, file_
     printing = setting.get('print', False)
-    file_ = setting.get('file', sys.stdout)
+    file_ = setting.get('file', file_)
     X_test_norm = setting.get('X_test_norm', data[4])
     y_test = setting.get('y_test', data[6])
     unique_classes = setting.get('unique_classes', data[7])
