@@ -1,11 +1,8 @@
-from sklearn.metrics import confusion_matrix
-
-from datensatz_torch import directory, dataset
+from datensatz_torch import directoryc, dataset
 from labeler_torch import labeler
 from training_data_torch import training_data
 from model_processing_torch import model_training_torch
 from mel_specs_torch import mel_specs
-from model_evaluation_torch import model_evaluation
 
 import sys
 
@@ -25,16 +22,12 @@ def main(settings):
     trained_data = training_data(mels, settings)
     #print(*trained_data)
     print(4)
-    trained = model_training_torch(trained_data, settings)
+   # model_training_torch(trained_data, settings)
     model_evaluation(trained_data, trained[0], settings)
-
-printing = False
-file_ = sys.stdout
 
 args = {
     'printing' : True,
     'big'      : False,
-    'confusion_matrix' : True,
 }
 
 if __name__=='__main__':

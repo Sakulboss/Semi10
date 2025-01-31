@@ -8,14 +8,18 @@ def training_data(data, **kwargs):
     segment_class_id = kwargs.get('segment_class_id', data[2])
     printing = kwargs.get('printing', False)
 
-    is_train = np.where(segment_file_mod_id <= 2)[0]
+
+
     is_test = np.where(segment_file_mod_id >= 3)[0]
 
-    if printing: print("Our feature matrix is split into {} training examples and {} test examples".format(len(is_train), len(is_test)))
+    if printing:
+        pass
 
     X_train = segment_list[is_train, :, :]
     y_train = segment_class_id[is_train]
     X_test = segment_list[is_test, :, :]
+    is_train = np.where(segment_file_mod_id <= 2)[0]
+    print("Our feature matrix is split into {} training examples and {} test examples".format(len(is_train), len(is_test)))
     y_test = segment_class_id[is_test]
 
     if printing: print("Let's look at the dimensions")

@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import haupt_driver_torch as hdt
 
 printing: bool = False
 file_ = sys.stdout
@@ -81,16 +82,16 @@ def model_training_torch(data, setting):
     epochs = setting.get('epochs', 1)
     batch_size = setting.get('batch_size', 4)
     model = setting.get('model', CNNModel(input_shape, n_classes))
-
-    model.train()
+    device = setting.get('device', 'cuda') # types: cpu, cuda, ipu, xpu, mkldnn, opengl, opencl, ideep, hip, ve, fpga, maia, xla, lazy, vulkan, mps, meta, hpu, mtia
+    model.train().to(device)
 
     optimizer = optim.Adam(model.parameters())
-    criterion = nn.CrossEntropyLoss()
+    loss = nn.CrossEntropyLoss()
     history = {'loss': [], 'accuracy': []}
 
     # Konvertiere die Daten in PyTorch Tensoren
     X_train_tensor = torch.tensor(X_train_norm, dtype=torch.float32)
-    y_train_tensor = torch.tensor(y_train_transformed, dtype=torch.long)
+    y_train_tensor = torch.tensor(y_train_transformed, dtype=torch.float32)
 
     for epoch in range(epochs):
         running_loss = 0.0
@@ -107,17 +108,17 @@ def model_training_torch(data, setting):
 
             # Vorwärtsdurchlauf
             outputs = model(inputs)
-            loss = criterion(outputs, labels)
+            output = loss(outputs, labels)
 
             # Rückwärtsdurchlauf und Optimierung
-            loss.backward()
+            output.backward()
             optimizer.step()
 
             # Verlust und Genauigkeit berechnen
-            running_loss += loss.item()
-            _, predicted = torch.max(outputs.data, 1)
+            running_loss += output.item()
+            #_, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
-            correct += (predicted == labels).sum().item()
+            correct += (outputs == labels).sum().item()
 
         # Durchschnittlichen Verlust und Genauigkeit für die Epoche speichern
         epoch_loss = running_loss / (len(X_train_tensor) // batch_size)
@@ -146,4 +147,5 @@ def model_training_torch(data, setting):
     return model, history, data
 
 if __name__ == '__main__':
-    pass
+    hdt.main(settings={'print': True, 'file': file_, 'confusion_matrix' : True, 'epochs' : 200, 'batch_size' : 128})
+    #pass
