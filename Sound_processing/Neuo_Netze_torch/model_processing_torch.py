@@ -90,8 +90,8 @@ def model_training_torch(data, setting):
     history = {'loss': [], 'accuracy': []}
 
     # Konvertiere die Daten in PyTorch Tensoren
-    X_train_tensor = torch.tensor(X_train_norm, dtype=torch.float32)
-    y_train_tensor = torch.tensor(y_train_transformed, dtype=torch.float32)
+    X_train_tensor = torch.tensor(X_train_norm, dtype=torch.float32).to(device)
+    y_train_tensor = torch.tensor(y_train_transformed, dtype=torch.float32).to(device)
 
     for epoch in range(epochs):
         running_loss = 0.0
@@ -147,5 +147,10 @@ def model_training_torch(data, setting):
     return model, history, data
 
 if __name__ == '__main__':
-    hdt.main(settings={'print': True, 'file': file_, 'confusion_matrix' : True, 'epochs' : 200, 'batch_size' : 128})
+    hdt.main(settings={'print': True, 'big' : True, 'file': file_, 'confusion_matrix' : True, 'epochs' : 20000, 'batch_size' : 128})
     #pass
+
+
+"""
+Bei diesem Programm tritt folgender Fehler auf:
+"""
