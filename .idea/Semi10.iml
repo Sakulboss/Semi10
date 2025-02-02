@@ -5,8 +5,9 @@
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.11 (github)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.12 (Semi10)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="Semi10forPi" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="GOOGLE" />

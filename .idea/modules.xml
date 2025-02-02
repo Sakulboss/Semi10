@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Semi10.iml" filepath="$PROJECT_DIR$/.idea/Semi10.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Semi10forPi/.idea/Semi10forPi.iml" filepath="$PROJECT_DIR$/../Semi10forPi/.idea/Semi10forPi.iml" />
     </modules>
   </component>
 </project>
