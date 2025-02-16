@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as pl
 import librosa
 import sys
+import os
 
 printing: bool = False
 file_ = sys.stdout
@@ -12,6 +13,9 @@ def printer(*text, sep=' ', end='\n', file=None):
     file = file or file_
     if printing: print(*text, sep=sep, end=end, file=file)
 
+def get_new_filename(size: str) -> str:
+    count = len([counter for counter in os.listdir(os.getcwd()) if counter.endswith('.npy')]) + 1; print(count)
+    return f'mels_{size}_{count}.npy'
 
 def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=64):
     """ Compute mel spectrogram
@@ -25,7 +29,7 @@ def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=
     # load audio samples
     x_new, fss = librosa.load(fn_wav_name, sr=fss, mono=True)
 
-    # normalize to the audio file to an maximum absolute value of 1
+    # normalize to the audio file to a maximum absolute value of 1
     if np.max(np.abs(x_new)) > 0:
         x_new = x_new / np.max(np.abs(x_new))
 
@@ -50,18 +54,18 @@ def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=
 def mel_specs(labels, setting):
     """
     Args:
-        labels:
-        setting:
+        labels:  data from previous step
+        setting: main settings like type of dataset and printing
     """
     global printing, file_
-    printing = setting.get('print', False)
-    file_ = setting.get('file', sys.stdout)
+    printing = setting.get('printing', printing)
+    file_ = setting.get('file', file_)
+    size = setting.get('big')
 
     data = setting.get('classified_samples', labels)
     fn_wav_list = setting.get('fn_wav_list', data[0])
     class_id = setting.get('class_id', data[1])
     all_mel_specs = []
-    printing = setting.get('printing', False)
 
     for count, fn_wav in enumerate(fn_wav_list):
         all_mel_specs.append(mel_spec_file(fn_wav_list[count]))
@@ -141,6 +145,7 @@ def mel_specs(labels, setting):
             pl.yticks([], [])
         pl.tight_layout()
         pl.show()
+
     return segment_file_mod_id, segment_list, segment_class_id, data[2], data[5]
 
 if __name__ == '__main__':

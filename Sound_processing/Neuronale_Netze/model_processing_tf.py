@@ -1,3 +1,5 @@
+from typing import Any
+
 import matplotlib.pyplot as pl
 from tensorflow.keras.models import Sequential, load_model, Model
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input, GlobalMaxPooling2D, BatchNormalization
@@ -51,7 +53,7 @@ def model_creation(input_shape, n_classes):
 
     return model
 
-def model_training(data, setting):
+def model_training(data: tuple, setting: dict) -> tuple[Any, Any, Any]:
     global printing, file_
     printing = setting.get('print', False)
     file_ = setting.get('file', sys.stdout)

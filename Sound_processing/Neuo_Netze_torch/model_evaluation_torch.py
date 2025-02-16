@@ -1,4 +1,4 @@
-from Sound_processing.Neuronale_Netze.model_processing import *
+from Sound_processing.Neuronale_Netze.model_processing_tf import *
 import sys
 import numpy as np
 from sklearn.metrics import accuracy_score, confusion_matrix

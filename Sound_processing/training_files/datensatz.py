@@ -19,7 +19,7 @@ def directory():
     if not os.path.basename(paths) == 'Sound_processing':
         os.chdir('..')
 
-def download_dataset():
+def download_small_dataset():
     directory()
 
     if not os.path.isfile('animal_sounds.zip'):
@@ -48,7 +48,7 @@ def download_dataset():
 def download_big_dataset():
     source_folder: str = 'viele_sounds'
     target_base_folder: str = 'viele_sounds_geordnet'
-    eintraege: list = []
+    entries: list = []
     directories: list = []
 
     directory()
@@ -58,41 +58,36 @@ def download_big_dataset():
             if line.startswith('#'):
                 continue
             else:
-                eintraege.append(line.split(','))
+                entries.append(line.split(','))
     if not os.path.isdir(target_base_folder):
         os.mkdir(target_base_folder)
-    for i in range(len(eintraege)):
-        target_folder = os.path.join(target_base_folder, eintraege[i][3])
+    for i in range(len(entries)):
+        target_folder = os.path.join(target_base_folder, entries[i][3])
         if not os.path.isdir(target_folder):
             os.mkdir(target_folder)
-        target_file = os.path.join(target_folder, eintraege[i][0])
+        target_file = os.path.join(target_folder, entries[i][0])
         if not os.path.isfile(target_file):
-            source_file = os.path.join(source_folder, eintraege[i][0])
+            source_file = os.path.join(source_folder, entries[i][0])
             shutil.copy(source_file, target_file)
-        directories.append(eintraege[i][3] + '/' + eintraege[i][0])
+        directories.append(entries[i][3] + '/' + entries[i][0])
     printer(len(directories))
 
-def dataset(setting: dict):
+def dataset(settings):
     directory()
     global printing, file_
-    printing = setting.get('print', False)
-    file_ = setting.get('file', sys.stdout)
+    printing   = settings.get('printing', None) or printing
+    size: str  = settings.get('size', None)     or 'size'
+    file_      = settings.get('file_', None)    or file_
 
-    big: bool = setting.get('big', False)
-
-    if big:
-        download_big_dataset()
+    if size == "big":
+        if not os.path.isdir('viele_sounds_geordnet'):
+            download_big_dataset()
         dir_dataset: str = 'viele_sounds_geordnet'
     else:
-        download_dataset()  # für den kleinen Datensatz
+        download_small_dataset()  # für den kleinen Datensatz
         dir_dataset: str = 'animal_sounds'
     return glob.glob(os.path.join(dir_dataset, '*'))
 
 
-setting: dict = {
-    'big': False,
-    'print': True
-}
-
 if __name__ == '__main__':
-    print(dataset(setting))
+    print(dataset({}))

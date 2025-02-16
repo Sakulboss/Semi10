@@ -1,6 +1,4 @@
 import matplotlib.pyplot as pl
-#from tensorflow.keras.models import Sequential, load_model, Model
-#from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input, GlobalMaxPooling2D, BatchNormalization
 import os
 import numpy as np
 from sklearn.metrics import accuracy_score, confusion_matrix
