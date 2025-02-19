@@ -1,6 +1,7 @@
-from Sound_processing.Neuronale_Netze.model_processing import *
 import sys
 import numpy as np
+import torch
+import torch.nn.functional as F
 from sklearn.metrics import accuracy_score, confusion_matrix
 import matplotlib.pyplot as pl
 
@@ -14,7 +15,7 @@ def printer(*text, sep=' ', end='\n', file=None):
     file = file or file_
     if printing: print(*text, sep=sep, end=end, file=file)
 
-def model_evaluation(data, model, setting):
+def model_evaluation_torch(data, model, setting):
     global printing, file_
     printing = setting.get('print', False)
     file_ = setting.get('file', file_)
@@ -26,13 +27,21 @@ def model_evaluation(data, model, setting):
 
 
     printer("Shape of the test data: {}".format(X_test_norm.shape))
-    y_test_pred = model.predict(X_test_norm)
-    printer("Shape of the predictions: {}".format(y_test_pred.shape))
 
-    # The model outputs in each row 5 probability values (they always add to 1!) for each class.
-    # We want to take the class with the highest probability as prediction!
+    # Convert the input data to a PyTorch tensor and ensure it's in the right shape
+    X_test_tensor = torch.tensor(X_test_norm, dtype=torch.float32)
 
-    y_test_pred = np.argmax(y_test_pred, axis=1)
+
+    # Set the model to evaluation mode
+    model.eval()
+
+    with torch.no_grad():  # Disable gradient calculation for inference
+        y_test_pred_logits = model(X_test_tensor)
+        y_test_pred_probs = F.softmax(y_test_pred_logits, dim=1)  # Apply softmax to get probabilities
+
+    printer("Shape of the predictions: {}".format(y_test_pred_probs.shape))
+    # Get the predicted class by taking the argmax
+    y_test_pred = torch.argmax(y_test_pred_probs, dim=1).numpy()
     printer(y_test_pred)
     printer("Shape of the predictions now: {}".format(y_test_pred.shape))
 
@@ -41,22 +50,23 @@ def model_evaluation(data, model, setting):
     printer("Accuracy score = ", accuracy)
 
     if setting.get('confusion_matrix', False):
-        pl.figure(figsize=(50, 50))
+        pl.figure(figsize=(10, 10))  # Adjusted size for better visibility
         cm = confusion_matrix(y_test, y_test_pred).astype(np.float32)
-        # normalize to probabilities
+        # Normalize to probabilities
         for i in range(cm.shape[0]):
             if np.sum(cm[i, :]) > 0:
-                cm[i, :] /= np.sum(cm[i, :])  # by dividing through the sum, we convert counts to probabilities
-        pl.imshow(cm)
+                cm[i, :] /= np.sum(cm[i, :])  # Convert counts to probabilities
+        pl.imshow(cm, interpolation='nearest')
         ticks = np.arange(n_sub)
         pl.xticks(ticks, unique_classes)
         pl.yticks(ticks, unique_classes)
+        pl.colorbar()
+        pl.title('Confusion Matrix')
+        pl.xlabel('Predicted Label')
+        pl.ylabel('True Label')
         pl.show()
-
-
     return unique_classes
+
 
 if __name__ == '__main__':
     pass
-
-

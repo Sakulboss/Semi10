@@ -36,12 +36,12 @@ def training_data(data, setting):
     y_train_transformed = OneHotEncoder(categories='auto', sparse_output=False).fit_transform(y_train.reshape(-1, 1))
     y_test_transformed = OneHotEncoder(categories='auto', sparse_output=False).fit_transform(y_test.reshape(-1, 1))
 
-    if len(X_train_norm.shape) == 3:
-        X_train_norm = np.expand_dims(X_train_norm, 1)
-        X_test_norm = np.expand_dims(X_test_norm, 1)
+    #if len(X_train_norm.shape) == 3:
+    X_train_norm = np.expand_dims(X_train_norm, 1)
+    X_test_norm = np.expand_dims(X_test_norm, 1)
 
-    else:
-        if printing: print("We already have four dimensions")
+    #else:
+    #    if printing: print("We already have four dimensions")
 
     if printing: print(f"Let's check if we have four dimensions. New shapes: {X_train_norm.shape} & {X_test_norm.shape}")
 
