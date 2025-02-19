@@ -34,7 +34,7 @@ def big_dataset(printing=False):
     target_base_folder = 'viele_sounds_geordnet'
     eintraege = []
     directories = []
-    with open('esc50.csv', 'r') as f:
+    with open('training_files/esc50.csv', 'r') as f:
         for line in f:
             if line.startswith('#'):
                 continue
