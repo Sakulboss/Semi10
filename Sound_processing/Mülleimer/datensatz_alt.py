@@ -23,7 +23,7 @@ def directory():
 def download_dataset(printing=False):
     directory()
 
-    if not os.path.isfile('animal_sounds.zip'):
+    if not os.path.isfile('../animal_sounds.zip'):
         printer('\nPlease wait a couple of seconds ...')
         try:
             wget.download(
@@ -38,8 +38,8 @@ def download_dataset(printing=False):
 
     if not os.path.isdir('animal_sounds'):
         printer("\nLet's unzip the file ... ")
-        assert os.path.isfile('animal_sounds.zip')
-        with zipfile.ZipFile('animal_sounds.zip', 'r') as f:
+        assert os.path.isfile('../animal_sounds.zip')
+        with zipfile.ZipFile('../animal_sounds.zip', 'r') as f:
             # unzip all files into current folder
             f.extractall('.')
         assert os.path.isdir('animal_sounds')

@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-import haupt_driver_torch as hdt
+
 
 printing: bool = False
 file_ = sys.stdout
@@ -145,8 +145,8 @@ def model_training_torch(data, setting):
     return model, history, data
 
 if __name__ == '__main__':
-    hdt.main(settings={'print': True, 'big' : True, 'file': file_, 'confusion_matrix' : True, 'epochs' : 20000, 'batch_size' : 128})
-    #pass
+    #hdt.main(settings={'print': True, 'big' : True, 'file': file_, 'confusion_matrix' : True, 'epochs' : 20000, 'batch_size' : 128})
+    pass
 
 
 """

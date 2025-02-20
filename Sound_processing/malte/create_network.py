@@ -6,27 +6,28 @@ from torch import optim
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
-from Sound_processing.Neuo_Netze_torch.haupt_driver_torch import main
+from Sound_processing.training_files.driver_mels import trainingdata
 import numpy as np
 
 args = {
     'printing'         : True,
-    'big'              : False,
-    'plot_history'     : True,
-    'confusion_matrix' : True,
+    'size'             : 'small',
+    'plot_history'     : False,
+    'confusion_matrix' : False,
+    'model'            : 'torch',
 }
 
 
 class CNN(nn.Module):
-    def __init__(self, in_channels, num_classes=5):
+    def __init__(self, in_channels, output_classes=5):
         """
         Define the layers of the convolutional neural network.
 
         Parameters:
             in_channels: int
                 The number of channels in the input image. For MNIST, this is 1 (grayscale images).
-            num_classes: int
-                The number of classes we want to predict, in our case 10 (digits 0 to 9).
+            output_classes: int
+                The number of classes we want to predict, in our case 5 (digits 0 to 4).
         """
         super(CNN, self).__init__()
 
@@ -36,8 +37,8 @@ class CNN(nn.Module):
         self.pool = nn.MaxPool2d(kernel_size=(2,2), stride=2)
         # Second convolutional layer: 8 input channels, 16 output channels, 3x3 kernel, stride 1, padding 1
         self.conv2 = nn.Conv2d(in_channels=8, out_channels=16, kernel_size=(3,3), stride=1, padding=1)
-        # Fully connected layer: 16*7*7 input features (after two 2x2 poolings), 10 output features (num_classes)
-        self.fc1 = nn.Linear(64 * 100, num_classes)
+        # Fully connected layer: 16*7*7 input features (after two 2x2 poolings), 10 output features (output_classes)
+        self.fc1 = nn.Linear(64 * 100, output_classes)
 
     def forward(self, x):
         """
@@ -130,7 +131,7 @@ class CustomDataset(Dataset):
         return self.features[idx], self.labels[idx]
 
 # Create datasets
-data = main(args)
+data = trainingdata(args)
 X_train_norm = data[2]
 y_train_transformed = data[3]
 X_test_norm = data[4]
@@ -157,7 +158,7 @@ X_test_tensor = torch.tensor(X_test_norm:=data[4], dtype=torch.float32)
 y_test_tensor = torch.tensor(y_test_transformed:=data[6], dtype=torch.long)'''
 
 
-model = CNN(in_channels=1, num_classes=num_classes).to(device)
+model = CNN(in_channels=1, output_classes=num_classes).to(device)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
@@ -172,8 +173,8 @@ for epoch in range(num_epochs):
         # Forward pass: compute the model output
         scores = model(data)
 
-        print(scores.shape, targets.shape)
-        print(scores, targets)
+        #print(scores.shape, targets.shape)
+        #print(scores, targets)
         loss = criterion(scores, targets)
 
         # Backward pass: compute the gradients

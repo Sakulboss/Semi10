@@ -1,10 +1,8 @@
-import sys
-
-import mel_spec_calculator as msc
+from Sound_processing.Mülleimer import mel_spec_calculator as msc
 from tensorflow.keras.models import load_model
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-import D3Modularised as D3M
+
 
 #Datenformat: (1, 64, 100, 1) - (Dateien, bins in mfcc, werte pro bin, werte als liste)
 
