@@ -9,7 +9,7 @@ import numpy as np
 
 args = {
     'printing'         : True,
-    'size'             : 'small',
+    'size'             : 'big',
     'plot_history'     : False,
     'confusion_matrix' : False,
     'model'            : 'torch',
@@ -141,7 +141,7 @@ def check_accuracy(loader, model):
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 input_size    = 64 * 100
-num_classes   = 5
+num_classes   = 50 # 5 small, 50 big
 learning_rate = 0.001
 batch_size    = 64
 num_epochs    = 10
