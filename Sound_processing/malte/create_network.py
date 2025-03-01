@@ -2,13 +2,14 @@ import torch
 import torch.nn.functional as F
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
+from tensorflow.python.ops.gen_array_ops import OneHot
 from torch import optim
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 from Sound_processing.training_files.driver_mels import trainingdata
 import numpy as np
-
+#https://machinelearningmastery.com/how-to-evaluate-the-performance-of-pytorch-models/
 args = {
     'printing'         : True,
     'size'             : 'small',
@@ -83,12 +84,16 @@ def check_accuracy(loader, model):
 
     with torch.no_grad():  # Disable gradient calculation
         for x, y in loader:
-            x = x.to(device)
+            x = x.to(device)  # Move data to device
             y = y.to(device)
-            print(y)
+            print('test', y)
+            y = np.argmax(y, axis=0)
+            print('test', y)
             # Forward pass: compute the model output
             _, predictions = model(x).max(1)  # Get the index of the max log-probability
             print('predictions',predictions)
+
+
 
             num_correct += (predictions == y).sum()  # Count correct predictions
             num_samples += predictions.size(0)  # Count total samples
@@ -127,7 +132,7 @@ class CustomDataset(Dataset):
         return len(self.labels)
 
     def __getitem__(self, idx):
-        return self.features[idx], self.labels[idx]  # Return the feature and label at the given index
+        return self.features[idx], self.labels[idx]
 
 # Create datasets
 data = trainingdata(args)
@@ -147,14 +152,6 @@ test_dataset = CustomDataset(X_test_tensor, y_test_tensor)
 train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True)
 
-'''
-data = main(args)
-X_train_tensor = torch.tensor(X_train_norm:= data[2], dtype=torch.float32)
-y_train_tensor = torch.tensor(y_train_transformed:=data[3], dtype=torch.long)
-print(X_train_tensor.shape)
-print(y_train_tensor.shape)
-X_test_tensor = torch.tensor(X_test_norm:=data[4], dtype=torch.float32)
-y_test_tensor = torch.tensor(y_test_transformed:=data[6], dtype=torch.long)'''
 
 
 model = CNN(in_channels=1, output_classes=num_classes).to(device)
@@ -180,6 +177,7 @@ for epoch in range(num_epochs):
         optimizer.zero_grad()
         loss.backward()
 
+        #y_pred = model()
         # Optimization step: update the model parameters
         optimizer.step()
 
@@ -192,13 +190,6 @@ print(check_accuracy(test_loader, model))
 
 r'''
 
-Epoch [1/10]
-  0%|          | 0/3 [00:00<?, ?it/s]
-Traceback (most recent call last):
-  File "C:\Semi\github\.venv\Lib\site-packages\numpy\_core\fromnumeric.py", line 57, in _wrapfunc
-    return bound(*args, **kwds)
-           ^^^^^^^^^^^^^^^^^^^^
-TypeError: argmax() got an unexpected keyword argument 'axis'
 
 
 '''
