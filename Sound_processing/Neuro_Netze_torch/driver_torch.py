@@ -12,7 +12,6 @@ def main(args):
     train(loader, args)
 
 
-
 specifiers = {
     'printing'         : True,
     'size'             : 'big',

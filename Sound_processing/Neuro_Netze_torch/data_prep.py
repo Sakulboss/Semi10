@@ -19,7 +19,6 @@ class CustomDataset(Dataset):
 def data_prep(data, args):
 
     x_train_norm = data[2]
-    print("x_train_norm shape: ", x_train_norm.shape)
     y_train_transformed = data[3]
     x_test_norm = data[4]
     y_test_transformed = data[6]

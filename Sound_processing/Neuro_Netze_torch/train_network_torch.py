@@ -40,6 +40,6 @@ def train(loader, args):
 
             # Optimization step: update the model parameters
             optimizer.step()
-        check_accuracy(test_loader, model)
+        check_accuracy(test_loader, model, device)
 
-    check_accuracy(train_loader, model)
+    check_accuracy(train_loader, model, device)
