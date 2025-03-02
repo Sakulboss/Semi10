@@ -1,5 +1,5 @@
 from Sound_processing.training_files.driver_mels import trainingdata
-from model_processing_torch import model_training_torch
+from Sound_processing.Mülleimer.model_processing_torch import model_training_torch
 #from model_evaluation_torch import model_evaluation
 import sys
 

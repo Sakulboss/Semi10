@@ -1,4 +1,4 @@
-from Sound_processing.Neuo_Netze_torch.model_processing_torch import *
+from Sound_processing.Mülleimer.model_processing_torch import *
 import sys
 import numpy as np
 
