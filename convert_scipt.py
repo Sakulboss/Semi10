@@ -42,4 +42,5 @@ def splitter(wav_file_path):
 	print(f"Split {wav_file_path} into {left_channel_path} and {right_channel_path}")
 
 if __name__ == '__main__':
-	cwav("output_2025-04-17-23-53-28_309_17.flac")
+	cwav("")
+	cwav("")
