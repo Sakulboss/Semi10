@@ -3,6 +3,8 @@ import torch
 import torch.nn.functional as f
 from torch import nn
 
+import os
+
 r"""
 l; layertype;        channels (in, out); kernel_size (h, w); stride; padding;;
 l; conv2d, linear;   (3,3);             (3,3);               1;      1;;
@@ -13,7 +15,7 @@ a; sigmoid, relu, tanh;;
 v; view;;
 """
 
-
+print('hie', file='todo.txt')
 
 
 def getnextmodel():
@@ -100,8 +102,6 @@ class CNN(nn.Module):
 
         super(CNN, self).__init__()
 
-
-
         self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=16, kernel_size=(2,2), stride=1, padding=1)
         self.pool = nn.MaxPool2d(kernel_size=(2,2), stride=2)
         self.conv2 = nn.Conv2d(in_channels=16, out_channels=16, kernel_size=(3,3), stride=1, padding=1)
@@ -120,7 +120,7 @@ class CNN(nn.Module):
                 The output tensor after passing through the network.
         """
         layers = getlayers()
-        for layer in layers:
+        for layer in self.layers:
             if layer.startswith('l'):
                 pass
             elif layer.startswith('p'):
@@ -196,7 +196,7 @@ def check_accuracy(loader, model, device):
         if loader.dataset.train:
             print(f"train: Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
         else:
-            print(f"test: Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
+            print(f"test:  Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
 
 
     model.train()  # Set the model back to training mode

@@ -22,32 +22,32 @@ def directory():
 def download_small_dataset():
     directory()
 
-    if not os.path.isfile('animal_sounds.zip'):
+    if not os.path.isfile('_animal_sounds.zip'):
         printer('\nPlease wait a couple of seconds ...')
         try:
             wget.download(
                 'https://github.com/machinelistening/machinelistening.github.io/blob/master/animal_sounds.zip?raw=true',
-                out='animal_sounds.zip', bar=None)
-            printer('animal_sounds.zip downloaded successfully ...')
+                out='_animal_sounds.zip', bar=None)
+            printer('_animal_sounds.zip downloaded successfully ...')
         except Exception as e:
             printer(f"Error downloading file: {str(e)}")
 
     else:
         printer('\nFiles already exist!', '\n')
 
-    if not os.path.isdir('animal_sounds'):
+    if not os.path.isdir('_animal_sounds'):
         printer("\nLet's unzip the file ... ")
-        assert os.path.isfile('animal_sounds.zip')
-        with zipfile.ZipFile('animal_sounds.zip', 'r') as f:
+        assert os.path.isfile('_animal_sounds.zip')
+        with zipfile.ZipFile('_animal_sounds.zip', 'r') as f:
             # unzip all files into current folder
             f.extractall('.')
-        assert os.path.isdir('animal_sounds')
+        assert os.path.isdir('_animal_sounds')
         printer("All done :)", '\n')
 
 
 def download_big_dataset():
-    source_folder: str = 'viele_sounds'
-    target_base_folder: str = 'viele_sounds_geordnet'
+    source_folder: str = '_viele_sounds'
+    target_base_folder: str = '_viele_sounds_geordnet'
     entries: list = []
     directories: list = []
 
@@ -80,12 +80,12 @@ def dataset(settings):
     file_      = settings.get('file_', None)    or file_
 
     if size == "big":
-        if not os.path.isdir('viele_sounds_geordnet'):
+        if not os.path.isdir('_viele_sounds_geordnet'):
             download_big_dataset()
-        dir_dataset: str = 'viele_sounds_geordnet'
+        dir_dataset: str = '_viele_sounds_geordnet'
     else:
         download_small_dataset()  # für den kleinen Datensatz
-        dir_dataset: str = 'animal_sounds'
+        dir_dataset: str = '_animal_sounds'
     return glob.glob(os.path.join(dir_dataset, '*'))
 
 

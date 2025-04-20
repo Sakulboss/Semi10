@@ -1,4 +1,4 @@
-from Sound_processing.Mülleimer import mel_spec_calculator as msc
+from Mülleimer import mel_spec_calculator as msc
 from tensorflow.keras.models import load_model
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -42,9 +42,7 @@ def predict_result(mel_spec, model, verb=0):
     return np.argmax(predictions)
 
 def chunks(l, n):
-    """Yield successive n-sized chunks from sublists of l."""
     for i in range(0, len(l) - 1, n): assert len(l[i]) == len(l[i + 1])
-
     for i in range(0, len(l[0]), n):
         parts = []
         for k in l:
@@ -72,10 +70,11 @@ def calculate_highest(results):
     return new_results[0][0]
 
 if __name__ == '__main__':
-    #filepath = 'viele_sounds_geordnet/chainsaw/1-19898-A-41.wav'
-    filepath = 'viele_sounds_geordnet/cat/1-47819-A-5.wav'
-    #filepath = 'viele_sounds_geordnet/airplane/1-36929-A-47.wav'
-    model_path = 'full_model_3_new.keras'
+    #filepath = '_viele_sounds_geordnet/chainsaw/1-19898-A-41.wav'
+    #filepath = '_viele_sounds_geordnet/cat/1-47819-A-5.wav'
+    #filepath = '_viele_sounds_geordnet/airplane/1-36929-A-47.wav'
+    filepath = '_viele_sounds_geordnet/hen/1-31251-A-6.wav'
+    model_path = '../Unbenutzt/full_model_3_new.keras'
     class_labels_big = ['airplane', 'breathing', 'brushing_teeth', 'can_opening', 'car_horn', 'cat', 'chainsaw',
                     'chirping_birds', 'church_bells', 'clapping', 'clock_alarm', 'clock_tick', 'coughing', 'cow',
                     'crackling_fire', 'crickets', 'crow', 'crying_baby', 'dog', 'door_wood_creaks', 'door_wood_knock',
