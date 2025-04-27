@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+from torch import nn, no_grad
 import torch.nn.functional as f
 from torch import nn
 
@@ -15,7 +16,6 @@ a; sigmoid, relu, tanh;;
 v; view;;
 """
 
-print('hie', file='todo.txt')
 
 
 def getnextmodel():
@@ -23,36 +23,11 @@ def getnextmodel():
         lines = file.readlines()
         if len(lines) == 0:
             return None
-        else:
-            return lines[0]
-
-
-def getlayers():
-    original_model_text = getnextmodel()
-    layers = original_model_text.split(';;')
-    functions = []
-    for layer in layers:
-        if layer.startswith('l'):
-            if 'conv2d' in layer:
-                functions.append('conv2d')
-                layers.append(create_conv_layer(layer))
-            elif 'linear' in layer:
-                functions.append('linear')
-                layers.append(create_linear_layer(layer))
+        for line in range(len(lines)):
+            if lines[line].startswith('#'):
+                pass
             else:
-                print('Error: Layer type not found')
-        elif layer.startswith('p'):
-            layers.append(create_linear_layer(layer))
-        elif layer.startswith('a'):
-            pass
-        elif layer.startswith('v'):
-            functions.append('view')
-        elif layer == '':
-            pass
-        else:
-            print('Error: Layer type not found')
-    return layers
-
+                return lines[line]
 
 
 def create_pooling_layer(layer_description: str):
@@ -83,29 +58,69 @@ def create_linear_layer(layer_description):
     channels = tuple(map(int, parts[1].strip().strip('()').split(',')))
     return nn.Linear(in_features=channels[0], out_features=channels[1])
 
+def getlayers():
+    original_model_text = getnextmodel()
+    layers = original_model_text.split(';;')
+    functions = []
+    for layer in layers:
+        if layer.startswith('l'):
+            if 'conv2d' in layer:
+                functions.append(create_conv_layer(layer))
+            elif 'linear' in layer:
+                functions.append(create_linear_layer(layer))
+            else:
+                print(f'Error: Layer type not found - {layer}')
+        elif layer.startswith('p'):
+            functions.append(create_pooling_layer(layer))
+        elif layer.startswith('a'):
+            if 'sigmoid' in layer:
+                functions.append(f.sigmoid)
+            elif 'relu' in layer:
+                functions.append(f.relu)
+            elif 'tanh' in layer:
+                functions.append(f.tanh)
+            else:
+                print('Error: Activation function not found')
+        elif layer.startswith('v'):
+            functions.append('view')
+        elif layer == '':
+            pass
+        else:
+            print(f'Error: Layer type not found - {layer}')
+    return functions
+
+for i in getlayers(): print(i)
+
+
+
 
 
 #stride:  how the filter moves
 #padding: frame for the old picture added
 
 class CNN(nn.Module):
-    def __init__(self, in_channels, output_classes=2):
+    def __init__(self):
         """
         Define the layers of the convolutional neural network.
 
         Parameters:
             in_channels: int
-                The number of channels in the input image. Because we use only calculated two - dimensional frames, we have only one channel.
+                The number of channels in the input image. Because we use only calculated two-dimensional frames, we have only one channel.
             output_classes: int
                 The number of classes we want to predict, in our case 2.
         """
 
         super(CNN, self).__init__()
 
+
+        """
         self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=16, kernel_size=(2,2), stride=1, padding=1)
         self.pool = nn.MaxPool2d(kernel_size=(2,2), stride=2)
         self.conv2 = nn.Conv2d(in_channels=16, out_channels=16, kernel_size=(3,3), stride=1, padding=1)
-        self.fc1 = nn.Linear(64 * 100, output_classes)
+        self.fc1 = nn.Linear(64 * 100, output_classes)"""
+
+
+        self.layers : list[str|nn.Module] = getlayers()
 
     def forward(self, x):
         """
@@ -119,21 +134,9 @@ class CNN(nn.Module):
             torch.Tensor
                 The output tensor after passing through the network.
         """
-        layers = getlayers()
         for layer in self.layers:
-            if layer.startswith('l'):
-                pass
-            elif layer.startswith('p'):
-                pass
-            elif layer.startswith('a'): #-----Fertig
-                if 'sigmoid' in layer:
-                    x = f.sigmoid(x)
-                elif 'relu' in layer:
-                    x = f.relu(x)
-                elif 'tanh' in layer:
-                    x = f.tanh(x)
-                else:
-                    print('Error: Activation function not found')
+            if isinstance(layer, nn.Module):
+                x = layer(x)
             elif layer.startswith('v'): #-----Fertig
                 x = x.view(x.size(0), -1)
             elif layer == '':
@@ -141,13 +144,13 @@ class CNN(nn.Module):
             else:
                 print('Error: Layer type not found')
 
-
+        '''
         x = f.relu(self.conv1(x))
         x = self.pool(x)
         x = f.relu(self.conv2(x))
         x = self.pool(x)
         x = x.view(x.size(0), -1)
-        x = self.fc1(x)
+        x = self.fc1(x)'''
         return x
 
 
@@ -174,7 +177,7 @@ def check_accuracy(loader, model, device):
     num_samples = 0
     model.eval()
 
-    with torch.no_grad():
+    with no_grad():
         for x, y in loader:
 
             x = x.to(device)

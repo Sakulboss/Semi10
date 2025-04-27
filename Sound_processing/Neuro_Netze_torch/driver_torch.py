@@ -14,13 +14,14 @@ def main(args):
 
 specifiers = {
     'printing'         : True,
-    'size'             : 'big',
+    'size'             : 'small',
     'plot_history'     : False,
     'confusion_matrix' : False,
     'model'            : 'torch',
     'learning_rate'    : 0.001,
     'batch_size'       : 64,
     'num_epochs'       : 10,
+    'epochs'           : 10,
 }
 
 if __name__ == '__main__':

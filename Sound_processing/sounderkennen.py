@@ -1,5 +1,6 @@
-from Mülleimer import mel_spec_calculator as msc
-from tensorflow.keras.models import load_model
+from Sound_processing import mel_spec_calculator as msc
+#from tensorflow.keras.models import load_model
+from torch import load
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 
@@ -12,21 +13,18 @@ from sklearn.preprocessing import StandardScaler
 def predict(filepath: str, model_path: str, class_labels: list, printing=True):
     verb = 0
     if printing: print('Model will load.')
-    model = load_model(model_path)
+    #model = load_model(model_path)
+    model = load(model_path)
     if printing:
         print("Model loaded")
         verb = 2
     mel_spec = msc.compute_mel_spec_for_audio_file(filepath)
     if printing: print('Mel specs erstellt')
     results = []
-
     for mel in chunks(mel_spec, 100):
-
-        if printing: print("Mel spectrogram: ", mel.shape)
-
+        if printing: print(f"Mel spectrogram: ", mel.shape)
         mel = np.expand_dims(mel, axis=-1)  # werte als liste
         mel = np.expand_dims(mel, axis=0)  # datei dimension
-
         scaler = StandardScaler()
         original_shape = mel[0].shape
         mel_2d = mel[0].reshape(-1, original_shape[-1])
@@ -38,7 +36,8 @@ def predict(filepath: str, model_path: str, class_labels: list, printing=True):
     return class_labels[index], index
 
 def predict_result(mel_spec, model, verb=0):
-    predictions = model.predict(mel_spec, verbose=verb)
+    #predictions = model.predict(mel_spec, verbose=verb)
+    predictions = model(mel_spec)
     return np.argmax(predictions)
 
 def chunks(l, n):
@@ -56,17 +55,13 @@ def calculate_highest(results):
     results = [int(i) for i in results]
     results.sort()
     sublists = {}
-
     if len(results) == 2: return results[0]
-
     for item in results:
         if item not in sublists:
             sublists[item] = []
         sublists[item].append(item)
-
     new_results = list(sublists.values())
     new_results.sort(key=len, reverse=True)
-
     return new_results[0][0]
 
 if __name__ == '__main__':
@@ -75,6 +70,7 @@ if __name__ == '__main__':
     #filepath = '_viele_sounds_geordnet/airplane/1-36929-A-47.wav'
     filepath = '_viele_sounds_geordnet/hen/1-31251-A-6.wav'
     model_path = '../Unbenutzt/full_model_3_new.keras'
+
     class_labels_big = ['airplane', 'breathing', 'brushing_teeth', 'can_opening', 'car_horn', 'cat', 'chainsaw',
                     'chirping_birds', 'church_bells', 'clapping', 'clock_alarm', 'clock_tick', 'coughing', 'cow',
                     'crackling_fire', 'crickets', 'crow', 'crying_baby', 'dog', 'door_wood_creaks', 'door_wood_knock',
