@@ -27,7 +27,7 @@ def train(loader, args):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-    model = CNN(in_channels=1, output_classes=num_classes).to(device)
+    model = CNN.to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
