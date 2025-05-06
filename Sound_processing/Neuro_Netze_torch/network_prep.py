@@ -3,10 +3,8 @@ import torch
 from torch import nn, no_grad
 import torch.nn.functional as f
 from torch import nn
-
 import os
 
-from torchgen.executorch.api.et_cpp import return_type
 
 r"""
 l; layertype;        channels (in, out); kernel_size (h, w); stride; padding;;
