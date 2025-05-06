@@ -1,8 +1,10 @@
 #l; conv; (1,16); (3,3); 1; 1;; a; relu;; p; maxpool; (3,3); 1; 1;; l; conv; (16, 32); (3,3); 1; 1;; v; view;; l; linear; (204800,5);;
+from tensorflow.python.autograph.operators import new_list
+
 
 class NetStruct:
     def __init__(self):
-        self.layers = ["- "]
+        self.start_layers = ["- "]
         self.conv_sizes  :list[tuple] = [ (3,3), (10,20)] #[(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,20), (10,50), (10,70)]
         self.pool_sizes  :list[tuple] = [(2,2), (3,3)]
         self.pool_types  :list[str]   = ["avgpool", "maxpool"]
@@ -11,80 +13,178 @@ class NetStruct:
         self.lin_layers  :list[int]   = [0,1]
         self.dim         :list[int]   = [1,60,100] #Channel, Height, Width
         self.output_dim  :int         = 2 #Output Dimension
-        self.filters     :list[int]   = [1,16,48,48] #Number of filters in the first layer
-
-        self.generator2()
+        self.filters     :list[tuple] = [(1,16),(16,48),(48,48)] #Number of channels
+        self.layers      :list[str]   = []
+        self.generator()
         self.save_net()
 
-    def pooling(self, stride=1):
-        new_list = []
-        for start_str in self.layers:
+
+    def conv(self, layer:list, channel, stride: int = 1):
+        conv_list = []
+        for start_str in layer:
+            for kernel in self.conv_sizes:
+                padding = (kernel[0] - 1, kernel[1] - 1)
+                conv_list.append(start_str + f'l; conv2d; {channel}; {kernel}; {stride}; {padding};; ')
+        return self.pooling(self.activation(conv_list))
+
+    def pooling(self, layer:list, stride=1):
+        pool_list = []
+        for start_str in layer:
             for p_type in self.pool_types:
                 for size in self.pool_sizes:
                     padding = (size[0]-1, size[1]-1)
-                    new_list.append(start_str + f'p; {p_type}; {size}; {stride}; {padding};; ')
+                    pool_list.append(start_str + f'p; {p_type}; {size}; {stride}; {padding};; ')
+        return pool_list
 
-    def linear(self, input_size:int):
-        new_list = []
-        kernel_size = (input_size, input_size)
-        for start_str in self.layers:
-                new_list.append(start_str + f'l; linear; {kernel_size};; ')
-        self.layers = new_list
+    def linear(self, layer:list, input_filters:int):
+        linear_list, size = [], input_filters * self.dim[1] * self.dim[2]
+        kernel_size = (size, size)
+        for start_str in layer:
+                linear_list.append(start_str + f'l; linear; {kernel_size};; ')
+        return self.activation(linear_list)
 
-    def last_layer(self, input_size:int):
-        new_list = []
-        kernel_size = (input_size, self.output_dim)
-        for start_str in self.layers:
-                new_list.append(start_str + f'l; linear; {kernel_size};; ')
-        self.layers = new_list
+    def last_layer(self, layer:list, input_filters:int):
+        last_list = []
+        kernel_size = (input_filters * self.dim[1] * self.dim[2], self.output_dim)
+        for start_str in layer:
+                last_list.append(start_str + f'l; linear; {kernel_size};; ')
+        return last_list
 
-    def activation(self):
-        new_list = []
-        for start_str in self.layers:
+    def activation(self, layer:list):
+        act_list = []
+        for start_str in layer:
             for activation in self.act_types:
                 if activation is not None:
-                    new_list.append(start_str + f'a; {activation};; ')
+                    act_list.append(start_str + f'a; {activation};; ')
                 else:
-                    new_list.append(start_str)
-        self.layers = new_list
+                    act_list.append(start_str)
+        return act_list
 
-    def conv(self, channel, stride: int = 1):
-        new_list = []
-        for start_str in self.layers:
-            for kernel in self.conv_sizes:
-                padding = (kernel[0] - 1, kernel[1] - 1)
-                new_list.append(start_str + f'l; conv2d; {channel}; {kernel}; {stride}; {padding};; ')
-        self.layers = new_list
-
+    @staticmethod
+    def view_layer(layer:list):
+        view_list = []
+        for start_str in layer:
+            view_list.append(start_str + f'v: view;; ')
+        return view_list
 
     def generator(self):
-        for num_conv in self.conv_layers:
-            for i in range(num_conv):
-                self.conv((self.filters[i], self.filters[i+1]))
-                self.activation()
-                self.pooling()
-            self.layers = [i + 'v: view;;' for i in self.layers]
-            for num_lin in self.lin_layers:
-                for i in range(num_lin):
-                    self.linear(self.filters[num_conv]*60*100)
-                    self.activation()
-                self.last_layer(self.filters[num_conv]*60*100)
 
-    def generator2(self):
-        for num_conv in self.conv_layers:
-            for i in range(num_conv):
-                self.conv((self.filters[i], self.filters[i + 1]))
-                self.activation()
-                self.pooling()
-            # Nach den Conv-Layern wird ein View hinzugefügt
-            self.layers = [i + 'v; view;; ' for i in self.layers]
+        #3 Conv, 3 Linear
+        self.layers += self.last_layer(
+            self.linear(
+                self.linear(
+                    self.view_layer(
+                        self.conv(
+                            self.conv(
+                                self.conv(
+                                    self.start_layers, self.filters[0]
+                                ), self.filters[1]
+                            ), self.filters[2]
+                        )
+                    ), self.filters[2][1]
+                ), self.filters[2][1]
+            ), self.filters[2][1]
+        )
 
-            # Danach werden nur noch Linear-Layer hinzugefügt
-            for num_lin in self.lin_layers:
-                for i in range(num_lin):
-                    self.linear(self.filters[num_conv] * 60 * 100)
-                    self.activation()
-                self.last_layer(self.filters[num_conv] * 60 * 100)
+        #2 Conv, 3 Linear
+        self.layers += self.last_layer(
+            self.linear(
+                self.linear(
+                    self.view_layer(
+                        self.conv(
+                            self.conv(
+                                    self.start_layers, self.filters[0]
+                            ), self.filters[1]
+                        )
+                    ), self.filters[1][1]
+                ), self.filters[1][1]
+            ), self.filters[1][1]
+        )
+
+        #1 Conv, 3 Linear
+        self.layers += self.last_layer(
+            self.linear(
+                self.linear(
+                    self.view_layer(
+                        self.conv(
+                            self.start_layers, self.filters[0]
+                        )
+                    ), self.filters[0][1]
+                ), self.filters[0][1]
+            ), self.filters[0][1]
+        )
+
+        #3 Conv, 2 Linear
+        self.layers += self.last_layer(
+            self.linear(
+                    self.view_layer(
+                        self.conv(
+                            self.conv(
+                                self.conv(
+                                    self.start_layers, self.filters[0]
+                                ), self.filters[1]
+                            ), self.filters[2]
+                        )
+                ), self.filters[2][1]
+            ), self.filters[2][1]
+        )
+
+        #3 Conv, 1 Linear
+        self.layers += self.last_layer(
+            self.view_layer(
+                self.conv(
+                    self.conv(
+                        self.conv(
+                            self.start_layers, self.filters[0]
+                        ), self.filters[1]
+                    ), self.filters[2]
+                )
+            ), self.filters[2][1]
+        )
+
+        #2 Conv, 2 Linear
+        self.layers += self.last_layer(
+            self.linear(
+                self.view_layer(
+                    self.conv(
+                        self.conv(
+                            self.start_layers, self.filters[0]
+                        ), self.filters[1]
+                    )
+                ), self.filters[1][1]
+            ), self.filters[1][1]
+        )
+
+        #2 Conv, 1 Linear
+        self.layers += self.last_layer(
+            self.view_layer(
+                self.conv(
+                    self.conv(
+                        self.start_layers, self.filters[0]
+                    ), self.filters[1]
+                )
+            ), self.filters[1][1]
+        )
+
+        #1 Conv, 2 Linear
+        self.layers += self.last_layer(
+            self.linear(
+                self.view_layer(
+                    self.conv(
+                        self.start_layers, self.filters[0]
+                    )
+                ), self.filters[0][1]
+            ), self.filters[0][1]
+        )
+
+        #1 Conv, 1 Linear
+        self.layers += self.last_layer(
+                self.view_layer(
+                        self.conv(
+                            self.start_layers, self.filters[0]
+                    )
+            ), self.filters[0][1]
+        )
 
     def save_net(self):
         with open('netstruct.txt', 'w') as f:
