@@ -22,8 +22,8 @@ def getnextmodel(file_path: str) -> str | None:
     with open(file_path, 'r') as file:
         lines = file.readlines()
     for i, line in enumerate(lines):
-        if line.startswith('-'):
-            lines[i] = '#' + line[1:]
+        if line.startswith('- '):
+            lines[i] = '# ' + line[1:]
             position = i
             break
     else:
@@ -91,7 +91,7 @@ def getlayers():
             print(f'Error: Layer class not found: --{layer}')
     return functions
 
-print(getnextmodel('netstruct.txt'))
+
 print(getlayers())
 
 

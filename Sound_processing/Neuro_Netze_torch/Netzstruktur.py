@@ -1,5 +1,5 @@
-#l; conv; (1,16); (3,3); 1; 1;; a; relu;; p; maxpool; (3,3); 1; 1;; l; conv; (16, 32); (3,3); 1; 1;; v; view;; l; linear; (204800,5);;
-from tensorflow.python.autograph.operators import new_list
+#l; conv2d; (1,16); (3,3); 1; 1;; a; relu;; p; maxpool; (3,3); 1; 1;; l; conv2d; (16, 32); (3,3); 1; 1;; v; view;; l; linear; (204800,5);;
+
 
 
 class NetStruct:
@@ -8,16 +8,14 @@ class NetStruct:
         self.conv_sizes  :list[tuple] = [ (3,3), (10,20)] #[(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,20), (10,50), (10,70)]
         self.pool_sizes  :list[tuple] = [(2,2), (3,3)]
         self.pool_types  :list[str]   = ["avgpool", "maxpool"]
-        self.act_types   :list[str]   = [None, 'sigmoid', 'relu', 'tanh']
-        self.conv_layers :list[int]   = [1,2]
-        self.lin_layers  :list[int]   = [0,1]
+        self.act_types   :list[str]   = [None, 'sigmoid', 'relu'] # 'tanh'
         self.dim         :list[int]   = [1,60,100] #Channel, Height, Width
         self.output_dim  :int         = 2 #Output Dimension
         self.filters     :list[tuple] = [(1,16),(16,48),(48,48)] #Number of channels
         self.layers      :list[str]   = []
+
         self.generator()
         self.save_net()
-
 
     def conv(self, layer:list, channel, stride: int = 1):
         conv_list = []
@@ -190,6 +188,6 @@ class NetStruct:
         with open('netstruct.txt', 'w') as f:
             for layer in self.layers:
                 f.write(layer + '\n')
-        print('Netzstruktur gespeichert.')
+        print('Netzstruktur gespeichert: {} Modelle.'.format(len(self.layers)))
 
 Cnn = NetStruct()
