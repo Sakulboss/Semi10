@@ -35,7 +35,7 @@ def create_trainingdata(settings) -> bool:
     return False
 
 def load_trainingdata(model='tf', size='small'):
-    print(f'training_data_{model}_{size}.npy')
+    #print(f'training_data_{model}_{size}.npy')
     ladung = np.load(f'training_data_{model}_{size}.npy', allow_pickle=True)
     return tuple(ladung)
 
@@ -45,7 +45,7 @@ def trainingdata(settings: dict) -> tuple:
     Returns:
         object: 
     """
-    print(settings['model'])
+    #print(settings['model'])
     create_trainingdata(settings)
     return load_trainingdata(settings['model'], settings['size'])
 
@@ -55,7 +55,7 @@ def main(settings):
 args: dict[str, Any] = {
     'printing' : True,
     'model'    : 'torch',
-    'size'     : 'bienen_1',
+    'size'     : 'small', #bienen_1
 }
 
 if __name__=='__main__':

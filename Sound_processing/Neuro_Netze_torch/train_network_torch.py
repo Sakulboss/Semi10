@@ -1,6 +1,5 @@
 import torch
-from torch import optim
-from torch import nn
+from torch import optim, no_grad, nn
 from tqdm import tqdm
 import os
 import numpy as np
@@ -13,10 +12,11 @@ def move_working_directory():
         if os.path.basename(working_directory) != "Sound_processing":
             os.chdir('..')
             break
-    os.chdir('Neuro_Netze_torch')
+    os.chdir('modelle')
 
 def get_new_filename(file_extension: str) -> str:
-    count = len([counter for counter in os.listdir('C:\\modelle') if counter.endswith(file_extension)]) + 1
+    move_working_directory()
+    count = len([counter for counter in os.listdir(os.getcwd()) if counter.endswith(file_extension)]) + 1
     return f'model_torch_{count}.{file_extension}'
 
 def train(loader, args):
@@ -27,9 +27,10 @@ def train(loader, args):
     num_classes = args.get('num_classes')
     learning_rate = args.get('learning_rate')
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    accuracy = []
 
-
-    model = CNN.to(device)
+    model = CNN()
+    model = model.to(device=device)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -53,19 +54,49 @@ def train(loader, args):
 
             # Optimization step: update the model parameters
             optimizer.step()
-        check_accuracy(test_loader, model, device)
+        accuracy.append((1-check_accuracy(test_loader, model, device))**2)
+        if epoch > 10 and accuracy[-1] > accuracy[-2]:
+            epoch_max = epoch
+            break
 
-    check_accuracy(train_loader, model, device)
+    print(f"Finished training. Best accuracy: {accuracy[-1]:.2f}% in epoch {epoch_max + 1}")
+    print(accuracy)
+    return model, accuracy
+
+
+def save_model_structure(model: CNN, accuracy, save_weight: bool = False):
+    """
+    Saves the model structure to a file.
+
+    Parameters:
+        save_weight: bool
+            If the model weights should be saved.
+        model: nn.Module
+            The neural network model.
+        accuracy: float
+            The accuracy of the model.
+    """
     move_working_directory()
-    print(os.getcwd())
-    torch.save(model, get_new_filename('ckpt'))
 
-def check_accuracy(loader, model, device):
+    with open('model_results', 'a') as f:
+        f.write(f'{accuracy:.2f}% {str(model)}\n')
+
+    if save_weight:
+        filename = get_new_filename('ckpt')
+        torch.save(model, filename)
+        print(f"Model weights saved to {filename}")
+
+
+
+
+
+def check_accuracy(loader, model, device, printing=False):
 
     """
     Checks the accuracy of the model on the given dataset loader.
 
     Parameters:
+        printing: Choose whether to print the accuracy or not.
         device: string
             The Device to run the model on.
         loader: DataLoader
@@ -73,7 +104,6 @@ def check_accuracy(loader, model, device):
         model: nn.Module
             The neural network model.
     """
-
 
     num_correct = 0
     num_samples = 0
@@ -97,11 +127,12 @@ def check_accuracy(loader, model, device):
             num_samples += predictions.size(0)
 
         # Calculate accuracy
-        accuracy = float(num_correct) / float(num_samples) * 100
-        if loader.dataset.train:
-            print(f"train: Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
-        else:
-            print(f"test:  Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
-
+        accuracy = float(num_correct) / float(num_samples)
+        if printing:
+            if loader.dataset.train:
+                print(f"train: Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
+            else:
+                print(f"test:  Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
 
     model.train()  # Set the model back to training mode
+    return accuracy

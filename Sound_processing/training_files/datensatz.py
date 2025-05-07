@@ -44,15 +44,12 @@ def download_small_dataset():
         assert os.path.isdir('_animal_sounds')
         printer("All done :)", '\n')
 
-
 def download_big_dataset():
     source_folder: str = '_viele_sounds'
     target_base_folder: str = '_viele_sounds_geordnet'
     entries: list = []
     directories: list = []
-
     directory()
-
     with open('esc50.csv', 'r') as f:
         for line in f:
             if line.startswith('#'):
@@ -89,7 +86,6 @@ def dataset(settings):
         download_small_dataset()  # für den kleinen Datensatz
         dir_dataset: str = '_animal_sounds'
     return glob.glob(os.path.join(dir_dataset, '*'))
-
 
 if __name__ == '__main__':
     print(dataset({}))

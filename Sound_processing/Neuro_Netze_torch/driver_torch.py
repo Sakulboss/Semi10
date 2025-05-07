@@ -1,8 +1,9 @@
 from Sound_processing.training_files.driver_mels import trainingdata
 from Sound_processing.Neuro_Netze_torch.data_prep import data_prep
 from Sound_processing.Neuro_Netze_torch.train_network_torch import train
+import torch
 
-
+print(torch.cuda.is_available())
 def main(args):
     data   = trainingdata(args)
     x = data[2].shape
@@ -20,8 +21,8 @@ specifiers = {
     'model'            : 'torch',
     'learning_rate'    : 0.001,
     'batch_size'       : 64,
-    'num_epochs'       : 10,
-    'epochs'           : 10,
+    'num_epochs'       : 100,
+    'epochs'           : 100,
 }
 
 if __name__ == '__main__':

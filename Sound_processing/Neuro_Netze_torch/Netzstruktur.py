@@ -14,12 +14,12 @@ v; view;;
 class NetStruct:
     def __init__(self):
         self.start_layers = ["- "]
-        self.conv_sizes  :list[tuple] = [ (3,3), (10,20)] #[(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,20), (10,50), (10,70)]
-        self.pool_sizes  :list[tuple] = [(2,2), (3,3)]
+        self.conv_sizes  :list[tuple] = [ (3,3), (11,21)] #[(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,20), (10,50), (10,70)]
+        self.pool_sizes  :list[tuple] = [(3,3), (5,5)]
         self.pool_types  :list[str]   = ["avgpool", "maxpool"]
         self.act_types   :list[str]   = [None, 'sigmoid', 'relu'] # 'tanh'
-        self.dim         :list[int]   = [1,60,100] #Channel, Height, Width
-        self.output_dim  :int         = 2 #Output Dimension
+        self.dim         :list[int]   = [1,64,100] #Channel, Height, Width
+        self.output_dim  :int         = 5 #Output Dimension
         self.linear_dim  :int         = 10 #Number of Linear Neurons
         self.filters     :list[tuple] = [(1,16),(16,48),(48,48)] #Number of channels
         self.layers      :list[str]   = []
@@ -31,7 +31,7 @@ class NetStruct:
         conv_list = []
         for start_str in layer:
             for kernel in self.conv_sizes:
-                padding = (kernel[0] - 1, kernel[1] - 1)
+                padding = (int((kernel[0] - 1)/2), int((kernel[1] - 1)/2))
                 conv_list.append(start_str + f'l; conv2d; {channel}; {kernel}; {stride}; {padding};; ')
         return self.pooling(self.activation(conv_list))
 
@@ -40,7 +40,7 @@ class NetStruct:
         for start_str in layer:
             for p_type in self.pool_types:
                 for size in self.pool_sizes:
-                    padding = (size[0]-1, size[1]-1)
+                    padding = (int((size[0]-1)/2), int((size[1]-1)/2))
                     pool_list.append(start_str + f'p; {p_type}; {size}; {stride}; {padding};; ')
         return pool_list
 

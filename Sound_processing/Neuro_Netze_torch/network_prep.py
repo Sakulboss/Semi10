@@ -5,6 +5,26 @@ import torch.nn.functional as f
 from torch import nn
 import os
 
+def split_list(lst, delimiter):
+    result = []
+    current = []
+    for item in lst:
+        if item == delimiter:
+            result.append(current)
+            current = []
+        else:
+            current.append(item)
+    result.append(current)  # Letzten Abschnitt hinzufügen
+    return result
+
+def move_working_directory():
+    working_directory = os.getcwd()
+    for i in range(3):
+        if os.path.basename(working_directory) != "Sound_processing":
+            os.chdir('..')
+            break
+    os.chdir('Neuro_Netze_torch')
+
 def getnextmodel(file_path: str) -> str | None:
     with open(file_path, 'r') as file:
         lines = file.readlines()
@@ -18,7 +38,6 @@ def getnextmodel(file_path: str) -> str | None:
     with open(file_path, 'w') as file:
         file.writelines(lines)
     return lines[position][2:]
-
 
 def create_pooling_layer(layer_description: str):
     parts = layer_description.split(';')
@@ -46,7 +65,11 @@ def create_linear_layer(layer_description):
     channels = tuple(map(int, parts[2].strip().strip('()').split(',')))
     return nn.Linear(in_features=channels[0], out_features=channels[1])
 
+def reshape_tensor(tensor):
+    return tensor.view(tensor.shape[0], -1)
+
 def getlayers():
+    move_working_directory()
     original_model_text = getnextmodel('_netstruct.txt')
     layers = original_model_text.split(';;')
     functions = []
@@ -71,13 +94,13 @@ def getlayers():
             else:
                 print("Error: Activation function not found: --{}".format(layer))
         elif layer.startswith('v'):
-            functions.append('view')
+            functions.append(reshape_tensor)
         elif layer == '':
             pass
         else:
             print(f'Error: Layer class not found: --{layer}')
-    return functions
 
+    return functions, original_model_text
 
 #stride:     how the filter moves
 #padding:    frame for the old picture added
@@ -91,7 +114,18 @@ class CNN(nn.Module):
         """
 
         super(CNN, self).__init__()
-        self.layers : list[str|nn.Module] = getlayers()
+        layers, self.text  = getlayers()
+
+        self.module_layers = nn.ModuleList(
+            [layer for layer in layers if isinstance(layer, nn.Module)]
+        )
+        self.functions = [
+            layer for layer in layers if callable(layer) and not isinstance(layer, nn.Module)
+        ]
+
+        self.layers = layers
+
+
 
     def forward(self, x):
         """
@@ -105,16 +139,19 @@ class CNN(nn.Module):
             torch.Tensor
                 The output tensor after passing through the network.
         """
+
+        layer_count = 0
+        func_count = 0
+
         for layer in self.layers:
             if isinstance(layer, nn.Module):
-                x = layer(x)
-            elif layer.startswith('v'):
-                x = x.view(x.size(0), -1)
-            elif layer == '':
-                pass
+                x = self.module_layers[layer_count](x)
+                layer_count += 1
+            elif callable(layer):
+                x = self.functions[func_count](x)
+                func_count += 1
             else:
-                print('Error: Layer type not found')
-
+                print(f"Error: Unknown layer type: {layer}")
         return x
 
 
