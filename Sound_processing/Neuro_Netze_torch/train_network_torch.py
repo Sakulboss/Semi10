@@ -24,12 +24,13 @@ def train(loader, args):
     train_loader = loader[0]
     test_loader = loader[1]
     num_epochs = args.get('epochs', 10)
-    num_classes = args.get('num_classes')
     learning_rate = args.get('learning_rate')
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     accuracy = []
-
+    epoch_max = num_epochs
     model = CNN()
+    if model.working is False:
+        return None
     model = model.to(device=device)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
@@ -56,10 +57,10 @@ def train(loader, args):
             optimizer.step()
         accuracy.append((1-check_accuracy(test_loader, model, device))**2)
         if epoch > 10 and accuracy[-1] > accuracy[-2]:
-            epoch_max = epoch
+            epoch_max: int = epoch
             break
 
-    print(f"Finished training. Best accuracy: {accuracy[-1]:.2f}% in epoch {epoch_max + 1}")
+    print(f"Finished training. Best accuracy: {100 * accuracy[-2]:.2f}% in epoch {epoch_max}")
     print(accuracy)
     return model, accuracy
 
@@ -78,8 +79,8 @@ def save_model_structure(model: CNN, accuracy, save_weight: bool = False):
     """
     move_working_directory()
 
-    with open('model_results', 'a') as f:
-        f.write(f'{accuracy:.2f}% {str(model)}\n')
+    with open('model_results.txt', 'a') as f:
+        f.write(f'{100 * accuracy[-2]:.2f}% {str(model)}\n')
 
     if save_weight:
         filename = get_new_filename('ckpt')

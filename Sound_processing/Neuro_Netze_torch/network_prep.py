@@ -1,6 +1,4 @@
-import numpy as np
-import torch
-from torch import nn, no_grad
+# -*- coding: utf-8 -*-
 import torch.nn.functional as f
 from torch import nn
 import os
@@ -71,6 +69,8 @@ def reshape_tensor(tensor):
 def getlayers():
     move_working_directory()
     original_model_text = getnextmodel('_netstruct.txt')
+    if original_model_text is None:
+        return None, None
     layers = original_model_text.split(';;')
     functions = []
     for layer in layers:
@@ -114,7 +114,15 @@ class CNN(nn.Module):
         """
 
         super(CNN, self).__init__()
-        layers, self.text  = getlayers()
+
+        layers, text = getlayers()
+        working = True
+
+        if (layers or text) is None:
+            working = False
+
+        self.text = text
+        self.working = working
 
         self.module_layers = nn.ModuleList(
             [layer for layer in layers if isinstance(layer, nn.Module)]
