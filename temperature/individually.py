@@ -90,14 +90,14 @@ if __name__ == '__main__':
         os.path.join(folder, 'ede8c5356461.csv')
     ]
 
-    plot_temperature_for_day(csv_files, '2025-04-28')
-    '''
+  #  plot_temperature_for_day(csv_files, '2025-04-28')
+
     all_days = get_all_days(csv_files)
     print(f"Found {len(all_days)} unique days in data.")
     
     for day in all_days:
-        save_file = os.path.join(output_folder, f'diagramm_{day}.png')
+        save_file = os.path.join(output_folder, f'individually_differences_{day}.png')
         plot_temperature_for_day(csv_files, day, save_path=save_file)
-'''
+
 
 
