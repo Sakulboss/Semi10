@@ -27,8 +27,8 @@ def download_small_dataset():
         try:
             wget.download(
                 'https://github.com/machinelistening/machinelistening.github.io/blob/master/animal_sounds.zip?raw=true',
-                out='_animal_sounds.zip', bar=None)
-            printer('_animal_sounds.zip downloaded successfully ...')
+                out='animal_sounds.zip', bar=None)
+            printer('animal_sounds.zip downloaded successfully ...')
         except Exception as e:
             printer(f"Error downloading file: {str(e)}")
 
@@ -83,6 +83,8 @@ def dataset(settings):
         if not os.path.isdir('_viele_sounds_geordnet'):
             download_big_dataset()
         dir_dataset: str = '_viele_sounds_geordnet'
+    elif size == 'bienen_1':
+        dir_dataset: str = '_bee_sounds'
     else:
         download_small_dataset()  # für den kleinen Datensatz
         dir_dataset: str = '_animal_sounds'

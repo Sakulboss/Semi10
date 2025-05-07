@@ -2,8 +2,10 @@ import torch
 from torch import optim
 from torch import nn
 from tqdm import tqdm
-from Sound_processing.Neuro_Netze_torch.network_prep import CNN, check_accuracy
 import os
+import numpy as np
+
+from Sound_processing.Neuro_Netze_torch.network_prep import CNN
 
 def move_working_directory():
     working_directory = os.getcwd()
@@ -57,3 +59,49 @@ def train(loader, args):
     move_working_directory()
     print(os.getcwd())
     torch.save(model, get_new_filename('ckpt'))
+
+def check_accuracy(loader, model, device):
+
+    """
+    Checks the accuracy of the model on the given dataset loader.
+
+    Parameters:
+        device: string
+            The Device to run the model on.
+        loader: DataLoader
+            The DataLoader for the dataset to check accuracy on.
+        model: nn.Module
+            The neural network model.
+    """
+
+
+    num_correct = 0
+    num_samples = 0
+    model.eval()
+
+    with no_grad():
+        for x, y in loader:
+
+            x = x.to(device)
+            _, predictions = model(x).max(1)
+
+            predictions_new = np.array(predictions.cpu())
+
+            if loader.dataset.train:
+                y_new = np.array(y.max(1))
+                y_new = np.array([int(i) for i in y_new[1]])
+            else:
+                y_new = np.array([int(i) for i in y])
+
+            num_correct += (predictions_new == y_new).sum()
+            num_samples += predictions.size(0)
+
+        # Calculate accuracy
+        accuracy = float(num_correct) / float(num_samples) * 100
+        if loader.dataset.train:
+            print(f"train: Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
+        else:
+            print(f"test:  Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
+
+
+    model.train()  # Set the model back to training mode

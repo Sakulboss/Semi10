@@ -1,5 +1,14 @@
 #l; conv2d; (1,16); (3,3); 1; 1;; a; relu;; p; maxpool; (3,3); 1; 1;; l; conv2d; (16, 32); (3,3); 1; 1;; v; view;; l; linear; (204800,5);;
 
+r"""
+l; layertype;        channels (in, out); kernel_size (h, w); stride; padding;;
+l; conv2d, linear;   (3,3);             (3,3);               1;      1;;
+p; pooltype;         size (h, w);       stride;              padding;;
+p; avgpool, maxpool; (2,2);             1;                   0;;
+a; activation_funtion;;
+a; sigmoid, relu, tanh;;
+v; view;;
+"""
 
 
 class NetStruct:
@@ -11,6 +20,7 @@ class NetStruct:
         self.act_types   :list[str]   = [None, 'sigmoid', 'relu'] # 'tanh'
         self.dim         :list[int]   = [1,60,100] #Channel, Height, Width
         self.output_dim  :int         = 2 #Output Dimension
+        self.linear_dim  :int         = 10 #Number of Linear Neurons
         self.filters     :list[tuple] = [(1,16),(16,48),(48,48)] #Number of channels
         self.layers      :list[str]   = []
 
@@ -34,19 +44,33 @@ class NetStruct:
                     pool_list.append(start_str + f'p; {p_type}; {size}; {stride}; {padding};; ')
         return pool_list
 
-    def linear(self, layer:list, input_filters:int):
+    def first_linear(self, layer:list, input_filters:int):
         linear_list, size = [], input_filters * self.dim[1] * self.dim[2]
-        kernel_size = (size, size)
+        kernel_size = (size, self.linear_dim)
         for start_str in layer:
                 linear_list.append(start_str + f'l; linear; {kernel_size};; ')
         return self.activation(linear_list)
 
-    def last_layer(self, layer:list, input_filters:int):
+    def middle_linear(self, layer:list):
+        linear_list = []
+        kernel_size = (self.linear_dim, self.linear_dim)
+        for start_str in layer:
+            linear_list.append(start_str + f'l; linear; {kernel_size};; ')
+        return self.activation(linear_list)
+
+    def last_linear(self, layer:list):
         last_list = []
-        kernel_size = (input_filters * self.dim[1] * self.dim[2], self.output_dim)
+        kernel_size = (self.linear_dim, self.output_dim)
         for start_str in layer:
                 last_list.append(start_str + f'l; linear; {kernel_size};; ')
         return last_list
+
+    def linear_only(self, layer:list, input_filters:int):
+        linear_list = []
+        kernel_size = (input_filters * self.dim[1] * self.dim[2], self.output_dim)
+        for start_str in layer:
+            linear_list.append(start_str + f'l; linear; {kernel_size};; ')
+        return self.activation(linear_list)
 
     def activation(self, layer:list):
         act_list = []
@@ -67,10 +91,10 @@ class NetStruct:
 
     def generator(self):
 
-        #3 Conv, 3 Linear
-        self.layers += self.last_layer(
-            self.linear(
-                self.linear(
+        #3 Conv, 3 Linear --
+        self.layers += self.last_linear(
+            self.middle_linear(
+                self.first_linear(
                     self.view_layer(
                         self.conv(
                             self.conv(
@@ -80,14 +104,14 @@ class NetStruct:
                             ), self.filters[2]
                         )
                     ), self.filters[2][1]
-                ), self.filters[2][1]
-            ), self.filters[2][1]
+                )
+            )
         )
 
         #2 Conv, 3 Linear
-        self.layers += self.last_layer(
-            self.linear(
-                self.linear(
+        self.layers += self.last_linear(
+            self.middle_linear(
+                self.first_linear(
                     self.view_layer(
                         self.conv(
                             self.conv(
@@ -95,26 +119,26 @@ class NetStruct:
                             ), self.filters[1]
                         )
                     ), self.filters[1][1]
-                ), self.filters[1][1]
-            ), self.filters[1][1]
+                )
+            )
         )
 
         #1 Conv, 3 Linear
-        self.layers += self.last_layer(
-            self.linear(
-                self.linear(
+        self.layers += self.last_linear(
+            self.middle_linear(
+                self.first_linear(
                     self.view_layer(
                         self.conv(
                             self.start_layers, self.filters[0]
                         )
                     ), self.filters[0][1]
-                ), self.filters[0][1]
-            ), self.filters[0][1]
+                )
+            )
         )
 
         #3 Conv, 2 Linear
-        self.layers += self.last_layer(
-            self.linear(
+        self.layers += self.last_linear(
+            self.first_linear(
                     self.view_layer(
                         self.conv(
                             self.conv(
@@ -124,11 +148,11 @@ class NetStruct:
                             ), self.filters[2]
                         )
                 ), self.filters[2][1]
-            ), self.filters[2][1]
+            )
         )
 
         #3 Conv, 1 Linear
-        self.layers += self.last_layer(
+        self.layers += self.linear_only(
             self.view_layer(
                 self.conv(
                     self.conv(
@@ -141,8 +165,8 @@ class NetStruct:
         )
 
         #2 Conv, 2 Linear
-        self.layers += self.last_layer(
-            self.linear(
+        self.layers += self.last_linear(
+            self.first_linear(
                 self.view_layer(
                     self.conv(
                         self.conv(
@@ -150,11 +174,11 @@ class NetStruct:
                         ), self.filters[1]
                     )
                 ), self.filters[1][1]
-            ), self.filters[1][1]
+            )
         )
 
         #2 Conv, 1 Linear
-        self.layers += self.last_layer(
+        self.layers += self.linear_only(
             self.view_layer(
                 self.conv(
                     self.conv(
@@ -165,18 +189,18 @@ class NetStruct:
         )
 
         #1 Conv, 2 Linear
-        self.layers += self.last_layer(
-            self.linear(
+        self.layers += self.last_linear(
+            self.first_linear(
                 self.view_layer(
                     self.conv(
                         self.start_layers, self.filters[0]
                     )
                 ), self.filters[0][1]
-            ), self.filters[0][1]
+            )
         )
 
         #1 Conv, 1 Linear
-        self.layers += self.last_layer(
+        self.layers += self.linear_only(
                 self.view_layer(
                         self.conv(
                             self.start_layers, self.filters[0]
@@ -185,7 +209,7 @@ class NetStruct:
         )
 
     def save_net(self):
-        with open('netstruct.txt', 'w') as f:
+        with open('_netstruct.txt', 'w') as f:
             for layer in self.layers:
                 f.write(layer + '\n')
         print('Netzstruktur gespeichert: {} Modelle.'.format(len(self.layers)))
