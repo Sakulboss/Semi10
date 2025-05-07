@@ -7,7 +7,7 @@ import zipfile
 import shutil
 
 def download_dataset(printing=False):
-    if not os.path.isfile('../Sound_processing/animal_sounds.zip'):
+    if not os.path.isfile('animal_sounds.zip'):
         if printing: print('\nPlease wait a couple of seconds ...')
         try:
             wget.download(
@@ -20,13 +20,13 @@ def download_dataset(printing=False):
     else:
         if printing: print('\nFiles already exist!', '\n')
 
-    if not os.path.isdir('../Sound_processing/_animal_sounds'):
+    if not os.path.isdir('_animal_sounds'):
         if printing: print("\nLet's unzip the file ... ")
-        assert os.path.isfile('../Sound_processing/animal_sounds.zip')
-        with zipfile.ZipFile('../Sound_processing/animal_sounds.zip', 'r') as f:
+        assert os.path.isfile('animal_sounds.zip')
+        with zipfile.ZipFile('animal_sounds.zip', 'r') as f:
             # unzip all files into current folder
             f.extractall('.')
-        assert os.path.isdir('../Sound_processing/_animal_sounds')
+        assert os.path.isdir('_animal_sounds')
         if printing: print("All done :)", '\n')
 
 def big_dataset(printing=False):
@@ -34,7 +34,7 @@ def big_dataset(printing=False):
     target_base_folder = '_viele_sounds_geordnet'
     eintraege = []
     directories = []
-    with open('../Sound_processing/training_files/esc50.csv', 'r') as f:
+    with open('training_files/esc50.csv', 'r') as f:
         for line in f:
             if line.startswith('#'):
                 continue
@@ -89,7 +89,7 @@ def compute_mel_spec_for_audio_file(fn_wav_name, n_fft=1024, hop_length=441, fss
     return x_new
 
 def get_new_filename(file_extension: str) -> str:
-    count = len([counter for counter in os.listdir('../Sound_processing/modelle') if counter.endswith(file_extension)]) + 1
+    count = len([counter for counter in os.listdir('modelle') if counter.endswith(file_extension)]) + 1
     return f'full_model_{count}.{file_extension}'
 
 if __name__ == '__main__':

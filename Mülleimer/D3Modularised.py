@@ -5,10 +5,9 @@ import matplotlib.pyplot as pl
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import accuracy_score, confusion_matrix
-import mel_spec_calculator as msc
-import tensorflow as tf
-from tensorflow.keras.models import Sequential, load_model, Model
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input, GlobalMaxPooling2D, BatchNormalization
+from Sound_processing import mel_spec_calculator as msc
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input
 
 
 #Herunterladen der Sounddateien und entpacken -------------------------------------------------------------------------- Fertig

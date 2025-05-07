@@ -55,7 +55,7 @@ def main(settings):
 args: dict[str, Any] = {
     'printing' : True,
     'model'    : 'torch',
-    'size'     : 'small',
+    'size'     : 'bienen_1',
 }
 
 if __name__=='__main__':

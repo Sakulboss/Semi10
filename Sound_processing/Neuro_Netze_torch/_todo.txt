@@ -1,0 +1,1 @@
+l: conv2d;5,16;(3,3);1;1;;a:relu;;p; maxpool; (2,2); 2; 0;;l: conv2d; (16, 32); (3,3); 1; 1;;v: view;;l: linear; (6400,5);;

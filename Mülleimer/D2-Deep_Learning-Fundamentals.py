@@ -10,8 +10,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from tensorflow.keras.layers import Input, Dense, Dropout
 from tensorflow.keras.models import Sequential
-import mel_spec_calculator as msc
-
+from Sound_processing import mel_spec_calculator as msc
 
 #Welche Diagramme angezeigt werden sollen ------------------------------------------------------------------------------
 
