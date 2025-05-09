@@ -17,7 +17,7 @@ def get_new_filename(size: str) -> str:
     count = len([counter for counter in os.listdir(os.getcwd()) if counter.endswith('.npy')]) + 1; print(count)
     return f'mels_{size}_{count}.npy'
 
-def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=64):
+def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=64, stereo:bool=True):
     """ Compute mel spectrogram
     Args:
         fn_wav_name (str): Audio file name
@@ -25,10 +25,13 @@ def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=
         hop_length (int): Hop size in samples
         fss (float): Sample rate in Hz
         n_mels (int): Number of mel bands
+        stereo (bool): If False, convert to mono
     """
     # load audio samples
-    x_new, fss = librosa.load(fn_wav_name, sr=fss, mono=True)
-
+    x_new, fss = librosa.load(fn_wav_name, sr=fss, mono=not stereo)
+    if stereo:
+        x_new = np.append(x_new[0], x_new[1])
+    printer(x_new.shape)
     # normalize to the audio file to a maximum absolute value of 1
     if np.max(np.abs(x_new)) > 0:
         x_new = x_new / np.max(np.abs(x_new))
@@ -60,7 +63,7 @@ def mel_specs(labels, setting):
     global printing, file_
     printing = setting.get('printing', printing)
     file_ = setting.get('file', file_)
-    size = setting.get('big')
+    size = setting.get('size', 'small')
 
     data = setting.get('classified_samples', labels)
     fn_wav_list = setting.get('fn_wav_list', data[0])
@@ -68,7 +71,7 @@ def mel_specs(labels, setting):
     all_mel_specs = []
 
     for count, fn_wav in enumerate(fn_wav_list):
-        all_mel_specs.append(mel_spec_file(fn_wav_list[count]))
+        all_mel_specs.append(mel_spec_file(fn_wav_list[count], stereo=(True if size == 'bienen_1' else False)))
 
     printer("We have {} spectrograms of shape: {}".format(len(all_mel_specs), all_mel_specs[0].shape))
 

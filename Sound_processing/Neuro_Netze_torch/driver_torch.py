@@ -10,7 +10,7 @@ def main(args):
     args['input_size'] = x[2] * x[3]
     args['num_classes'] = data[1]
     loader = data_prep(data, args)
-    while work:
+    while True:
         trained_model = train(loader, args)
         if trained_model is not None:
             save_model_structure(trained_model, args)

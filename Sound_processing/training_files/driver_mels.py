@@ -22,11 +22,14 @@ def create_trainingdata(settings) -> bool:
     move_working_directory()
     path = os.path.join(os.getcwd(), f'training_data_{model}_{size}.npy')
 
-    if os.path.isfile(path): print('Mels exist!'); return True
+    #if os.path.isfile(path): print('Mels exist!'); return True
 
     dir_list = dataset(settings)
+    print(1)
     labels = labeler(dir_list, settings)
+    print(2)
     mels = mel_specs(labels, settings)
+    print(3)
     trained_data = training_data(mels, settings, model=model)
 
     trained_data = np.array(trained_data, dtype=object)
@@ -50,12 +53,14 @@ def trainingdata(settings: dict) -> tuple:
     return load_trainingdata(settings['model'], settings['size'])
 
 def main(settings):
-    print(trainingdata(settings))
+    data = trainingdata(settings)
+    #print(data)
     
 args: dict[str, Any] = {
-    'printing' : True,
-    'model'    : 'torch',
-    'size'     : 'small', #bienen_1
+    'printing'         : True,
+    'model'            : 'torch',
+    'size'             : 'bienen_1', #'small', #'bienen_1'
+    'file_ID_diagram'  : True
 }
 
 if __name__=='__main__':

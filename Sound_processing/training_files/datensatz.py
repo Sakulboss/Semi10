@@ -27,7 +27,7 @@ def download_small_dataset():
         try:
             wget.download(
                 'https://github.com/machinelistening/machinelistening.github.io/blob/master/animal_sounds.zip?raw=true',
-                out='animal_sounds.zip', bar=None)
+                out='_animal_sounds.zip', bar=None)
             printer('animal_sounds.zip downloaded successfully ...')
         except Exception as e:
             printer(f"Error downloading file: {str(e)}")
@@ -69,6 +69,34 @@ def download_big_dataset():
         directories.append(entries[i][3] + '/' + entries[i][0])
     printer(len(directories))
 
+def create_bienen1():
+    source_folder: str = os.path.join('_bees', '27-28_April')
+    target_base_folder: str = '_bee_sounds'
+    categories: list = ['no_event', 'swarm_event']
+    entries: list = []
+    directories: list = []
+    if not os.path.isdir(target_base_folder):
+        os.mkdir(target_base_folder)
+    count = 0
+    for i in range(len(files := os.listdir(source_folder))):
+        if files[i].endswith('.wav'):
+            entries.append(files[i])
+            if entries[count].endswith('17.wav'):
+                target_folder = os.path.join(target_base_folder, 'no_event' )
+            else:
+                target_folder = os.path.join(target_base_folder, 'swarm_event')
+
+            if not os.path.isdir(target_folder):
+                os.mkdir(target_folder)
+
+            target_file = os.path.join(target_folder, entries[count])
+            if not os.path.isfile(target_file):
+                source_file = os.path.join(source_folder, entries[count])
+                shutil.copy(source_file, target_file)
+            directories.append(target_folder + '/' + entries[count])
+            count += 1
+    printer(len(directories))
+
 def dataset(settings):
     directory()
     global printing, file_
@@ -81,6 +109,8 @@ def dataset(settings):
             download_big_dataset()
         dir_dataset: str = '_viele_sounds_geordnet'
     elif size == 'bienen_1':
+        if not os.path.isdir('_bee_sounds'):
+            create_bienen1()
         dir_dataset: str = '_bee_sounds'
     else:
         download_small_dataset()  # für den kleinen Datensatz
