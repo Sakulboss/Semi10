@@ -148,7 +148,7 @@ def plot_all_pairwise_differences(csv_files, target_day, save_path=None, toleran
         plt.show()
 
 if __name__ == '__main__':
-    folder = 'temperature_data'
+    folder = 'temperature_Marco'
     output_folder = 'diagramme'
     os.makedirs(output_folder, exist_ok=True)
 
