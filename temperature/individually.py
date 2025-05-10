@@ -79,7 +79,7 @@ def plot_temperature_for_day(csv_files, target_day, save_path=None):
 
 
 if __name__ == '__main__':
-    folder = 'temperature_data'
+    folder = 'temperature_Marco'
     output_folder = 'diagramme'
     os.makedirs(output_folder, exist_ok=True)
 

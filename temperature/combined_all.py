@@ -4,11 +4,9 @@ import matplotlib.pyplot as plt
 import os
 
 
-def read_and_filter_csv(file_path, target_day=None):
+def read_csv(file_path):
     """
-    Reads CSV file and filters rows for the target_day (YYYY-MM-DD).
-    If target_day is None, returns all data.
-    Returns lists of datetime objects and temperature floats.
+    Reads CSV file and returns lists of datetime objects and temperature floats.
     """
     times = []
     temps = []
@@ -16,39 +14,24 @@ def read_and_filter_csv(file_path, target_day=None):
         reader = csv.DictReader(csvfile)
         for row in reader:
             dt = datetime.strptime(row[' time'], '%Y-%m-%d %H:%M:%S')
-            if target_day is None or dt.strftime('%Y-%m-%d') == target_day:
-                times.append(dt)
-                temps.append(float(row[' temp']))
+            times.append(dt)
+            temps.append(float(row[' temp']))
     return times, temps
 
 
-def get_all_days(csv_files):
-    """
-    Scans all CSV files and returns a sorted list of unique days (YYYY-MM-DD) found in all files.
-    """
-    unique_days = set()
-    for csv_file in csv_files:
-        with open(csv_file, 'r', newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                dt = datetime.strptime(row[' time'], '%Y-%m-%d %H:%M:%S')
-                unique_days.add(dt.strftime('%Y-%m-%d'))
-    return sorted(unique_days)
-
-
-def plot_temperature_for_day(csv_files, target_day, save_path=None):
+def plot_all_temperature_data(csv_files, save_path=None):
     all_data = []
     all_temps = []
     all_times = []
 
     for csv_file in csv_files:
-        times, temps = read_and_filter_csv(csv_file, target_day)
+        times, temps = read_csv(csv_file)
         all_data.append((times, temps))
         all_temps.extend(temps)
         all_times.extend(times)
 
     if not all_temps or not all_times:
-        print(f"No temperature or time data found for the day {target_day} in the provided files.")
+        print("No temperature or time data found in the provided files.")
         return
 
     min_temp = min(all_temps)
@@ -65,7 +48,7 @@ def plot_temperature_for_day(csv_files, target_day, save_path=None):
     for i, (times, temps) in enumerate(all_data):
         ax.plot(times, temps, linestyle='-', label=f'Data from {os.path.basename(csv_files[i])}')
 
-    ax.set_title(f'Temperature Data for {target_day} from 4 CSV files')
+    ax.set_title('Combined Temperature Data from All CSV Files')
     ax.set_xlabel('Time')
     ax.set_ylabel('Temperature')
     ax.grid(True)
@@ -77,7 +60,7 @@ def plot_temperature_for_day(csv_files, target_day, save_path=None):
     if save_path:
         plt.savefig(save_path)
         plt.close(fig)  # Close to free memory, do not show the plot
-        print(f"Saved plot for {target_day} as {save_path}")
+        print(f"Saved combined plot as {save_path}")
     else:
         plt.show()
 
@@ -94,9 +77,5 @@ if __name__ == '__main__':
         os.path.join(folder, 'ede8c5356461.csv')
     ]
 
-    all_days = get_all_days(csv_files)
-    print(f"Found {len(all_days)} unique days in data.")
-
-    for day in all_days:
-        save_file = os.path.join(output_folder, f'combined_temps_{day}.png')
-        plot_temperature_for_day(csv_files, day, save_path=save_file)
+    save_file = os.path.join(output_folder, 'combined_temps_all_days.png')
+    plot_all_temperature_data(csv_files, save_path=save_file)

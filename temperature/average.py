@@ -160,7 +160,7 @@ def plot_diff_to_average(csv_files, target_day, save_path=None, tolerance_second
         plt.show()
 
 if __name__ == '__main__':
-    folder = 'temperature_data'
+    folder = 'temperature_FF'
     output_folder = 'diagramme'
     os.makedirs(output_folder, exist_ok=True)
 
