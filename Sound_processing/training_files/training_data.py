@@ -2,12 +2,25 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import StandardScaler
 
-def training_data(data: tuple, setting: dict, model: str = 'torch') -> tuple: #model: tf or torch
+def training_data(data: tuple, setting: dict, ) -> tuple:
+    """
+    This function prepares the training data: It splits the data into training and test data
+    Args:
+        data:     Data from the previous mel_specs function.
+        setting:  Main settings like the type of dataset and injection of other labeled data.
+
+    Returns:
+
+
+    """
+
+    model: str           = setting.get('model', 'torch')
+    segment_file_mod_id  = setting.get('segment_file_mod_id', data[0])
+    segment_list         = setting.get('segment_list', data[1])
+    segment_class_id     = setting.get('segment_class_id', data[2])
+    printing             = setting.get('printing', False)
+
     if model not in ['torch', 'tf']: raise ValueError('Got unknown model name.')
-    segment_file_mod_id = setting.get('segment_file_mod_id', data[0])
-    segment_list = setting.get('segment_list', data[1])
-    segment_class_id = setting.get('segment_class_id', data[2])
-    printing = setting.get('printing', False)
 
     is_train = np.where(segment_file_mod_id <= 2)[0]
     is_test = np.where(segment_file_mod_id >= 3)[0]
@@ -18,12 +31,6 @@ def training_data(data: tuple, setting: dict, model: str = 'torch') -> tuple: #m
     y_train = segment_class_id[is_train]
     x_test = segment_list[is_test, :, :]
     y_test = segment_class_id[is_test]
-
-    if printing: print("Let's look at the dimensions")
-    if printing: print(x_train.shape)
-    if printing: print(y_train.shape)
-    if printing: print(x_test.shape)
-    if printing: print(y_test.shape)
 
     x_train_norm = np.zeros_like(x_train)
     x_test_norm = np.zeros_like(x_test)
@@ -44,13 +51,9 @@ def training_data(data: tuple, setting: dict, model: str = 'torch') -> tuple: #m
         x_train_norm = np.expand_dims(x_train_norm, -1)
         x_test_norm = np.expand_dims(x_test_norm, -1)
 
-    else:
-        if printing: print("We already have four dimensions")
-
     if printing: print(f"Let's check if we have four dimensions. New shapes: {x_train_norm.shape} & {x_test_norm.shape}")
 
     # The input shape is the "time-frequency shape" of our segments + the number of channels
-    # Make sure to NOT include the first (batch) dimension!
     input_shape = x_train_norm.shape[1:]
 
     # Get the number of classes:
