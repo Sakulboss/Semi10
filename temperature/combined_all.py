@@ -2,6 +2,7 @@ import csv
 from datetime import datetime
 import matplotlib.pyplot as plt
 import os
+import glob
 
 
 def read_csv(file_path, start_time=None, end_time=None):
@@ -70,20 +71,19 @@ def plot_temperature_in_range(csv_files, start_time=None, end_time=None, save_pa
 
 
 if __name__ == '__main__':
-    folder = 'temperature_FF'
+    folder = 'temperature_Marco'
     output_folder = 'diagramme'
     os.makedirs(output_folder, exist_ok=True)
 
-    csv_files = [
-        os.path.join(folder, '27f3c5356461.csv'),
-        os.path.join(folder, '47cdfb356461.csv'),
-        os.path.join(folder, 'e2e4c5356461.csv'),
-        os.path.join(folder, 'ede8c5356461.csv')
-    ]
+    # Dynamisch alle CSV-Dateien im Ordner einlesen
+    csv_files = glob.glob(os.path.join(folder, '*.csv'))
+    if not csv_files:
+        print(f"No CSV files found in folder {folder}")
+        exit(1)
 
-    # Specify time range here (example)
-    start_time_str = '2025-05-01 00:00:00'
-    end_time_str = '2025-05-1 23:59:59'
+    # Beispiel-Zeitraum (kann auch auf None gesetzt werden für alle Daten)
+    start_time_str = '2025-05-06 00:00:00'  # Beispiel: Startdatum
+    end_time_str = '2025-05-10 23:59:59'    # Beispiel: Enddatum
 
     start_time = datetime.strptime(start_time_str, '%Y-%m-%d %H:%M:%S')
     end_time = datetime.strptime(end_time_str, '%Y-%m-%d %H:%M:%S')
