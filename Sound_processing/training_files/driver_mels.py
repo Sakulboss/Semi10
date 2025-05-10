@@ -24,13 +24,10 @@ def create_trainingdata(settings) -> bool:
 
     #if os.path.isfile(path): print('Mels exist!'); return True
 
-    dir_list = dataset(settings)
-    print(1)
-    labels = labeler(dir_list, settings)
-    print(2)
+    dir_list = dataset(settings.get('size', 'bienen_1'))
+    labels = labeler(dir_list)
     mels = mel_specs(labels, settings)
-    print(3)
-    trained_data = training_data(mels, settings, model=model)
+    trained_data = training_data(mels, settings)
 
     trained_data = np.array(trained_data, dtype=object)
     os.chdir('training_files')
@@ -38,7 +35,6 @@ def create_trainingdata(settings) -> bool:
     return False
 
 def load_trainingdata(model='tf', size='small'):
-    #print(f'training_data_{model}_{size}.npy')
     ladung = np.load(f'training_data_{model}_{size}.npy', allow_pickle=True)
     return tuple(ladung)
 
@@ -59,11 +55,9 @@ def main(settings):
 args: dict[str, Any] = {
     'printing'         : True,
     'model'            : 'torch',
-    'size'             : 'bienen_1', #'small', #'bienen_1'
+    'size'             : 'bienen_1', #'big', 'small', 'bienen_1'
     'file_ID_diagram'  : True
 }
 
 if __name__=='__main__':
     main(args)
-
-#64 Anfangsneuronen fest machen
