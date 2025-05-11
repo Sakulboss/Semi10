@@ -15,7 +15,7 @@ def labeler(data: list):
         unique_classes: list of class labels - used for human readability
         n_files: number of all used files
         file_num_in_class: list of file numbers in class - used for human readability
-        n_sub: number of subdirectories
+        n_sub: number of subdirectories -> number of classes
 
     """
 

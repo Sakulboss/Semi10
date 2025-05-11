@@ -3,8 +3,9 @@ from Sound_processing.Neuro_Netze_torch.data_prep import data_prep
 from Sound_processing.Neuro_Netze_torch.train_network_torch import train, save_model_structure
 import torch
 
-print(torch.cuda.is_available())
+
 def main(args):
+    if args['printing']: print(torch.cuda.is_available())
     data = trainingdata(args)
     x = data[2].shape
     args['input_size'] = x[2] * x[3]
@@ -20,9 +21,7 @@ def main(args):
 
 specifiers = {
     'printing'         : True,
-    'size'             : 'small',
-    'plot_history'     : False,
-    'confusion_matrix' : False,
+    'size'             : 'bienen_1',
     'model'            : 'torch',
     'learning_rate'    : 0.001,
     'batch_size'       : 64,
