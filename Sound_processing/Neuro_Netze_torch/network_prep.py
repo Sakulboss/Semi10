@@ -28,7 +28,7 @@ def getnextmodel(file_path: str) -> str | None:
         lines = file.readlines()
     for i, line in enumerate(lines):
         if line.startswith('- '):
-            lines[i] = '# ' + line[1:]
+            lines[i] = '#' + line[1:]
             position = i
             break
     else:
@@ -66,9 +66,12 @@ def create_linear_layer(layer_description):
 def reshape_tensor(tensor):
     return tensor.view(tensor.shape[0], -1)
 
-def getlayers():
+def getlayers(omt:str = None):
     move_working_directory()
-    original_model_text = getnextmodel('_netstruct.txt')
+    if omt is None:
+        original_model_text = getnextmodel('_netstruct.txt')
+    else:
+        original_model_text = omt
     if original_model_text is None:
         return None, None
     layers = original_model_text.split(';;')
@@ -107,15 +110,17 @@ def getlayers():
 #diletation: not needed, but it adds space between filter kernels (pure brainfuck)
 
 class CNN(nn.Module):
-    def __init__(self):
+    def __init__(self, text=None):
         """
         Parameters:
-        No given parameters. Net is created with the given structure in the _netstruct.txt file.
+            text: str
+                The structure of the neural network. It is a string that contains the layers and their parameters.
+        If not given, the structure is read from the _netstruct.txt file.
         """
 
         super(CNN, self).__init__()
 
-        layers, text = getlayers()
+        layers, text = getlayers(text)
         working = True
 
         if (layers or text) is None:
@@ -163,4 +168,9 @@ class CNN(nn.Module):
         return x
 
 
+    def __str__(self):
+        """
+        Returns start text of the neural network.
+        """
+        return self.text
 

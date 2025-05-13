@@ -5,7 +5,7 @@ import matplotlib.pyplot as pl
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import accuracy_score, confusion_matrix
-import Sound_processing.mel_spec_calculator as msc
+import Sound_processing.training_files.datensatz as msc
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input
@@ -13,7 +13,7 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropou
 #Herunterladen der Sounddateien und entpacken --------------------------------------------------------------------------
 
 #msc.download_dataset() #für den kleinen Datensatz
-msc.big_dataset()
+msc.download_big_dataset()
 dir_dataset = '_viele_sounds_geordnet'
 sub_directories = glob.glob(os.path.join(dir_dataset, '*'))
 

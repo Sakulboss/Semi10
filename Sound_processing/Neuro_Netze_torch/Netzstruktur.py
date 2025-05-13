@@ -19,7 +19,7 @@ class NetStruct:
         self.pool_types  :list[str]   = ["avgpool", "maxpool"]
         self.act_types   :list[str]   = [None, 'sigmoid', 'relu'] # 'tanh'
         self.dim         :list[int]   = [1,64,100] #Channel, Height, Width
-        self.output_dim  :int         = 5 #Output Dimension
+        self.output_dim  :int         = 2 #Output Dimension
         self.linear_dim  :int         = 10 #Number of Linear Neurons
         self.filters     :list[tuple] = [(1,16),(16,48),(48,48)] #Number of channels
         self.layers      :list[str]   = []

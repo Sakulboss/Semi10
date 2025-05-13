@@ -22,7 +22,7 @@ def training_data(data: tuple, setting: dict, ) -> tuple:
     segment_list         = setting.get('segment_list', data[1])
     segment_class_id     = setting.get('segment_class_id', data[2])
     printing             = setting.get('printing', False)
-    test_size = setting.get('test_size', 0.3)
+    test_size            = setting.get('test_size', 0.3)
 
     if model not in ['torch', 'tf']: raise ValueError('Got unknown model name.')
 
