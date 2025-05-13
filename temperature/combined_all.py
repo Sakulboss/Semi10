@@ -71,7 +71,7 @@ def plot_temperature_in_range(csv_files, start_time=None, end_time=None, save_pa
 
 
 if __name__ == '__main__':
-    folder = 'temperature_Marco'
+    folder = 'temperature_FF'
     output_folder = 'diagramme'
     os.makedirs(output_folder, exist_ok=True)
 
@@ -82,7 +82,7 @@ if __name__ == '__main__':
         exit(1)
 
     # Beispiel-Zeitraum (kann auch auf None gesetzt werden für alle Daten)
-    start_time_str = '2025-05-06 00:00:00'  # Beispiel: Startdatum
+    start_time_str = '2025-04-06 00:00:00'  # Beispiel: Startdatum
     end_time_str = '2025-05-10 23:59:59'    # Beispiel: Enddatum
 
     start_time = datetime.strptime(start_time_str, '%Y-%m-%d %H:%M:%S')
