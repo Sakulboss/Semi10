@@ -6,7 +6,7 @@ from torch import load, tensor
 import os
 
 
-def predict(filepath: str, model_path: str, class_labels: list, printing=True, model_struct=None):
+def predict(filepath: str, model_path: str, class_labels: list, printing=True, model_struct=None, channel=0):
     """
     This function loads the model and predicts the class of the audio file.
     Args:
@@ -29,7 +29,7 @@ def predict(filepath: str, model_path: str, class_labels: list, printing=True, m
     model.eval()
     if printing: print("Model loaded")
 
-    mel_spec = msc.compute_mel_spec_for_audio_file(filepath, mono=False, channel = 1)
+    mel_spec = msc.compute_mel_spec_for_audio_file(filepath, mono=False, channel = channel)
     if printing: print('Mel specs erstellt')
     count = 0
     results = []
