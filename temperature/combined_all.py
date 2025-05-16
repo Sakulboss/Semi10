@@ -82,8 +82,8 @@ if __name__ == '__main__':
         exit(1)
 
     # Beispiel-Zeitraum (kann auch auf None gesetzt werden für alle Daten)
-    start_time_str = '2025-04-06 00:00:00'  # Beispiel: Startdatum
-    end_time_str = '2025-05-10 23:59:59'    # Beispiel: Enddatum
+    start_time_str = '2025-05-09 00:00:00'  # Beispiel: Startdatum
+    end_time_str = '2025-05-16 23:59:59'    # Beispiel: Enddatum
 
     start_time = datetime.strptime(start_time_str, '%Y-%m-%d %H:%M:%S')
     end_time = datetime.strptime(end_time_str, '%Y-%m-%d %H:%M:%S')
