@@ -36,7 +36,6 @@ def create_trainingdata(settings) -> bool:
     size = settings.get('size', 'small')
 
     path = os.path.join(os.getcwd(), f'training_data_{model}_{size}.npy')
-
     # Check if the file already exists
     if os.path.isfile(path) and settings.get('create_new', False): print('Mels exist!'); return True
 
@@ -45,7 +44,6 @@ def create_trainingdata(settings) -> bool:
     labels = labeler(dir_list)
     mels = mel_specs(labels, settings)
     trained_data = training_data(mels, settings)
-
     # Save the training data
     trained_data = np.array(trained_data, dtype=object)
     os.chdir('training_files')

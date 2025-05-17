@@ -10,7 +10,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from tensorflow.keras.layers import Input, Dense, Dropout
 from tensorflow.keras.models import Sequential
-from Sound_processing import mel_spec_calculator as msc
+import Sound_processing.training_files.datensatz as msc
 
 #Welche Diagramme angezeigt werden sollen ------------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ specto_predictions_diagram: bool = True
 
 #Herunterladen der Sounddateien und entpacken --------------------------------------------------------------------------
 
-msc.download_dataset()
+msc.download_small_dataset()
 dir_dataset = '../Sound_processing/_animal_sounds'
 sub_directories = glob.glob(os.path.join(dir_dataset, '*'))
 

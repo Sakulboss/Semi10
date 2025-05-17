@@ -25,37 +25,37 @@ def get_new_filename(file_extension: str) -> str:
     Creates a new filename for the model based on the number of existing files with the same extension in the current working directory.
     Args:
         file_extension: name of the file extension (e.g. 'ckpt', 'h5', ...)
-
     Returns:
         new filename
     """
     move_working_directory()
-    count = len([counter for counter in os.listdir(os.getcwd()) if counter.endswith(file_extension)]) + 1
+    count = len([counter for counter in os.listdir(os.getcwd()) if counter.endswith('.'+file_extension)]) + 1
     return f'model_torch_{count}.{file_extension}'
 
 
-def train(loader, args):
+def train(loader, args) -> tuple[CNN, list] | None:
     """
     Trains the model using the given data loader and arguments.
     Args:
         loader: data loader for the training and testing data
         args:  dictionary containing training parameters such as epochs, learning rate, if it should print the accuracy, etc.
     Returns:
-        model: the trained model
-        accuracy: the accuracy of the trained model
+        the trained model and the accuracy of the trained model
     """
 
     # Initialize variables
-    train_loader = loader[0]
-    test_loader = loader[1]
-    num_epochs = args.get('epochs', 10)
-    learning_rate = args.get('learning_rate', 0.01)
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    accuracy = []
-    epoch_max = num_epochs
+    train_loader    = loader[0]
+    test_loader     = loader[1]
+    num_epochs      = args.get('epochs', 10)
+    learning_rate   = args.get('learning_rate', 0.01)
+    min_epoch       = args.get('min_epoch', 5)
+    device          = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    accuracy        = []
+    epoch_max       = num_epochs
+    model_struct    = args.get('model_text', None)
 
     #Create the model and check if the model is working -> when all models are tested, model.working is False. After that move model to GPU or CPU.
-    model = CNN()
+    model = CNN(model_struct)
     if model.working is False:
         return None
     model = model.to(device=device)
@@ -65,7 +65,7 @@ def train(loader, args):
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     for epoch in range(num_epochs):
-        print(f"\nEpoch [{epoch + 1}/{num_epochs}]")
+        #print(f"\nEpoch [{epoch + 1}/{num_epochs}]")
         for batch_index, (data, targets) in enumerate(tqdm(train_loader, disable=True)):
             # Move data and targets to the device (GPU/CPU)
 
@@ -85,12 +85,12 @@ def train(loader, args):
 
         #calculate the middle squared error of the model, if it gets worse, stop training.
         accuracy.append((1-check_accuracy(test_loader, model, device))**2)
-        if epoch > 10 and accuracy[-1] > accuracy[-2]:
+        if epoch > min_epoch and accuracy[-1] > accuracy[-2]:
             epoch_max: int = epoch
             break
 
-    print(f"Finished training. Best accuracy: {100 * accuracy[-2]:.2f}% in epoch {epoch_max} with the model {str(model)}")
-    print(accuracy)
+    print(f"Finished training. MSE: {100 * accuracy[-2]:.2f}% in epoch {epoch_max} with the model {str(model)}")
+    #print(accuracy)
     return model, accuracy
 
 
@@ -103,8 +103,10 @@ def save_model_structure(model: CNN, accuracy, save_weight: bool = False):
             If the model weights should be saved.
         model: nn.Module
             The neural network model.
-        accuracy: float
+        accuracy: list
             The accuracy of the model.
+    Returns:
+        None
     """
     move_working_directory()
 

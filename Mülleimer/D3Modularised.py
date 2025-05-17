@@ -5,7 +5,7 @@ import matplotlib.pyplot as pl
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import accuracy_score, confusion_matrix
-from Sound_processing import mel_spec_calculator as msc
+import Sound_processing.training_files.datensatz as msc
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input
 
@@ -17,10 +17,10 @@ def dataset(**kwargs):
     printing = kwargs.get('printing', False)
 
     if not big:
-        msc.big_dataset(printing=printing)
+        msc.download_big_dataset()
         dir_dataset = '../Sound_processing/_animal_sounds'
     else:
-        msc.download_dataset(printing=printing)  # für den kleinen Datensatz
+        msc.download_small_dataset()  # für den kleinen Datensatz
         dir_dataset = '../Sound_processing/_viele_sounds_geordnet'
     return glob.glob(os.path.join(dir_dataset, '*'))
 

@@ -16,7 +16,7 @@ def cwav(flac_file_path):
 	# Load the FLAC file
 	audio = AudioSegment.from_file(flac_file_path, format="flac")
 	# Create the output file path by changing the extension to .wav
-	wav_file_path = os.path.splitext(flac_file_path)[0] + '.wav'
+	wav_file_path = os.path.splitext(flac_file_path)[0] + 'new' + '.wav'
 	# Export as WAV
 	audio.export(wav_file_path, format="wav")
 	print(f"Converted {flac_file_path} to {wav_file_path}")
@@ -42,5 +42,4 @@ def splitter(wav_file_path):
 	print(f"Split {wav_file_path} into {left_channel_path} and {right_channel_path}")
 
 if __name__ == '__main__':
-	cwav("")
-	cwav("")
+	cwav(r"F:\Aufnahmen\Zuhause\19-22_April\output_2025-04-19-19-23-31_0_22.flac")
