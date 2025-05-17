@@ -17,7 +17,7 @@ class NetStruct:
         self.conv_sizes  :list[tuple] = [ (3,3), (11,21)] #[(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), (10,20), (10,50), (10,70)]
         self.pool_sizes  :list[tuple] = [(3,3), (5,5)]
         self.pool_types  :list[str]   = ["avgpool", "maxpool"]
-        self.act_types   :list[str]   = [None, 'sigmoid', 'relu'] # 'tanh'
+        self.act_types   :list[str]   = [None, 'relu'] # 'tanh'
         self.dim         :list[int]   = [1,64,100] #Channel, Height, Width
         self.output_dim  :int         = 2 #Output Dimension
         self.linear_dim  :int         = 10 #Number of Linear Neurons
@@ -209,9 +209,14 @@ class NetStruct:
         )
 
     def save_net(self):
-        with open('_netstruct.txt', 'w') as f:
+        with open('_netstruct1.txt', 'w') as f:
             for layer in self.layers:
                 f.write(layer + '\n')
         print('Netzstruktur gespeichert: {} Modelle.'.format(len(self.layers)))
 
-Cnn = NetStruct()
+
+if __name__=='__main__':
+    # Example usage
+    # Create an instance of the NetStruct class
+    # This will generate the network structure and save it to a file
+    Cnn = NetStruct()

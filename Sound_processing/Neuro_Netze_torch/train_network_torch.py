@@ -90,7 +90,6 @@ def train(loader, args) -> tuple[CNN, list] | None:
             break
 
     print(f"Finished training. MSE: {100 * accuracy[-2]:.2f}% in epoch {epoch_max} with the model {str(model)}")
-    #print(accuracy)
     return model, accuracy
 
 
@@ -111,7 +110,7 @@ def save_model_structure(model: CNN, accuracy, save_weight: bool = False):
     move_working_directory()
 
     with open('model_results.txt', 'a') as f:
-        f.write(f'{100 * accuracy[-2]:.2f}% {str(model)}\n')
+        f.write(f'{100 * accuracy[-2]:.5f}% {str(model)}')
 
     if save_weight:
         filename = get_new_filename('ckpt')

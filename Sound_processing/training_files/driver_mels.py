@@ -24,7 +24,7 @@ def move_working_directory():
 
 def create_trainingdata(settings) -> bool:
     """
-    This function creates the main datasets for the ANN. If the dataset exists earlier, it is not created again.
+    This function creates the main datasets for the CNN. If the dataset exists earlier, it is not created again.
     Args:
         settings: main settings like the type of dataset, if it should be created new, etc.
     Returns:
@@ -33,11 +33,11 @@ def create_trainingdata(settings) -> bool:
     #Initialize the working directory and variables
     move_working_directory()
     model = settings.get('model', 'torch')
-    size = settings.get('size', 'small')
+    size = settings.get('size', 'bienen_1')
 
     path = os.path.join(os.getcwd(), f'training_data_{model}_{size}.npy')
     # Check if the file already exists
-    if os.path.isfile(path) and settings.get('create_new', False): print('Mels exist!'); return True
+    if os.path.isfile(path) and not settings.get('create_new', False): return True
 
     # If the file does not exist, create it
     dir_list = dataset(settings.get('size', 'bienen_1'))

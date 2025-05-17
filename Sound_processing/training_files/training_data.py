@@ -52,7 +52,7 @@ def training_data(data: tuple, setting: dict, ) -> tuple:
     y_train_transformed = OneHotEncoder(categories='auto', sparse_output=False).fit_transform(y_train.reshape(-1, 1))
     y_test_transformed = OneHotEncoder(categories='auto', sparse_output=False).fit_transform(y_test.reshape(-1, 1))
 
-    # Put the
+    # Create the right dimensions
     if len(x_train_norm.shape) == 3 and model == 'torch':
         x_train_norm = np.expand_dims(x_train_norm, 1)
         x_test_norm = np.expand_dims(x_test_norm, 1)

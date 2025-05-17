@@ -17,15 +17,12 @@ def compute_mel_spec_for_audio_file(fn_wav_name, n_fft=1024, hop_length=441, fss
         mono (bool): If True, convert to mono
     """
     # load audio samples
-    print('1')
     x_new, fss = librosa.load(fn_wav_name, sr=fss, mono=mono)
     if not mono:
         x_new = x_new[channel]
-    print('2')
     # normalize to the audio file to a maximum absolute value of 1
     if np.max(np.abs(x_new)) > 0:
         x_new = x_new / np.max(np.abs(x_new))
-    print('3')
     # mel-spectrogram
     x_new = librosa.feature.melspectrogram(y=x_new,
                                        sr=fss,
@@ -37,7 +34,6 @@ def compute_mel_spec_for_audio_file(fn_wav_name, n_fft=1024, hop_length=441, fss
                                        power=1.0,
                                        htk=True,
                                        norm=None)
-    print('4')
     # apply dB normalization
     x_new = librosa.amplitude_to_db(x_new)
 
