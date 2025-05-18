@@ -4,3 +4,5 @@ Sound_processing/training_files/training_data_torch_bienen_1.npy
 Sound_processing/_viele_sounds_geordnet
 Sound_processing/_bee_sounds
 Sound_processing/_bees
+**/__pycache__/**
+/.idea/*
