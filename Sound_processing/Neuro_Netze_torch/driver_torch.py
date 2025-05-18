@@ -2,7 +2,7 @@ from Sound_processing.training_files.driver_mels import trainingdata
 from Sound_processing.Neuro_Netze_torch.data_prep import data_prep
 from Sound_processing.Neuro_Netze_torch.train_network_torch import train, save_model_structure, get_new_filename, move_working_directory
 import torch
-from torch import save
+
 
 
 def main(args):
