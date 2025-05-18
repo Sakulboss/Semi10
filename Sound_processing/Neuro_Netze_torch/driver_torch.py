@@ -39,6 +39,7 @@ specifiers = {
     'min_epoch'        : 5,
     'train_once'       : False,
     #'model_text'       : 'l; conv2d; (1, 16); (3, 3); 1; (1, 1);; p; avgpool; (3, 3); 1; (1, 1);; l; conv2d; (16, 48); (3, 3); 1; (1, 1);; p; avgpool; (3, 3); 1; (1, 1);; l; conv2d; (48, 48); (3, 3); 1; (1, 1);; p; maxpool; (3, 3); 1; (1, 1);; v: view;; l; linear; (307200, 10);; l; linear; (10, 10);; l; linear; (10, 2);;',
+    'dropbox'          : r'C:\Users\sdose\Dropbox\Semi',
 }
 
 if __name__ == '__main__':

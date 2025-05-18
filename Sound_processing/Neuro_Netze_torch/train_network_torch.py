@@ -53,9 +53,10 @@ def train(loader, args) -> tuple[CNN, list] | None:
     accuracy        = []
     epoch_max       = num_epochs
     model_struct    = args.get('model_text', None)
+    dropbox         = args.get('dropbox', None)
 
     #Create the model and check if the model is working -> when all models are tested, model.working is False. After that move model to GPU or CPU.
-    model = CNN(model_struct)
+    model = CNN(dropbox, model_struct)
     if model.working is False:
         return None
     model = model.to(device=device)
@@ -93,7 +94,7 @@ def train(loader, args) -> tuple[CNN, list] | None:
     return model, accuracy
 
 
-def save_model_structure(model: CNN, accuracy, save_weight: bool = False):
+def save_model_structure(model: CNN, accuracy,path = None, save_weight: bool = False):
     """
     Saves the model structure to a file.
 
@@ -104,10 +105,17 @@ def save_model_structure(model: CNN, accuracy, save_weight: bool = False):
             The neural network model.
         accuracy: list
             The accuracy of the model.
+        path: str
+            The path to the dropbox to save the model structure. If None, it will be saved in models.
     Returns:
         None
     """
     move_working_directory()
+
+    if path is None:
+        path = os.getcwd()
+    else:
+        path = os.path.join(path, '_netstruct.txt')
 
     with open('model_results.txt', 'a') as f:
         f.write(f'{100 * accuracy[-2]:.5f}% {str(model)}')
