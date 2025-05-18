@@ -2,11 +2,23 @@ from Sound_processing.training_files.driver_mels import trainingdata
 from Sound_processing.Neuro_Netze_torch.data_prep import data_prep
 from Sound_processing.Neuro_Netze_torch.train_network_torch import train, save_model_structure, get_new_filename, move_working_directory
 import torch
+import logging
 
-
+def setup_logging():
+    # Konfiguriere das Logging-Format und Level
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            # logging.FileHandler('training.log'),
+            logging.StreamHandler()  # Ausgabe auch in der Konsole
+        ]
+    )
+    return logging.getLogger(__name__)
 
 def main(args):
-    if args['printing']: print(torch.cuda.is_available())
+    logger = setup_logging()
+    logger.info(f"CUDA available: {torch.cuda.is_available()}")
     data = trainingdata(args)
     x = data[2].shape
     args['input_size'] = x[2] * x[3]
