@@ -44,6 +44,7 @@ def create_trainingdata(settings) -> bool:
     labels = labeler(dir_list)
     mels = mel_specs(labels, settings)
     trained_data = training_data(mels, settings)
+
     # Save the training data
     trained_data = np.array(trained_data, dtype=object)
     os.chdir('training_files')

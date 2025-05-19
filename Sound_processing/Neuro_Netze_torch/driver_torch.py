@@ -64,20 +64,5 @@ def main():
             else: break
 
 
-specifiers = {
-    'printing'         : True,
-    'size'             : 'bienen_1',
-    'model'            : 'torch',
-    'create_new'       : False,
-    'learning_rate'    : 0.001,
-    'batch_size'       : 128,
-    'num_epochs'       : 100,
-    'epochs'           : 100,
-    'min_epoch'        : 5,
-    'train_once'       : False,
-    #'model_text'       : 'l; conv2d; (1, 16); (3, 3); 1; (1, 1);; p; avgpool; (3, 3); 1; (1, 1);; l; conv2d; (16, 48); (3, 3); 1; (1, 1);; p; avgpool; (3, 3); 1; (1, 1);; l; conv2d; (48, 48); (3, 3); 1; (1, 1);; p; maxpool; (3, 3); 1; (1, 1);; v: view;; l; linear; (307200, 10);; l; linear; (10, 10);; l; linear; (10, 2);;',
-    'dropbox'          : r'C:\Users\SFZ Rechner\PycharmProjects\Semi10\Sound_processing\Neuro_Netze_torch',
-}
-
 if __name__ == '__main__':
     main()

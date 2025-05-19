@@ -19,7 +19,7 @@ def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=
     x_new, fss = librosa.load(fn_wav_name, sr=fss, mono=not stereo)
     if stereo:
         x_new = np.append(x_new[0], x_new[1])
-    print(1)
+
     #normalize to the audio file to a maximum absolute value of 1
     if np.max(np.abs(x_new)) > 0:
         x_new = x_new / np.max(np.abs(x_new))
