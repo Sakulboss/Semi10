@@ -74,8 +74,8 @@ def create_bienen1():
     Returns:
 
     """
-    source_folder: str = os.path.join('_bees', '27-28_April')
-    target_base_folder: str = '_bee_sounds'
+    source_folder: str = '/home/malde/Desktop/_bees/26-27_April'
+    target_base_folder: str = '/home/malde/Desktop/_bee_sounds'
     categories: list = ['no_event', 'swarm_event']
     entries: list = []
     directories: list = []
@@ -83,9 +83,9 @@ def create_bienen1():
         os.mkdir(target_base_folder)
     count = 0
     for i in range(len(files := os.listdir(source_folder))):
-        if files[i].endswith('.wav'):
+        if files[i].endswith('.flac'):
             entries.append(files[i])
-            if entries[count].endswith('17.wav'):
+            if entries[count].endswith('17.flac'):
                 target_folder = os.path.join(target_base_folder, 'no_event' )
             else:
                 target_folder = os.path.join(target_base_folder, 'swarm_event')
@@ -118,12 +118,13 @@ def dataset(size: str) -> list[str]:
             download_big_dataset()
         dir_dataset: str = '_viele_sounds_geordnet'
     elif size == 'bienen_1':
-        if not os.path.isdir('_bee_sounds'):
+        if not os.path.isdir('/home/malde/Desktop/_bee_sounds'):
             create_bienen1()
-        dir_dataset: str = '_bee_sounds'
+        dir_dataset: str = '/home/malde/Desktop/_bee_sounds'
     else:
         if not os.path.isdir('_animal_sounds'):
             download_small_dataset()
         dir_dataset: str = '_animal_sounds'
+    print(glob.glob(os.path.join(dir_dataset, '*')))
     return glob.glob(os.path.join(dir_dataset, '*'))
 

@@ -2,23 +2,10 @@ from Sound_processing.training_files.driver_mels import trainingdata
 from Sound_processing.Neuro_Netze_torch.data_prep import data_prep
 from Sound_processing.Neuro_Netze_torch.train_network_torch import train, save_model_structure, get_new_filename, move_working_directory
 import torch
-import logging
-
-def setup_logging():
-    # Konfiguriere das Logging-Format und Level
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            # logging.FileHandler('training.log'),
-            logging.StreamHandler()  # Ausgabe auch in der Konsole
-        ]
-    )
-    return logging.getLogger(__name__)
 
 def main(args):
-    logger = setup_logging()
-    logger.info(f"CUDA available: {torch.cuda.is_available()}")
+
+    print(f"CUDA available: {torch.cuda.is_available()}")
     data = trainingdata(args)
     x = data[2].shape
     args['input_size'] = x[2] * x[3]
@@ -51,7 +38,7 @@ specifiers = {
     'min_epoch'        : 5,
     'train_once'       : False,
     #'model_text'       : 'l; conv2d; (1, 16); (3, 3); 1; (1, 1);; p; avgpool; (3, 3); 1; (1, 1);; l; conv2d; (16, 48); (3, 3); 1; (1, 1);; p; avgpool; (3, 3); 1; (1, 1);; l; conv2d; (48, 48); (3, 3); 1; (1, 1);; p; maxpool; (3, 3); 1; (1, 1);; v: view;; l; linear; (307200, 10);; l; linear; (10, 10);; l; linear; (10, 2);;',
-    'dropbox'          : r'C:\Users\sdose\Dropbox\Semi',
+    'dropbox'          : r'/home/malde/Dropbox',
 }
 
 if __name__ == '__main__':

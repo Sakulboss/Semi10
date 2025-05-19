@@ -61,8 +61,8 @@ def load_trainingdata(model='torch', size='bienen_1') -> tuple:
     Returns:
         contents of the file as a tuple
     """
-    ladung = np.load(f'training_data_{model}_{size}.npy', allow_pickle=True)
-    return tuple(ladung)
+    data = np.load(f'training_data_{model}_{size}.npy', allow_pickle=True)
+    return tuple(data)
 
 
 def trainingdata(settings: dict) -> tuple:

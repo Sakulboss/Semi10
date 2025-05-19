@@ -2,7 +2,7 @@ import numpy as np
 import librosa.feature as mf
 import librosa
 
-def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=64, stereo:bool=True):
+def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 48000, n_mels=64, stereo:bool=True):
     """
     Compute mel spectrogram from audio file with librosa.feature.melspectogram()
     Args:
@@ -16,7 +16,14 @@ def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=
         x_new (ndarray): Mel spectrogram
     """
 
-    x_new, fss = librosa.load(fn_wav_name, sr=fss, mono=not stereo)
+    try:
+        x_new, fss = librosa.load(fn_wav_name, sr=fss, mono=not stereo)
+    except Exception as e:
+        print(f'File {fn_wav_name} is probably corrupted. Please delete this file!')
+        print(e)
+        return None
+
+    print(1)
     if stereo:
         x_new = np.append(x_new[0], x_new[1])
 
@@ -61,16 +68,18 @@ def mel_specs(labels, setting):
     data = setting.get('classified_samples', labels)
     fn_wav_list = setting.get('fn_wav_list', data[0])
     class_id = setting.get('class_id', data[1])
-    all_mel_specs = []
+    all_mel_specs = np.array([])
     segment_list = []
     segment_file_id = []
     segment_class_id = []
 
     # Create mel spectrograms
     for count, fn_wav in enumerate(fn_wav_list):
-        all_mel_specs.append(mel_spec_file(fn_wav_list[count], stereo=(True if size == 'bienen_1' else False)))
+        mel = mel_spec_file(fn_wav_list[count], stereo=(True if size == 'bienen_1' else False))
+        if mel is not None: np.append(all_mel_specs, mel)
+    for mel in all_mel_specs:
+        print(mel.shape)
 
-    all_mel_specs = np.array(all_mel_specs)
     n_spectrograms = all_mel_specs.shape[0]
     spec_length_frames = all_mel_specs.shape[2]
 

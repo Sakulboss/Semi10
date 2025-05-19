@@ -27,12 +27,12 @@ def labeler(data: list):
 
     for i in range(n_sub):
         current_class_label = os.path.basename(data[i])
-        current_fn_wav_list = sorted(glob.glob(os.path.join(data[i], '*.wav')))
+        current_fn_wav_list = sorted(glob.glob(os.path.join(data[i], '*.flac')))
         for k, fn_wav in enumerate(current_fn_wav_list):
             fn_wav_list.append(fn_wav)
             class_label.append(current_class_label)
             file_num_in_class.append(k)
-
+    print(fn_wav_list)
     n_files = len(class_label)
 
     file_num_in_class = np.array(file_num_in_class)
