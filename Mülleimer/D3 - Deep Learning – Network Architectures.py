@@ -261,6 +261,6 @@ pl.xticks(ticks, unique_classes)
 pl.yticks(ticks, unique_classes)
 pl.show()
 
-model.save(f'C:\\modelle\\{msc.get_new_filename('keras')}') #saves the model into modelle
+model.save(f'C:\\modelle\\{msc.get_new_filename("keras")}') #saves the model into modelle
 
 print("Done :)")
