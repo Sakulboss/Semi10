@@ -40,7 +40,7 @@ def create_trainingdata(settings) -> bool:
     if os.path.isfile(path) and not settings.get('create_new', False): return True
 
     # If the file does not exist, create it
-    dir_list = dataset(settings.get('size', 'bienen_1'))
+    dir_list = dataset(settings.get('size', 'bienen_1'), settings)
     labels = labeler(dir_list)
     mels = mel_specs(labels, settings)
     trained_data = training_data(mels, settings)
@@ -74,7 +74,8 @@ def trainingdata(settings: dict) -> tuple:
         contents of the training data file as a tuple
     """
     create_trainingdata(settings)
-    return load_trainingdata(settings['model'], settings['size'])
+    return load_trainingdata(settings.get('model', 'torch'), settings['size'])
+    ''
 
 
 def main(settings):

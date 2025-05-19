@@ -1,5 +1,4 @@
 import os
-import sys
 import wget
 import zipfile
 import shutil
@@ -68,24 +67,25 @@ def download_big_dataset():
         directories.append(entries[i][3] + '/' + entries[i][0])
 
 
-def create_bienen1():
+def create_bienen1(args: dict = None) -> None:
     """
     This function categorizes the bee sounds captured by us. The KNN was trained on this dataset.
-    Returns:
+    Returns: None
 
     """
-    source_folder: str = os.path.join('_bees', '27-28_April')
-    target_base_folder: str = '_bee_sounds'
-    categories: list = ['no_event', 'swarm_event']
+    ext = args.get("training_file_extensions","wav")
+    source_folder: str = args.get("training_files_storage_location", os.path.join(os.getcwd(),'_bees\\27-28_April'))
+    target_base_folder: str = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_bee_sounds')
+    # categories: list = ['no_event', 'swarm_event']
     entries: list = []
     directories: list = []
     if not os.path.isdir(target_base_folder):
         os.mkdir(target_base_folder)
     count = 0
     for i in range(len(files := os.listdir(source_folder))):
-        if files[i].endswith('.wav'):
+        if files[i].endswith(ext):
             entries.append(files[i])
-            if entries[count].endswith('17.wav'):
+            if entries[count].endswith(f'17.{ext}'):
                 target_folder = os.path.join(target_base_folder, 'no_event' )
             else:
                 target_folder = os.path.join(target_base_folder, 'swarm_event')
@@ -101,16 +101,18 @@ def create_bienen1():
             count += 1
 
 
-def dataset(size: str) -> list[str]:
+def dataset(size: str, args: dict) -> list[str]:
     """
     This function defines the used dataset. Therefor the working directory is changed to the correct one. It then creates the sorted dataset if it doesn't exist yet. The dataset is then returned as a list of paths.
 
     Args:
         size: string, size of the dataset ('small', 'big', 'bienen_1')
+        args: dictionary with the settings for the dataset like file storage locations, etc.
 
     Returns:
         list[str]: list of paths to the dataset
     """
+
     directory()
 
     if size == "big":
@@ -118,9 +120,10 @@ def dataset(size: str) -> list[str]:
             download_big_dataset()
         dir_dataset: str = '_viele_sounds_geordnet'
     elif size == 'bienen_1':
-        if not os.path.isdir('_bee_sounds'):
-            create_bienen1()
-        dir_dataset: str = '_bee_sounds'
+        sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_bee_sounds')
+        if not os.path.isdir(sorted_files):
+            create_bienen1(args)
+        dir_dataset: str = sorted_files
     else:
         if not os.path.isdir('_animal_sounds'):
             download_small_dataset()

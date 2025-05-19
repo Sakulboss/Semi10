@@ -26,7 +26,6 @@ def move_working_directory():
 def getnextmodel(file_path: str) -> str | None:
     with open(file_path, 'r') as file:
         lines = file.readlines()
-    lines = lines[::-1]
     for i, line in enumerate(lines):
         if line.startswith('- '):
             lines[i] = '#' + line[1:]
@@ -34,7 +33,6 @@ def getnextmodel(file_path: str) -> str | None:
             break
     else:
         return None
-    lines = lines[::-1]
     with open(file_path, 'w') as file:
         file.writelines(lines)
     return lines[position][2:]
@@ -126,8 +124,7 @@ class CNN(nn.Module):
 
         if path is None:
             path = os.getcwd()
-        else:
-            path = os.path.join(path, '_netstruct.txt')
+        path = os.path.join(path, '_netstruct.txt')
 
         layers, text = getlayers(path, text)
         working = True

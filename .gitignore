@@ -6,3 +6,4 @@ Sound_processing/_bee_sounds
 Sound_processing/_bees
 **/__pycache__/**
 /.idea/*
+*.tar.zst

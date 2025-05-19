@@ -28,7 +28,6 @@ def get_new_filename(file_extension: str) -> str:
     Returns:
         new filename
     """
-    move_working_directory()
     count = len([counter for counter in os.listdir(os.getcwd()) if counter.endswith('.'+file_extension)]) + 1
     return f'model_torch_{count}.{file_extension}'
 
@@ -46,17 +45,16 @@ def train(loader, args) -> tuple[CNN, list] | None:
     # Initialize variables
     train_loader    = loader[0]
     test_loader     = loader[1]
-    num_epochs      = args.get('epochs', 10)
+    max_epochs      = args.get('epochs', 10)
     learning_rate   = args.get('learning_rate', 0.01)
     min_epoch       = args.get('min_epoch', 5)
     device          = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     accuracy        = []
-    epoch_max       = num_epochs
     model_struct    = args.get('model_text', None)
     dropbox         = args.get('dropbox', None)
 
     #Create the model and check if the model is working -> when all models are tested, model.working is False. After that move model to GPU or CPU.
-    model = CNN(dropbox, model_struct)
+    model = CNN(path=dropbox, text=model_struct)
     if model.working is False:
         return None
     model = model.to(device=device)
@@ -65,7 +63,7 @@ def train(loader, args) -> tuple[CNN, list] | None:
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-    for epoch in range(num_epochs):
+    for epoch in range(max_epochs):
         #print(f"\nEpoch [{epoch + 1}/{num_epochs}]")
         for batch_index, (data, targets) in enumerate(tqdm(train_loader, disable=True)):
             # Move data and targets to the device (GPU/CPU)
@@ -89,12 +87,13 @@ def train(loader, args) -> tuple[CNN, list] | None:
         if epoch > min_epoch and accuracy[-1] > accuracy[-2]:
             epoch_max: int = epoch
             break
-
-    print(f"Finished training. MSE: {100 * accuracy[-2]:.2f}% in epoch {epoch_max} with the model {str(model)}")
+    else:
+        epoch_max: int = max_epochs
+    print(f"Finished training. MSE: {100 * accuracy[-2]:.2f}% in epoch {epoch_max} with model {str(model)}")
     return model, accuracy
 
 
-def save_model_structure(model: CNN, accuracy,path = None, save_weight: bool = False):
+def save_model_structure(model: CNN, accuracy, path = None, save_weight: bool = False):
     """
     Saves the model structure to a file.
 
@@ -110,17 +109,18 @@ def save_model_structure(model: CNN, accuracy,path = None, save_weight: bool = F
     Returns:
         None
     """
-    move_working_directory()
+
 
     if path is None:
+        move_working_directory()
         path = os.getcwd()
-    else:
-        path = os.path.join(path, '_netstruct.txt')
+    path_to_file = os.path.join(path, 'model_results.txt')
 
-    with open('model_results.txt', 'a') as f:
+    with open(path_to_file, 'a') as f:
         f.write(f'{100 * accuracy[-2]:.5f}% {str(model)}')
 
     if save_weight:
+        os.chdir(path)
         filename = get_new_filename('ckpt')
         torch.save(model, filename)
         print(f"Model weights saved to {filename}")
