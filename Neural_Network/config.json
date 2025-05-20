@@ -1,0 +1,21 @@
+{
+  "training_data": {
+    "training_files_storage_location": "C:\\Users\\SFZ Rechner\\PycharmProjects\\Semi10\\Sound_processing\\_bees\\27-28_April",
+    "sorted_files_storage_location": "C:\\Users\\SFZ Rechner\\PycharmProjects\\Semi10\\Sound_processing",
+    "training_file_extensions": "wav",
+    "size": "bienen_1",
+    "create_new": false,
+    "printing": true
+  },
+  "model_settings": {
+    "batch_size": 128,
+    "learning_rate": 0.001,
+    "num_epochs": 100,
+    "epochs": 100,
+    "min_epoch": 5,
+    "train_once": false,
+    "model_text": "l; conv2d; (1, 16); (3, 3); 1; (1, 1);; p; avgpool; (3, 3); 1; (1, 1);; l; conv2d; (16, 48); (3, 3); 1; (1, 1);; p; avgpool; (3, 3); 1; (1, 1);; l; conv2d; (48, 48); (3, 3); 1; (1, 1);; p; maxpool; (3, 3); 1; (1, 1);; v: view;; l; linear; (307200, 10);; l; linear; (10, 10);; l; linear; (10, 2);",
+    "dropbox": "C:\\Users\\SFZ Rechner\\Documents\\training_status",
+    "printing": true
+  }
+}

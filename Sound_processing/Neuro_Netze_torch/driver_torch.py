@@ -55,11 +55,11 @@ def main():
         move_working_directory()
         torch.save(trained_model[0].state_dict(), get_new_filename('pt'))
     else:
-        args['model_text'] = None
+        model_args['model_text'] = None
         while True:
             trained_model, accuracy = train(loader, model_args)
             if trained_model is not None:
-                save_model_structure(trained_model, accuracy, model_args.get("dropbox", None),)
+                save_model_structure(trained_model, accuracy, model_args.get("dropbox", None))
                 continue
             else: break
 

@@ -117,7 +117,7 @@ def save_model_structure(model: CNN, accuracy, path = None, save_weight: bool = 
     path_to_file = os.path.join(path, 'model_results.txt')
 
     with open(path_to_file, 'a') as f:
-        f.write(f'{100 * accuracy[-2]:.5f}% {str(model)}')
+        f.write(f'{100 * accuracy[-2]:.5f}% {str(model)}\n')
 
     if save_weight:
         os.chdir(path)
