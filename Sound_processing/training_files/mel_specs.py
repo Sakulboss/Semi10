@@ -16,7 +16,12 @@ def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=
         x_new (ndarray): Mel spectrogram
     """
 
-    x_new, fss = librosa.load(fn_wav_name, sr=fss, mono=not stereo)
+    try:
+        x_new, fss = librosa.load(fn_wav_name, sr=fss, mono=not stereo)
+    except Exception as e:
+        print(e)
+        return None
+
     if stereo:
         x_new = np.append(x_new[0], x_new[1])
 
@@ -65,11 +70,18 @@ def mel_specs(labels, setting):
     segment_list = []
     segment_file_id = []
     segment_class_id = []
-    print(fn_wav_list)
+    error_files = []
+
     # Create mel spectrograms
     for count, fn_wav in enumerate(fn_wav_list):
-        mel_spec = mel_spec_file(fn_wav_list[count], stereo=(True if size == 'bienen_1' else False))
-        all_mel_specs.append(mel_spec)
+        mel_spec = mel_spec_file(fn_wav_list[count], stereo=(size == 'bienen_1'))
+        if mel_spec is None or count != 0 and mel_spec.shape != all_mel_specs[-1].shape:
+            error_files.append(fn_wav_list[count])
+        else:
+            all_mel_specs.append(mel_spec)
+    if not error_files:
+        error_files = [(str(i) + "\n") for i in error_files]
+        print(f'Wrong file size, please remove the file(s): {error_files}')
 
     all_mel_specs = np.stack(all_mel_specs, axis=0)
 
