@@ -7,6 +7,7 @@
     "training_file_extensions": "wav",
     "size": "bees_1",
     "segment_length_frames": "100",
+    "test_size": 0.2,
     "create_new": true,
     "printing": true
   },
@@ -15,7 +16,7 @@
     "learning_rate": 0.001,
     "max_epochs": 100,
     "min_epoch": 5,
-    "train_once": false,
+    "train_once": true,
     "model_text": "l; conv2d; (1, 16); (3, 3); 1; (1, 1);; p; avgpool; (3, 3); 1; (1, 1);; l; conv2d; (16, 48); (3, 3); 1; (1, 1);; p; avgpool; (3, 3); 1; (1, 1);; l; conv2d; (48, 48); (3, 3); 1; (1, 1);; p; maxpool; (3, 3); 1; (1, 1);; v: view;; l; linear; (307200, 10);; l; linear; (10, 10);; l; linear; (10, 2);",
     "dropbox": "C:\\Users\\SFZ Rechner\\Documents\\training_status",
     "printing": true

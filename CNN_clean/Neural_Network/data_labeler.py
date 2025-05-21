@@ -1,7 +1,6 @@
 import numpy as np
 import os
 import glob
-import sys
 
 
 def labeler(data: list, extension: str) -> tuple:
@@ -17,7 +16,6 @@ def labeler(data: list, extension: str) -> tuple:
         n_files: number of all used files
         file_num_in_class: list of file numbers in class - used for human readability
         n_sub: number of subdirectories -> number of classes
-
     """
 
     n_sub = len(data)

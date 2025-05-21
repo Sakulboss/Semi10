@@ -26,7 +26,7 @@ def get_new_filename(file_extension: str) -> str:
     """
     Creates a new filename for the model based on the number of existing files with the same extension in the current working directory.
     Args:
-        file_extension: name of the file extension (e.g. 'ckpt', 'h5', ...)
+        file_extension: name of the file extension (e.g. 'ckpt', 'pt', ...)
     Returns:
         new filename
     """
@@ -34,12 +34,13 @@ def get_new_filename(file_extension: str) -> str:
     return f'model_torch_{count}.{file_extension}'
 
 
-def train(loader, args) -> tuple[CNN, list] | None:
+def train(loader, args, logger) -> tuple[CNN, list] | None:
     """
     Trains the model using the given data loader and arguments.
     Args:
         loader: data loader for the training and testing data
-        args:  dictionary containing training parameters such as epochs, learning rate, if it should print the accuracy, etc.
+        args:   dictionary containing training parameters such as epochs, learning rate, if it should print the accuracy, etc.
+        logger: logger for logging
     Returns:
         the trained model and the accuracy of the trained model
     """
@@ -70,15 +71,23 @@ def train(loader, args) -> tuple[CNN, list] | None:
     for epoch in range(max_epochs):
         #print(f"\nEpoch [{epoch + 1}/{num_epochs}]")
         for batch_index, (data, targets) in enumerate(tqdm(train_loader, disable=True)):
-            # Move data and targets to the device (GPU/CPU)
 
+            # Move data and targets to the device (GPU/CPU)
             data = data.to(device)
             targets = targets.to(device)
 
             # Forward pass: compute the model output
             scores = model(data)
-            loss = criterion(scores, targets)
 
+            #print(scores)
+            #print(targets)
+
+            #try:
+            loss = criterion(scores, targets)
+            #except RuntimeError:
+
+            logger.critical(f'Shape of scores ({scores.shape}) or targets ({targets.shape}) are incorrect (not 0D or 1D) -> Training cannot be completed')
+            #    break
             # Backward pass: compute the gradients
             optimizer.zero_grad()
             loss.backward()

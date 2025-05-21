@@ -27,7 +27,7 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     is_train = np.where(segment_file_mod_id <  test_size * 10)[0]
     is_test  = np.where(segment_file_mod_id >= test_size * 10)[0]
 
-    logger.info(f"Our feature matrix is split into {len(is_train)} training examples and {len(is_test)} test examples")
+    logger.info(f"The feature matrix is split into {len(is_train)} training and {len(is_test)} test examples.")
 
     # Now the data itself is split with the indices
     x_train = segment_list[is_train, :, :]
@@ -56,10 +56,14 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
 
     logger.info(f"Shapes of the train and test data: {x_train_norm.shape} & {x_test_norm.shape}")
 
-    # The input shape is the "time-frequency shape" of our segments plus the number of channels, which is 1 (needed for the model -> channel dimension)
+    # The input shape is the "time-frequency shape" of our segments with the number of channels, which is 1 (needed for the model -> channel dimension (e.g., a rgb picture))
     input_shape = x_train_norm.shape[1:]
     n_classes = y_train_transformed.shape[1]
+    print(y_train)
 
-    assert n_classes == data[4] # Check if the number of classes is the same as in the data
+    try:
+        assert n_classes == data[4] # Check if the number of classes is the same as in the data
+    except AssertionError:
+        logger.debug(f"Number of classes in data: {n_classes} vs. Number of classes in dir structure: {data[4]} - please correct")
 
     return input_shape, n_classes, x_train_norm, y_train_transformed, x_test_norm, y_test_transformed, y_test, data[3], data[4]

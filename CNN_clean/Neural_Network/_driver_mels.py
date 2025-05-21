@@ -32,7 +32,7 @@ def create_trainingdata(settings, logger) -> bool:
     """
     #Initialize the working directory and variables
     #move_working_directory()
-    print(os.getcwd())
+
     os.chdir('..')
     os.chdir('files')
     size = settings.get('size', 'bees_1')
@@ -41,11 +41,16 @@ def create_trainingdata(settings, logger) -> bool:
     if os.path.isfile(path) and not settings.get('create_new', False): return True
 
     # If the file does not exist, create it
+    logger.info(f'Creating new dataset and saving it in {path}')
+    logger.info(f'Downloading and sorting the files...')
     dir_list = dataset(settings.get('size', 'bienen_1'), settings, logger)
+    logger.info(f'Labeling each file...')
     labels = labeler(dir_list, settings.get('training_file_extensions', 'wav'))
+    logger.info(f'Creating Mel-spectograms...')
     mels = mel_specs(labels, settings, logger)
+    logger.info(f'Splitting into test and training dataset and adding the right dimensions for the model...')
     trained_data = training_data(mels, settings, logger)
-
+    logger.info(f'Saving training data...')
     # Save the training data
     trained_data = np.array(trained_data, dtype=object)
 

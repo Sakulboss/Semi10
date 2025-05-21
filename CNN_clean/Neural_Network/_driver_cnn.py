@@ -41,7 +41,7 @@ def main():
 
     # Set up logging
     logger = setup_logging()
-    logger.info(f"CUDA available: {torch.cuda.is_available()}")
+    logger.info(f"CUDA acceleration available: {torch.cuda.is_available()}")
 
     # Create the training data if it doesn't exist
     data = trainingdata(data_args, logger)
@@ -56,13 +56,13 @@ def main():
 
     # Check if only a specific model should be trained or if the list with models should be continued
     if args.get('train_once', False):
-        trained_model = train(loader, model_args)
+        trained_model = train(loader, model_args, logger)
         move_working_directory()
         torch.save(trained_model[0].state_dict(), get_new_filename('pt'))
     else:
         model_args['model_text'] = None
         while True:
-            trained_model, accuracy = train(loader, model_args)
+            trained_model, accuracy = train(loader, model_args, logger)
             if trained_model is not None:
                 save_model_structure(trained_model, accuracy, model_args.get("dropbox", None))
                 continue

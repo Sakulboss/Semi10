@@ -4,14 +4,22 @@ import zipfile
 import shutil
 import glob
 
+def change_cwd_to_training_files(logger):
+    os.chdir('..')
+    os.chdir('files')
+    os.chdir('_esc50')
+    logger.debug(f'Set training files storage location to: {os.getcwd()}')
 
-def download_esc50():
+
+def download_esc50(args):
     """
-    This function categorizes the ESC-50 dataset. It was only used to check whether the KNN could work with big datasets. The KNN was not trained on this dataset.
+    This function categorizes the ESC-50 dataset. It was only used to check whether CNN could work
+    with big datasets. CNN was not trained on this dataset.
     Returns:
         None
     """
-    source_folder: str = '_viele_sounds'
+
+    source_folder: str = args.get('training_files_storage_location', os.path.join('data', ''))
     target_base_folder: str = '_viele_sounds_geordnet'
     entries: list = []
     directories: list = []
@@ -88,9 +96,9 @@ def dataset(size: str, args: dict, logger) -> list[str]:
         Wichtig -> muss gefixed werden
         
         """
-        sorted_files = sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_esc50')
+        sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_esc50')
         if not os.path.isdir(sorted_files):
-            download_esc50()
+            download_esc50(args)
         dir_dataset: str = '_esc50_sorted'
 
 
@@ -101,6 +109,8 @@ def dataset(size: str, args: dict, logger) -> list[str]:
         dir_dataset: str = sorted_files
     else:
         raise ValueError('Invalid dataset size.')
-    logger.critical('Fixen !!!!!')
+
+    logger.critical('ESC50 Fixen!!! Umsetzung von Zielspeicherort für ZIP notwendig, wenn möglich auch unsere Daten als Zip zum herunterladen parat haben und das einbauen')
+
     return glob.glob(os.path.join(dir_dataset, '*'))
 
