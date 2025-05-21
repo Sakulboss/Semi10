@@ -16,27 +16,6 @@ def directory():
         os.chdir('../..')
 
 
-def download_small_dataset() -> None:
-    """
-    This function downloads, unzips and categorizes a small dataset from our external supervisor. It was only used for testing purposes. The KNN was not trained on this dataset.
-    Returns:
-        None
-    """
-    directory()
-    if not os.path.isfile('_animal_sounds.zip'):
-        try:
-            wget.download(
-                'https://github.com/machinelistening/machinelistening.github.io/blob/master/animal_sounds.zip?raw=true',
-                out='_animal_sounds.zip', bar=None)
-        except Exception as e:
-            print(f"Error downloading file: {str(e)}")
-    if not os.path.isdir('_animal_sounds'):
-        assert os.path.isfile('_animal_sounds.zip')
-        with zipfile.ZipFile('_animal_sounds.zip', 'r') as f:
-            f.extractall('.')
-        assert os.path.isdir('_animal_sounds')
-
-
 def download_esc50():
     """
     This function categorizes the ESC-50 dataset. It was only used to check whether the KNN could work with big datasets. The KNN was not trained on this dataset.

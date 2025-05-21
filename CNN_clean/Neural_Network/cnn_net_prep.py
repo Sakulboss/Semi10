@@ -17,10 +17,7 @@ def split_list(lst, delimiter):
 
 def move_working_directory():
     working_directory = os.getcwd()
-    for i in range(3):
-        if os.path.basename(working_directory) != "Sound_processing":
-            os.chdir('../..')
-            break
+    os.chdir('..')
     os.chdir('Neuro_Netze_torch')
 
 def getnextmodel(file_path: str) -> str | None:
@@ -120,10 +117,12 @@ class CNN(nn.Module):
 
         super(CNN, self).__init__()
 
-        move_working_directory()
+
 
         if path is None:
+            move_working_directory()
             path = os.getcwd()
+
         path = os.path.join(path, '_netstruct.txt')
 
         layers, text = getlayers(path, text)

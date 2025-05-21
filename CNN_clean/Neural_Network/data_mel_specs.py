@@ -1,6 +1,8 @@
 import numpy as np
 import librosa.feature as mf
 import librosa
+from tqdm import tqdm
+
 
 def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=64, stereo:bool=True):
     """
@@ -77,7 +79,7 @@ def mel_specs(labels, setting, logger):
 
     # Create mel spectrograms
 
-    for count in range(len(fn_wav_list)):
+    for count in tqdm(range(len(fn_wav_list))):
         mel_spec = mel_spec_file(fn_wav_list[count], stereo=(size == 'bienen_1'))
         if mel_spec is None or count != 0 and mel_spec.shape != all_mel_specs[-1].shape:
             error_files.append(fn_wav_list[count])

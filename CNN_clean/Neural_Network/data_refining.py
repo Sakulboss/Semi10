@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import StandardScaler
 
-def training_data(data: tuple, setting: dict, ) -> tuple:
+def training_data(data: tuple, setting: dict, logger) -> tuple:
     """
     This function prepares the training data: It splits the data into training and test data
     Args:
@@ -27,7 +27,7 @@ def training_data(data: tuple, setting: dict, ) -> tuple:
     is_train = np.where(segment_file_mod_id <  test_size * 10)[0]
     is_test  = np.where(segment_file_mod_id >= test_size * 10)[0]
 
-    if printing: print(f"Our feature matrix is split into {len(is_train)} training examples and {len(is_test)} test examples")
+    logger.info(f"Our feature matrix is split into {len(is_train)} training examples and {len(is_test)} test examples")
 
     # Now the data itself is split with the indices
     x_train = segment_list[is_train, :, :]
@@ -54,7 +54,7 @@ def training_data(data: tuple, setting: dict, ) -> tuple:
         x_train_norm = np.expand_dims(x_train_norm, 1)
         x_test_norm = np.expand_dims(x_test_norm, 1)
 
-    if printing: print(f"Shapes of the train and test data: {x_train_norm.shape} & {x_test_norm.shape}")
+    logger.info(f"Shapes of the train and test data: {x_train_norm.shape} & {x_test_norm.shape}")
 
     # The input shape is the "time-frequency shape" of our segments plus the number of channels, which is 1 (needed for the model -> channel dimension)
     input_shape = x_train_norm.shape[1:]

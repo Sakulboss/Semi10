@@ -32,10 +32,11 @@ def create_trainingdata(settings, logger) -> bool:
     """
     #Initialize the working directory and variables
     #move_working_directory()
-    model = settings.get('model', 'torch')
-    size = settings.get('size', 'bienen_1')
-
-    path = os.path.join(os.getcwd(), f'training_data_{model}_{size}.npy')
+    print(os.getcwd())
+    os.chdir('..')
+    os.chdir('files')
+    size = settings.get('size', 'bees_1')
+    path = os.path.join(os.getcwd(), f'training_data_torch_{size}.npy')
     # Check if the file already exists
     if os.path.isfile(path) and not settings.get('create_new', False): return True
 
@@ -43,13 +44,12 @@ def create_trainingdata(settings, logger) -> bool:
     dir_list = dataset(settings.get('size', 'bienen_1'), settings)
     labels = labeler(dir_list, settings.get('training_file_extensions', 'wav'))
     mels = mel_specs(labels, settings, logger)
-    trained_data = training_data(mels, settings)
+    trained_data = training_data(mels, settings, logger)
 
     # Save the training data
     trained_data = np.array(trained_data, dtype=object)
-    os.chdir('..')
-    os.chdir('training_files')
-    np.save(f'training_data_{model}_{size}.npy', trained_data)
+
+    np.save(f'training_data_torch_{size}.npy', trained_data)
     return False
 
 

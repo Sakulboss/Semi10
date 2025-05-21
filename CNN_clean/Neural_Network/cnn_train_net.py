@@ -5,7 +5,7 @@ from torch import optim, no_grad, nn
 from tqdm import tqdm
 import os
 import numpy as np
-from Sound_processing.Neuro_Netze_torch.network_prep import CNN
+from cnn_net_prep import CNN
 
 
 def move_working_directory():
@@ -47,7 +47,7 @@ def train(loader, args) -> tuple[CNN, list] | None:
     # Initialize variables
     train_loader    = loader[0]
     test_loader     = loader[1]
-    max_epochs      = args.get('epochs', 10)
+    max_epochs      = args.get('max_epochs', 10)
     learning_rate   = args.get('learning_rate', 0.01)
     min_epoch       = args.get('min_epoch', 5)
     device          = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
