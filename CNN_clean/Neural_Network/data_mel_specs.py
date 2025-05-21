@@ -47,7 +47,7 @@ def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=
     return x_new
 
 
-def mel_specs(labels, setting):
+def mel_specs(labels, setting, logger):
     """
     Create mel spectrograms from audio files and splits them into segments to generate more training data.
     Args:
@@ -76,7 +76,8 @@ def mel_specs(labels, setting):
     error_files = []
 
     # Create mel spectrograms
-    for count, fn_wav in enumerate(fn_wav_list):
+
+    for count in range(len(fn_wav_list)):
         mel_spec = mel_spec_file(fn_wav_list[count], stereo=(size == 'bienen_1'))
         if mel_spec is None or count != 0 and mel_spec.shape != all_mel_specs[-1].shape:
             error_files.append(fn_wav_list[count])
@@ -84,17 +85,12 @@ def mel_specs(labels, setting):
             all_mel_specs.append(mel_spec)
     if not error_files == []:
         error_files = [(str(i) + "\n") for i in error_files]
-        print(f'Wrong file size, please remove the file(s): {error_files}')
+        logger.error(f'Wrong file size, please remove the file(s): {error_files}')
 
     all_mel_specs = np.stack(all_mel_specs, axis=0)
 
-    #Überprüfen der Form jedes aufgeteilten Arrays
-    print(all_mel_specs)
     n_spectrograms = all_mel_specs.shape[0]
     spec_length_frames = all_mel_specs.shape[2]
-
-
-
     max_segment_start_offset = spec_length_frames - segment_length_frames
 
     # Create segments from the mel spectrograms with random start points
@@ -109,7 +105,6 @@ def mel_specs(labels, setting):
 
     # conversion from the list of spectrogram segments into a tensor (3D array)
     segment_list = np.array(segment_list)
-
     segment_file_id = np.array(segment_file_id)
     segment_file_mod_id = np.mod(segment_file_id, 5)
     segment_class_id = np.array(segment_class_id)

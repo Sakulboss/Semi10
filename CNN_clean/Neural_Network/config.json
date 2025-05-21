@@ -1,9 +1,11 @@
 {
+  "project_dir_name": "Semi10",
   "training_data": {
     "training_files_storage_location": "C:\\Users\\SFZ Rechner\\PycharmProjects\\Semi10\\Sound_processing\\_bees\\27-28_April",
     "sorted_files_storage_location": "C:\\Users\\SFZ Rechner\\PycharmProjects\\Semi10\\Sound_processing",
+    "mel_specs_storage_location": "C:\\Users\\SFZ Rechner\\PycharmProjects\\Semi10\\Neural_Network",
     "training_file_extensions": "wav",
-    "size": "bienen_1",
+    "size": "bees_1",
     "create_new": false,
     "printing": true
   },
