@@ -41,7 +41,7 @@ def create_trainingdata(settings, logger) -> bool:
     if os.path.isfile(path) and not settings.get('create_new', False): return True
 
     # If the file does not exist, create it
-    dir_list = dataset(settings.get('size', 'bienen_1'), settings)
+    dir_list = dataset(settings.get('size', 'bienen_1'), settings, logger)
     labels = labeler(dir_list, settings.get('training_file_extensions', 'wav'))
     mels = mel_specs(labels, settings, logger)
     trained_data = training_data(mels, settings, logger)

@@ -5,17 +5,6 @@ import shutil
 import glob
 
 
-def directory():
-    """
-    This function changes the working directory. It is necessary so that the files and directories are created and found correctly.
-    Returns:
-        None
-    """
-    paths = os.getcwd()
-    if not os.path.basename(paths) == 'Sound_processing':
-        os.chdir('../..')
-
-
 def download_esc50():
     """
     This function categorizes the ESC-50 dataset. It was only used to check whether the KNN could work with big datasets. The KNN was not trained on this dataset.
@@ -26,7 +15,6 @@ def download_esc50():
     target_base_folder: str = '_viele_sounds_geordnet'
     entries: list = []
     directories: list = []
-    directory()
     with open('esc50.csv', 'r') as f:
         for line in f:
             if line.startswith('#'):
@@ -79,24 +67,33 @@ def create_bee_1(args: dict = None) -> None:
             count += 1
 
 
-def dataset(size: str, args: dict) -> list[str]:
+def dataset(size: str, args: dict, logger) -> list[str]:
     """
     This function defines the used dataset. Therefor the working directory is changed to the correct one. It then creates the sorted dataset if it doesn't exist yet. The dataset is then returned as a list of paths.
 
     Args:
         size: string, size of the dataset ('esc50' or 'bienen_1')
         args: dictionary with the settings for the dataset like file storage locations, etc.
+        logger: logger object
 
     Returns:
         list[str]: list of paths to the dataset
     """
 
-    directory()
+
+
 
     if size == "esc50":
-        if not os.path.isdir('_esc50'):
+        """
+        Wichtig -> muss gefixed werden
+        
+        """
+        sorted_files = sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_esc50')
+        if not os.path.isdir(sorted_files):
             download_esc50()
         dir_dataset: str = '_esc50_sorted'
+
+
     elif size == 'bees_1':
         sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_bee_sounds')
         if not os.path.isdir(sorted_files):
@@ -104,6 +101,6 @@ def dataset(size: str, args: dict) -> list[str]:
         dir_dataset: str = sorted_files
     else:
         raise ValueError('Invalid dataset size.')
-
+    logger.critical('Fixen !!!!!')
     return glob.glob(os.path.join(dir_dataset, '*'))
 

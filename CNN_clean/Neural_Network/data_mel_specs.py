@@ -68,8 +68,8 @@ def mel_specs(labels, setting, logger):
     data = setting.get('classified_samples', labels)
     fn_wav_list = setting.get('fn_wav_list', data[0])
     class_id = setting.get('class_id', data[1])
-    segments_per_spectrogram = setting.get('segments_per_spectrogram', 10)
-    segment_length_frames = setting.get('segment_length_frames', 128)
+    segments_per_spectrogram = int(setting.get('segments_per_spectrogram', 10))
+    segment_length_frames = int(setting.get('segment_length_frames', 100))
 
     all_mel_specs = []
     segment_list = []
@@ -79,7 +79,7 @@ def mel_specs(labels, setting, logger):
 
     # Create mel spectrograms
 
-    for count in tqdm(range(len(fn_wav_list))):
+    for count in tqdm(range(len(fn_wav_list)), desc='Mel-Cepstogramm'):
         mel_spec = mel_spec_file(fn_wav_list[count], stereo=(size == 'bienen_1'))
         if mel_spec is None or count != 0 and mel_spec.shape != all_mel_specs[-1].shape:
             error_files.append(fn_wav_list[count])

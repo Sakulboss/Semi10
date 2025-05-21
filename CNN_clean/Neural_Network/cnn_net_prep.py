@@ -18,7 +18,8 @@ def split_list(lst, delimiter):
 def move_working_directory():
     working_directory = os.getcwd()
     os.chdir('..')
-    os.chdir('Neuro_Netze_torch')
+    print(f'Working directory: {working_directory}')
+    os.chdir('files')
 
 def getnextmodel(file_path: str) -> str | None:
     with open(file_path, 'r') as file:

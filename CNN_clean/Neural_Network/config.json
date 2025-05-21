@@ -6,7 +6,8 @@
     "mel_specs_storage_location": "C:\\Users\\SFZ Rechner\\PycharmProjects\\Semi10\\Neural_Network",
     "training_file_extensions": "wav",
     "size": "bees_1",
-    "create_new": false,
+    "segment_length_frames": "100",
+    "create_new": true,
     "printing": true
   },
   "model_settings": {
