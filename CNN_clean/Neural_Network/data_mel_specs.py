@@ -6,7 +6,7 @@ import librosa
 from tqdm import tqdm
 
 
-def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=64, stereo:bool=True):
+def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 48000, n_mels=64, stereo:bool=True):
     """
     Compute mel spectrogram from audio file with librosa.feature.melspectogram()
     Args:

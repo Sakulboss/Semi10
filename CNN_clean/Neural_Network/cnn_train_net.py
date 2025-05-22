@@ -54,6 +54,7 @@ def train(loader, args, logger) -> tuple[CNN, list] | None:
     device          = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     accuracy        = []
     epoch_time      = []
+    mse             = []
     model_struct    = args.get('model_text', None)
     dropbox         = args.get('dropbox', None)
 
@@ -69,7 +70,7 @@ def train(loader, args, logger) -> tuple[CNN, list] | None:
     start = time.perf_counter()
 
     for epoch in range(max_epochs):
-        #print(f"\nEpoch [{epoch + 1}/{num_epochs}]")
+        logger.info(f"\nEpoch [{epoch + 1}/{max_epochs}]")
         for batch_index, (data, targets) in enumerate(tqdm(train_loader, disable=True)):
 
             # Move data and targets to the device (GPU/CPU)
@@ -99,13 +100,16 @@ def train(loader, args, logger) -> tuple[CNN, list] | None:
         start = end
 
         #calculate the middle squared error of the model, if it gets worse, stop training.
-        accuracy.append((1-check_accuracy(test_loader, model, device, logger))**2)
-        if epoch > min_epoch and accuracy[-1] > accuracy[-2]:
+
+        acc = check_accuracy(train_loader, model, device, logger)
+        accuracy.append((1-acc)**2)
+        mse.append(sum(accuracy)/len(accuracy))
+        if epoch > min_epoch and mse[-1] > mse[-2]:
             epoch_max: int = epoch
             break
     else:
         epoch_max: int = max_epochs
-    logger.info(f"Finished training. MSE: {100 * accuracy[-2]:.2f}% in epoch {epoch_max} with on average {sum(epoch_time)/len(epoch_time):.3f} model {str(model)}")
+    logger.info(f"Finished training. MSE: {100*mse[-1]:.2f}% in epoch {epoch_max} with on average {sum(epoch_time)/len(epoch_time):.3f} s and model {str(model)}")
     return model, accuracy
 
 

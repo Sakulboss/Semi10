@@ -7,7 +7,8 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     This function prepares the training data: It splits the data into training and test data
     Args:
         data:     Data from the previous mel_specs function.
-        setting:  Main settings like the type of dataset and injection of other labeled data.
+        setting:  Main settings like the type of dataset and injection of other labeled data
+        logger:   The logger for logging.
 
     Returns:
         - input_shape: shape of the input data for the model
@@ -24,6 +25,9 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     test_size            = setting.get('test_size', 0.3)
 
     # Split the data into training and test data
+    logger.critical(f"Make that the data is splitted ramdomised into the datasets!!!")
+    np.random.seed(0)
+    #np.random.choice()
     is_train = np.where(segment_file_mod_id <  test_size * 10)[0]
     is_test  = np.where(segment_file_mod_id >= test_size * 10)[0]
 
@@ -59,7 +63,6 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     # The input shape is the "time-frequency shape" of our segments with the number of channels, which is 1 (needed for the model -> channel dimension (e.g., a rgb picture))
     input_shape = x_train_norm.shape[1:]
     n_classes = y_train_transformed.shape[1]
-    print(y_train)
 
     try:
         assert n_classes == data[4] # Check if the number of classes is the same as in the data

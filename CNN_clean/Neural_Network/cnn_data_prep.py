@@ -46,6 +46,8 @@ def data_prep(data, args):
     x_test_tensor = torch.tensor(x_test_norm, dtype=torch.float32)
     y_test_tensor = torch.tensor(y_test_transformed, dtype=torch.float)
 
+    print(f'{x_test_tensor.shape} - {x_train_tensor.shape}')
+
     # Create CustomDataset objects for training and testing data
     train_dataset = CustomDataset(x_train_tensor, y_train_tensor)
     test_dataset = CustomDataset(x_test_tensor, y_test_tensor, train=False)

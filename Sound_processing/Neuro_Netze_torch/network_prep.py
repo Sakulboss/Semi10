@@ -72,6 +72,7 @@ def getlayers(path:str = '_netstruct.txt', omt:str = None):
         original_model_text = getnextmodel(path)
     else:
         original_model_text = omt
+
     if original_model_text is None:
         return None, None
     layers = original_model_text.split(';;')
