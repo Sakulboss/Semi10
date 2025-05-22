@@ -18,7 +18,6 @@ def split_list(lst, delimiter):
 def move_working_directory():
     working_directory = os.getcwd()
     os.chdir('..')
-    print(f'Working directory: {working_directory}')
     os.chdir('files')
 
 def getnextmodel(file_path: str) -> str | None:
@@ -178,5 +177,7 @@ class CNN(nn.Module):
         """
         Returns start text of the neural network.
         """
+        if self.text.endswith('\n'):
+            self.text = self.text[:-2]
         return self.text
 

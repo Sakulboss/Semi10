@@ -79,15 +79,13 @@ def train(loader, args, logger) -> tuple[CNN, list] | None:
             # Forward pass: compute the model output
             scores = model(data)
 
-            #print(scores)
-            #print(targets)
+            try:
+                loss = criterion(scores, targets)
+            except RuntimeError:
+                logger.critical(f'Shape of scores ({scores.shape}) or targets ({targets.shape}) are not equal -> Training cannot be completed')
+                logger.debug(f'Scores: {scores} \nTargets: {targets}')
+                break
 
-            #try:
-            loss = criterion(scores, targets)
-            #except RuntimeError:
-
-            logger.critical(f'Shape of scores ({scores.shape}) or targets ({targets.shape}) are incorrect (not 0D or 1D) -> Training cannot be completed')
-            #    break
             # Backward pass: compute the gradients
             optimizer.zero_grad()
             loss.backward()
@@ -101,13 +99,13 @@ def train(loader, args, logger) -> tuple[CNN, list] | None:
         start = end
 
         #calculate the middle squared error of the model, if it gets worse, stop training.
-        accuracy.append((1-check_accuracy(test_loader, model, device))**2)
+        accuracy.append((1-check_accuracy(test_loader, model, device, logger))**2)
         if epoch > min_epoch and accuracy[-1] > accuracy[-2]:
             epoch_max: int = epoch
             break
     else:
         epoch_max: int = max_epochs
-    print(f"Finished training. MSE: {100 * accuracy[-2]:.2f}% in epoch {epoch_max} with model {str(model)}")
+    logger.info(f"Finished training. MSE: {100 * accuracy[-2]:.2f}% in epoch {epoch_max} with on average {sum(epoch_time)/len(epoch_time):.3f} model {str(model)}")
     return model, accuracy
 
 
@@ -144,17 +142,14 @@ def save_model_structure(model: CNN, accuracy, path = None, save_weight: bool = 
         print(f"Model weights saved to {filename}")
 
 
-def check_accuracy(loader, model, device, printing=False):
+def check_accuracy(loader, model, device, logger):
     """
     Checks the accuracy of the model on the given dataset loader.
     Parameters:
-        printing: Choose whether to print the accuracy or not.
-        device: string
-            The Device to run the model on.
-        loader: DataLoader
-            The DataLoader for the dataset to check accuracy on.
-        model: nn.Module
-            The neural network model.
+        device: string The Device to run the model on.
+        loader: DataLoader The DataLoader for the dataset to check accuracy on.
+        model: nn.Module The neural network model.
+        logger: logger The logger for logging.
     """
 
     # Initialize variables
@@ -185,11 +180,11 @@ def check_accuracy(loader, model, device, printing=False):
 
         # Calculate accuracy
         accuracy = float(num_correct) / float(num_samples)
-        if printing:
-            if loader.dataset.train:
-                print(f"train: Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
-            else:
-                print(f"test:  Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
+
+        if loader.dataset.train:
+            logger.debug(f"train: Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
+        else:
+            logger.debug(f"test:  Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
 
     model.train()  # Set the model back to training mode
     return accuracy
