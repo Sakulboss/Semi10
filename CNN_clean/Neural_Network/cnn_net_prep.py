@@ -117,8 +117,6 @@ class CNN(nn.Module):
 
         super(CNN, self).__init__()
 
-
-
         if path is None:
             move_working_directory()
             path = os.getcwd()
@@ -142,7 +140,6 @@ class CNN(nn.Module):
         ]
 
         self.layers = layers
-
 
 
     def forward(self, x):
