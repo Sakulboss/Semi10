@@ -13,8 +13,10 @@ waiting = False
 
 def main():
     global waiting
+    path_to_config = r"C:\\Users\\sdose\\Desktop\\config.json"
+
     # Load arguments from JSON file
-    args = load_args()#
+    args = load_args(path_to_config)
     data_args = args['training_data']
     model_args = args['model_settings']
 

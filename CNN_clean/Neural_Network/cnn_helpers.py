@@ -39,13 +39,16 @@ def setup_logging(level=2):
     return logging.getLogger(__name__)
 
 
-def load_args() -> dict:
+def load_args(path=None) -> dict:
     """
     This function loads the arguments from a file. The file is created in the create_trainingdata function. The correct file is found by the size and model.
     Returns:
         contents of the file as a dictionary
     """
-    with open('config.json', 'r') as file:
+    if path is None:
+        path = os.path.join(os.getcwd(), 'config.json')
+
+    with open(path, 'r') as file:
         args = json.load(file)
     return args
 
