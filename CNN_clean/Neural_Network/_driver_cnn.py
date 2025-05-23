@@ -13,7 +13,7 @@ waiting = False
 
 def main():
     global waiting
-    path_to_config = r"C:\\Users\\sdose\\Desktop\\config.json"
+    path_to_config = None # Path to the config file, if None, use the one in this directory
 
     # Load arguments from JSON file
     args = load_args(path_to_config)

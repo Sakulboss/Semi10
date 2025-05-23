@@ -180,17 +180,21 @@ class CNN(nn.Module):
         super(CNN, self).__init__()
 
         if args.get('use_server', True) and not args.get('train_once', True):
-            layers, text, self.line = getlayers(logger, args)
+            layers, text, line = getlayers(logger, args)
         else:
             layers, text = getlayers(logger, args)
-            self.line = None
+            line = -1
+
+        self.line = line
 
         working = True
 
         if (layers or text) is None:
             working = False
-        logger.debug(f"Model structure: {layers}")
 
+        logger.debug(f"Model structure: {layers}")
+        logger.debug(f"Model structure text: {text}")
+        logger.debug(f"Model structure line: {line}")
 
         self.text:str        = text
         self.working:bool    = working
@@ -234,6 +238,23 @@ class CNN(nn.Module):
             else:
                 print(f"Error: Unknown layer type: {layer}")
         return x
+
+    def __int__(self):
+        return self.line
+
+
+    def acc(self):
+        """
+        Returns the accuracy of the neural network.
+        """
+        return self.accuracy[-2] if self.accuracy else None
+
+
+    def epoch(self):
+        """
+        Returns the epoch of the neural network.
+        """
+        return self.epoch_max
 
 
     def __str__(self):
