@@ -4,6 +4,9 @@ import zipfile
 import shutil
 import glob
 
+from tqdm import tqdm
+
+
 def change_cwd_to_training_files(logger):
     os.chdir('..')
     os.chdir('files')
@@ -56,7 +59,7 @@ def create_bee_1(args: dict = None) -> None:
     if not os.path.isdir(target_base_folder):
         os.mkdir(target_base_folder)
     count = 0
-    for i in range(len(files := os.listdir(source_folder))):
+    for i in tqdm(range(len(files := os.listdir(source_folder)))):
         if files[i].endswith(ext):
             entries.append(files[i])
             if entries[count].endswith(f'17.{ext}'):
@@ -108,5 +111,6 @@ def dataset(size: str, args: dict, logger) -> list[str]:
         raise ValueError('Invalid dataset size.')
 
     logger.critical('ESC50 Fixen!!! Umsetzung von Zielspeicherort für ZIP notwendig, wenn möglich auch unsere Daten als Zip zum herunterladen parat haben und das einbauen')
+    logger.warning(glob.glob(os.path.join(dir_dataset, '*')))
     return glob.glob(os.path.join(dir_dataset, '*'))
 

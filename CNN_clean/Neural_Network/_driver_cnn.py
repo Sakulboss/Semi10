@@ -1,50 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import torch
-import logging
-import json
-import time
 from threading import Thread
 
 from _driver_mels import trainingdata
 from cnn_data_prep import data_prep
 from cnn_train_net import train, save_model_structure, get_new_filename, move_working_directory
+from cnn_helpers import setup_logging, get_uuid, load_args
 
 waiting = False
-
-
-def setup_logging():
-    # Konfiguriere das Logging-Format und Level
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            # logging.FileHandler('training.log'),
-            logging.StreamHandler()  # Ausgabe auch in der Konsole
-        ]
-    )
-    return logging.getLogger(__name__)
-
-
-def load_args() -> dict:
-    """
-    This function loads the arguments from a file. The file is created in the create_trainingdata function. The correct file is found by the size and model.
-    Returns:
-        contents of the file as a dictionary
-    """
-    with open('config.json', 'r') as file:
-        args = json.load(file)
-    return args
-
-
-def animate():
-    global waiting
-    animation = "|/-\\"
-    idx = 0
-    while waiting:
-        print('Netz wird trainiert ', animation[idx % len(animation)], end="\r")
-        idx += 1
-        time.sleep(0.1)
 
 
 def main():

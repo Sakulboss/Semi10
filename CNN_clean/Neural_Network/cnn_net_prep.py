@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
+import requests
 import torch.nn.functional as f
 from torch import nn
 import os
+
+from cnn_helpers import get_uuid
+
 
 def split_list(lst, delimiter):
     result = []
@@ -15,12 +19,47 @@ def split_list(lst, delimiter):
     result.append(current)  # Letzten Abschnitt hinzufügen
     return result
 
+
 def move_working_directory():
     working_directory = os.getcwd()
     os.chdir('..')
     os.chdir('files')
 
+
+def get_next_line(server_url, logger, uuid_file_path=None):
+    """
+    This fuction sends a GET request to the server to retrieve the layer to be trained.
+    Args:
+        server_url:      The URL of the server to send the request to.
+        logger:          The logger for logging.
+        uuid_file_path:  The path to the uuid file to use.
+    Returns:
+        The line and line index from the server response.
+    """
+
+    params = {'key': get_uuid(uuid_file_path)}
+    try:
+        logger.debug(f"GET {server_url} with params {params}")
+        response = requests.get(server_url, params=params)
+        response.raise_for_status()
+        data = response.json()
+        if 'line' in data and 'line_index' in data:
+            return data['line'], data['line_index']
+        else:
+            logger.debug('Server response:', data.get('message', 'No line found'))
+            return None, None
+    except requests.RequestException as e:
+        logger.critical('Error during GET:', str(e))
+        return None, None
+
+
 def getnextmodel(file_path: str) -> str | None:
+    """
+    Args:
+        file_path: The path to the file with the model structures.
+    Returns:
+        model structure
+    """
     with open(file_path, 'r') as file:
         lines = file.readlines()
     for i, line in enumerate(lines):
@@ -33,6 +72,7 @@ def getnextmodel(file_path: str) -> str | None:
     with open(file_path, 'w') as file:
         file.writelines(lines)
     return lines[position][2:]
+
 
 def create_pooling_layer(layer_description: str):
     parts = layer_description.split(';')
@@ -47,6 +87,7 @@ def create_pooling_layer(layer_description: str):
     else:
         raise ValueError(f"Unbekannter Pooling-Typ: {pool_type}")
 
+
 def create_conv_layer(layer_description: str):
     parts = layer_description.split(';')
     channels = tuple(map(int, parts[2].strip().strip('()').split(',')))
@@ -55,22 +96,38 @@ def create_conv_layer(layer_description: str):
     padding = tuple(map(int, parts[5].strip().strip('()').split(',')))
     return nn.Conv2d(in_channels=channels[0], out_channels=channels[1], kernel_size=kernel_size, stride=stride, padding=padding)
 
+
 def create_linear_layer(layer_description):
     parts = layer_description.split(';')
     channels = tuple(map(int, parts[2].strip().strip('()').split(',')))
     return nn.Linear(in_features=channels[0], out_features=channels[1])
 
+
 def reshape_tensor(tensor):
     return tensor.view(tensor.shape[0], -1)
 
-def getlayers(path:str = '_netstruct.txt', omt:str = None):
+
+def getlayers(logger, args:dict):
+
+    path:str           = args.get('model_structure_file', os.path.join(os.getcwd(), '_netstruct.txt'))
+    server_url:str     = args.get('server_url', 'https://survive.cermann.com/server.php')
+    uuid_file_path:str = args.get('uuid_file_path', 'device_uuid.txt')
+    use_server:bool    = args.get('use_server', True)
+    omt:str            = args.get('model_structure_text', '')
+    training_once      = args.get('train_once', True)
+
     move_working_directory()
-    if omt is None:
-        original_model_text = getnextmodel(path)
-    else:
+    if training_once:
         original_model_text = omt
+    else:
+        if use_server:
+            original_model_text = get_next_line(server_url, logger, uuid_file_path)
+        else:
+            original_model_text = getnextmodel(path)
+
     if original_model_text is None:
         return None, None
+
     layers = original_model_text.split(';;')
     functions = []
     for layer in layers:
@@ -106,24 +163,21 @@ def getlayers(path:str = '_netstruct.txt', omt:str = None):
 #padding:    frame for the old picture added
 #diletation: not needed, but it adds space between filter kernels (pure brainfuck)
 
+
 class CNN(nn.Module):
-    def __init__(self, path = os.getcwd(), text=None):
+    def __init__(self, logger, args:dict):
         """
         Parameters:
-            text: str
-                The structure of the neural network. It is a string that contains the layers and their parameters.
+            logger: The logger for logging.
+            args:   The settings for the neural network
+
+
         If not given, the structure is read from the _netstruct.txt file.
         """
 
         super(CNN, self).__init__()
 
-        if path is None:
-            move_working_directory()
-            path = os.getcwd()
-
-        path = os.path.join(path, '_netstruct.txt')
-
-        layers, text = getlayers(path, text)
+        layers, text = getlayers(logger, args)
         working = True
 
         if (layers or text) is None:

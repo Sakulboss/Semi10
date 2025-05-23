@@ -55,8 +55,9 @@ def mel_specs(labels, setting, logger):
     """
     Create mel spectrograms from audio files and splits them into segments to generate more training data.
     Args:
-        labels: data from previous step
+        labels:  data from previous step
         setting: main settings like the type of dataset and injection of other labeled data.
+        logger:  The logger for logging.
     Returns:
         segment_file_mod_id: file ids of the segments
         segment_list: list of mel spectrogram segments
@@ -80,20 +81,20 @@ def mel_specs(labels, setting, logger):
     error_files = []
 
     # Create mel spectrograms
-    if logger.getEffectiveLevel() == logging.INFO:
-        for count in tqdm(range(len(fn_wav_list)), desc='Mel-Cepstogramm'):
-            mel_spec = mel_spec_file(fn_wav_list[count], stereo=(size == 'bees_1'))
-            if mel_spec is None or count != 0 and mel_spec.shape != all_mel_specs[-1].shape:
-                error_files.append(fn_wav_list[count])
-            else:
-                all_mel_specs.append(mel_spec)
-    else:
+    #if logger.getEffectiveLevel() == logging.INFO:
+    for count in tqdm(range(len(fn_wav_list)), desc='Mel-Cepstogramm'):
+        mel_spec = mel_spec_file(fn_wav_list[count], stereo=(size == 'bees_1'))
+        if mel_spec is None or count != 0 and mel_spec.shape != all_mel_specs[-1].shape:
+            error_files.append(fn_wav_list[count])
+        else:
+            all_mel_specs.append(mel_spec)
+    '''else:
         for count in range(len(fn_wav_list)):
             mel_spec = mel_spec_file(fn_wav_list[count], stereo=(size == 'bees_1'))
             if mel_spec is None or count != 0 and mel_spec.shape != all_mel_specs[-1].shape:
                 error_files.append(fn_wav_list[count])
             else:
-                all_mel_specs.append(mel_spec)
+                all_mel_specs.append(mel_spec)'''
 
     if not error_files == []:
         error_files = [(str(i) + "\n") for i in error_files]
