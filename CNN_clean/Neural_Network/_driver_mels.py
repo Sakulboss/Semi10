@@ -7,20 +7,6 @@ from data_mel_specs import mel_specs
 from data_refining import training_data
 
 
-def move_working_directory():
-    """
-    This function changes the current working directory (cwd) to the directory 'training_files' in which also this program is located. It is necessary so that the files and directories are created and found correctly.
-    Returns:
-        None
-    """
-    working_directory = os.getcwd()
-    for i in range(3):
-        if os.path.basename(working_directory) != "Sound_processing":
-            os.chdir('../..')
-            break
-    os.chdir('training_files')
-
-
 def create_trainingdata(settings, logger) -> bool:
     """
     This function creates the main datasets for the CNN. If the dataset exists earlier, it is not created again.
@@ -31,7 +17,6 @@ def create_trainingdata(settings, logger) -> bool:
         bool: True if the dataset was created, False if it already exists.
     """
     #Initialize the working directory and variables
-    #move_working_directory()
 
     os.chdir('..')
     os.chdir('files')

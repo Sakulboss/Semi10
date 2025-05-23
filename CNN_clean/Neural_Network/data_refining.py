@@ -24,7 +24,6 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     #segment_file_mod_id  = setting.get('segment_file_mod_id', data[0]) --old unused
     segment_list         = setting.get('segment_list', data[1])
     segment_class_id     = setting.get('segment_class_id', data[2])
-    printing             = setting.get('printing', False)
     test_size            = setting.get('test_size', 0.3)
     #seed                = setting.get('seed', )                        --unused due to misunderstanding of seed
     event_ratio          = setting.get('swarm_event_ratio', 0.5) #Anteil swarm_event in der finalen Auswahl (z.B. 0.5 = 50%)
@@ -81,7 +80,7 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     logger.info(f'Ratio of test data: set value {test_size}; is value {len(x_test) / len(x_train)}')
     logger.info(f'Ratio of test data: set value {test_size}; is value {len(y_test) / len(y_train)}')
     logger.info(f'train_data is made of {np.sum(y_train == 1)} random swarm mels and {np.sum(y_train == 0)} random non swarm mels.')
-    ĺogger.info(f'test_data is made of {np.sum(y_test == 1)} random swarm mels and {np.sum(y_test == 0)} random non swarm mels.')
+    logger.info(f'test_data is made of {np.sum(y_test == 1)} random swarm mels and {np.sum(y_test == 0)} random non swarm mels.')
     #------------------------------------------------------------------
     # Initialisiere Norm-Arrays
     x_train_norm = np.zeros_like(x_train)

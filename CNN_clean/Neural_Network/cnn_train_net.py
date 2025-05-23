@@ -55,11 +55,9 @@ def train(loader, args, logger) -> tuple[CNN, list] | None:
     accuracy        = []
     epoch_time      = []
     mse             = []
-    model_struct    = args.get('model_text', None)
-    dropbox         = args.get('dropbox', None)
 
     #Create the model and check if the model is working -> when all models are tested, model.working is False. After that move model to GPU or CPU.
-    model = CNN(path=dropbox, text=model_struct)
+    model = CNN(logger, args)
     if model.working is False:
         return None
     model = model.to(device=device)
@@ -101,7 +99,7 @@ def train(loader, args, logger) -> tuple[CNN, list] | None:
 
         #calculate the middle squared error of the model, if it gets worse, stop training.
 
-        acc = check_accuracy(train_loader, model, device, logger)
+        acc = check_accuracy(test_loader, model, device, logger)
         accuracy.append((1-acc)**2)
         mse.append(sum(accuracy)/len(accuracy))
         if epoch > min_epoch and mse[-1] > mse[-2]:
