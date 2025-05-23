@@ -5,6 +5,7 @@ CNN_clean/Neural_Network/device_uuid.txt
 Sound_processing/_viele_sounds_geordnet
 Sound_processing/_bee_sounds
 Sound_processing/_bees
+CNN_clean/Neural_Network/config.json
 **/__pycache__/**
 /.idea/*
 *.tar.zst

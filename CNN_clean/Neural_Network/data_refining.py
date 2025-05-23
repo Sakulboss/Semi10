@@ -76,20 +76,12 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
 
     x_test = segment_list[is_test, :, :]
     y_test = segment_class_id[is_test]
-    #---------------------------------------------------------
-    print('x_test_len,y_test_len')
-    print(len(x_test),len(y_test))
+
     #--------------------------------------------------------------
-    # Anzahl der Klassen im Trainingsset
-    anzahl_swarm_train = np.sum(y_train == 1)
-    anzahl_no_train = np.sum(y_train == 0)
-
-    # Anzahl der Klassen im Testset
-    anzahl_swarm_test = np.sum(y_test == 1)
-    anzahl_no_test = np.sum(y_test == 0)
-
-    print(f"Train - Swarm: {anzahl_swarm_train}, No Swarm: {anzahl_no_train}")
-    print(f"Test  - Swarm: {anzahl_swarm_test}, No Swarm: {anzahl_no_test}")
+    logger.info(f'Ratio of test data: set value {test_size}; is value {len(x_test) / len(x_train)}')
+    logger.info(f'Ratio of test data: set value {test_size}; is value {len(y_test) / len(y_train)}')
+    logger.info(f'train_data is made of {np.sum(y_train == 1)} random swarm mels and {np.sum(y_train == 0)} random non swarm mels.')
+    ĺogger.info(f'test_data is made of {np.sum(y_test == 1)} random swarm mels and {np.sum(y_test == 0)} random non swarm mels.')
     #------------------------------------------------------------------
     # Initialisiere Norm-Arrays
     x_train_norm = np.zeros_like(x_train)
