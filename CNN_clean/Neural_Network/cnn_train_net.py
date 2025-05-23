@@ -102,12 +102,13 @@ def train(loader, args, logger) -> CNN | None:
         acc = check_accuracy(test_loader, model, device, logger)
         model.accuracy.append((1-acc)**2)
         model.mse.append(sum(model.accuracy)/len(model.accuracy))
-        if epoch > min_epoch and model.mse[-1] > model.mse[-2]:
+        #if epoch > min_epoch and model.mse[-1] > model.mse[-2]:
+        if epoch > min_epoch and model.accuracy[-1] > model.accuracy[-2]:
             model.epoch_max = epoch
             break
     else:
         model.epoch_max = max_epochs
-    logger.info(f"Finished training. MSE: {100*model.mse[-2]:.2f}% in epoch {model.epoch_max} with on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
+    logger.info(f"Finished training. MSE: {100*model.accuracy[-2]:.2f}% in epoch {model.epoch_max} with on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
     return model
 
 
@@ -160,7 +161,7 @@ def send_result(model, args, logger):
     payload = {'line_index': model.line,
                'model':str(model),
                'result': model.accuracy[-2],
-               'epoch': model.epoch_max}
+               'epoch': model.epoch_max-1}
     params = {'key': device_uuid}
 
     try:

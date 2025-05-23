@@ -2,7 +2,8 @@ Sound_processing/Neuro_Netze_torch/_netstruct.txt
 Sound_processing/training_files/training_data_torch_big.npy
 Sound_processing/training_files/training_data_torch_bienen_1.npy
 CNN_clean/Neural_Network/device_uuid.txt
-**/CNN_clean/Neural_Network/config.json
+CNN_clean/Neural_Network/config.json
+CNN_clean/files/server.php
 Sound_processing/_viele_sounds_geordnet
 Sound_processing/_bee_sounds
 Sound_processing/_bees
