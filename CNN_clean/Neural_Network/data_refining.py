@@ -35,7 +35,7 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     # Choose the minimum; important for the following case: 600 Swarm_data & 500 non_swarm_data; we choose 500 samples from each and distribute them; determined by: test_size
     min_class_count = min(len(idx_swarm), len(idx_no))
 
-    # Choose the the indices for the minimum
+    # Choose the indices for the minimum
     idx_swarm = idx_swarm[:min_class_count]
     idx_no = idx_no[:min_class_count]
 
