@@ -8,8 +8,7 @@ from tqdm import tqdm
 import os
 import numpy as np
 
-from CNN_clean.Neural_Network.cnn_helpers import get_uuid
-from CNN_clean.Neural_Network.cnn_net_prep import CNN
+from cnn_helpers import get_uuid
 from cnn_net_prep import CNN
 
 
