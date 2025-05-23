@@ -19,11 +19,9 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     """
 
     # Initialize the working directory and variables
-    #segment_file_mod_id  = setting.get('segment_file_mod_id', data[0]) --old unused
     segment_list         = setting.get('segment_list', data[1])
     segment_class_id     = setting.get('segment_class_id', data[2])
     test_size            = setting.get('test_size', 0.3)
-    #seed                = setting.get('seed', )                        --unused due to misunderstanding of seed
     event_ratio          = setting.get('swarm_event_ratio', 0.5)        #Ratio of swarm_event 0.5 -> swarm_event equals no_swarm
 
     #np.random.seed(seed)
@@ -37,7 +35,7 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
 
     # Choose the indices for the minimum
     idx_swarm = idx_swarm[:min_class_count]
-    idx_no = idx_no[:min_class_count]
+    idx_no_event = idx_no[:min_class_count]
 
     # Quantity of swarm & non swarm data; determined by: event_ratio
     test_count_swarm = int(min_class_count * test_size * event_ratio)
@@ -48,8 +46,8 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     train_swarm = np.setdiff1d(idx_swarm, test_swarm)
 
     # Choosing random test/train indices for: no_event
-    test_no = np.random.choice(idx_no, size=test_count_no, replace=False)
-    train_no = np.setdiff1d(idx_no, test_no)
+    test_no_event = np.random.choice(idx_no, size=test_count_no_event, replace=False)
+    train_no_event = np.setdiff1d(idx_no_event, test_no_event)
 
     # Create an empty boolean array with length of segment_class_id
     is_train = np.zeros(segment_class_id.shape[0], dtype=bool)
@@ -57,9 +55,9 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
 
     # Configure boolean arrays
     is_train[train_swarm] = True
-    is_train[train_no] = True
+    is_train[train_no_event] = True
     is_test[test_swarm] = True
-    is_test[test_no] = True
+    is_test[test_no_event] = True
 
 
     # Finally create training & test datasets
@@ -80,9 +78,9 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     x_train_norm = np.zeros_like(x_train)
     x_test_norm = np.zeros_like(x_test)
 
-    #print("Train set:", x_train.shape, y_train.shape)      --only for checking
-    #print("Test set:", x_test.shape, y_test.shape)
-    #print("Norm arrays:", x_train_norm.shape, x_test_norm.shape)
+    logger.debug("Train set:", x_train.shape, y_train.shape)
+    logger.debug("Test set:", x_test.shape, y_test.shape)
+    logger.debug("Norm arrays:", x_train_norm.shape, x_test_norm.shape)
 
     # Transform the data
     for i in range(x_train.shape[0]):
@@ -91,7 +89,7 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     for i in range(x_test.shape[0]):
         x_test_norm[i, :, :] = StandardScaler().fit_transform(x_test[i, :, :])
 
-    # Encode the labels with OneHotEncoder so that they represent the wanted output by the CNN (2,5) -> ((0,0,1,0,0,0), (0,0,0,0,0,1))
+    # Encode the labels with OneHotEncoder so that they represent the wanted output by the CNN {(2,5) -> ((0,0,1,0,0,0), (0,0,0,0,0,1))}
     y_train_transformed = OneHotEncoder(categories='auto', sparse_output=False).fit_transform(y_train.reshape(-1, 1))
     y_test_transformed = OneHotEncoder(categories='auto', sparse_output=False).fit_transform(y_test.reshape(-1, 1))
 

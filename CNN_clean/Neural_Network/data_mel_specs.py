@@ -6,11 +6,12 @@ import librosa
 from tqdm import tqdm
 
 
-def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 48000, n_mels=64, stereo:bool=True):
+def mel_spec_file(fn_wav_name, logger, n_fft=1024, hop_length=441, fss = 48000, n_mels=64, stereo:bool=True):
     """
     Compute mel spectrogram from audio file with librosa.feature.melspectogram()
     Args:
         fn_wav_name (str): Audio file name
+        logger : The logger for logging
         n_fft (int): FFT size
         hop_length (int): Hop size in samples
         fss (float): Sample rate in Hz
@@ -23,7 +24,7 @@ def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 48000, n_mels=6
     try:
         x_new, fss = librosa.load(fn_wav_name, sr=fss, mono=not stereo)
     except Exception as e:
-        print(e)
+        logger.error(e)
         return None
 
     if stereo:

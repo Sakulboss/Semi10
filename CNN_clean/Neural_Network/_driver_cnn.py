@@ -33,25 +33,24 @@ def main():
     # Create the data loader
     loader = data_prep(data, model_args)
     logger.info('Training will begin')
-    # Check if only a specific model should be trained or if the list with models should be continued
 
+    # Check if only a specific model should be trained or if the list with models should be continued
     if args.get('train_once', False):
         trained_model = train(loader, model_args, logger)
         move_working_directory()
         torch.save(trained_model[0].state_dict(), get_new_filename('pt'))
 
     else:
-        model_args['model_text'] = None
         while True:
             #waiting = True
             #thread_animation = Thread(target=animate)
             #thread_animation.start()
 
-            trained_model, accuracy = train(loader, model_args, logger)
+            trained_model = train(loader, model_args, logger)
             #waiting = False
 
             if trained_model is not None:
-                save_model_structure(trained_model, accuracy, model_args.get("dropbox", None))
+                save_model_structure(trained_model, logger, model_args)
                 continue
             else: break
 

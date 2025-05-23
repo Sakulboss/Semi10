@@ -189,6 +189,8 @@ class CNN(nn.Module):
 
         if (layers or text) is None:
             working = False
+        logger.debug(f"Model structure: {layers}")
+
 
         self.text:str        = text
         self.working:bool    = working

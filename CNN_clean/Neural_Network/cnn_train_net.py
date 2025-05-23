@@ -101,23 +101,23 @@ def train(loader, args, logger) -> CNN | None:
 
         acc = check_accuracy(test_loader, model, device, logger)
         model.accuracy.append((1-acc)**2)
-        model.mse.append(sum(model.accuracy)/len(model.accuracy))
+        #model.mse.append(sum(model.accuracy)/len(model.accuracy))
         #if epoch > min_epoch and model.mse[-1] > model.mse[-2]:
         if epoch > min_epoch and model.accuracy[-1] > model.accuracy[-2]:
             model.epoch_max = epoch
             break
     else:
         model.epoch_max = max_epochs
-    logger.info(f"Finished training. MSE: {100*model.accuracy[-2]:.2f}% in epoch {model.epoch_max} with on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
+    logger.info(f"Finished training. MSE: {model.accuracy[-2]:.2f} in epoch {model.epoch_max} with on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
     return model
 
 
-def save_model_structure(model: CNN, args):
+def save_model_structure(model: CNN, logger, args):
     """
     Saves the model structure to a file.
-
     Parameters:
         args:  Settings for the model, including the path to save the model.
+        logger: The logger for logging.
         model: The neural network model.
     Returns:
         None
@@ -134,13 +134,13 @@ def save_model_structure(model: CNN, args):
     with open(path_to_file, 'a') as f:
         f.write(f'{100 * model.accuracy[-2]:.5f}% {str(model)}\n')
 
-    send_result(model.accuracy[-2], )
+    send_result(model.accuracy[-2], args, logger)
 
     if save_weight:
         os.chdir(path)
         filename = get_new_filename('ckpt')
         torch.save(model, filename)
-        print(f"Model weights saved to {filename}")
+        logger.debug(f"Model weights saved to {filename}")
 
 
 def send_result(model, args, logger):
@@ -158,7 +158,7 @@ def send_result(model, args, logger):
     server_url = args.get('server_url', 'https://survive.cermann.com/server.php')
 
     headers = {'Content-Type': 'application/json'}
-    payload = {'line_index': model.line,
+    payload = {'line_index': model.text,
                'model':str(model),
                'result': model.accuracy[-2],
                'epoch': model.epoch_max-1}
