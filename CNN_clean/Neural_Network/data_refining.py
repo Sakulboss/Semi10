@@ -29,46 +29,44 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
 
     #np.random.seed(seed)
 
-    # indices of classes
+    # Indices of classes
     idx_swarm = np.where(segment_class_id == 1)[0]
     idx_no = np.where(segment_class_id == 0)[0]
 
-    # choose the minimum; important for the following case: 600 Swarm_data & 500 non_swarm_data; we choose 500 samples from each and distribute them; determined by: test_size
+    # Choose the minimum; important for the following case: 600 Swarm_data & 500 non_swarm_data; we choose 500 samples from each and distribute them; determined by: test_size
     min_class_count = min(len(idx_swarm), len(idx_no))
 
-    # choose the the indices for the minimum
+    # Choose the the indices for the minimum
     idx_swarm = idx_swarm[:min_class_count]
     idx_no = idx_no[:min_class_count]
 
-    # quantity of swarm & non swarm data; determined by: event_ratio
+    # Quantity of swarm & non swarm data; determined by: event_ratio
     test_count_swarm = int(min_class_count * test_size * event_ratio)
     test_count_no = int(min_class_count * test_size * (1 - event_ratio))
 
     #train_count_swarm = min_class_count - test_count_swarm         --deprecated
     #train_count_no = min_class_count - test_count_no
 
-    # choosing random test/train indices for: swarm_event
+    # Choosing random test/train indices for: swarm_event
     test_swarm = np.random.choice(idx_swarm, size=test_count_swarm, replace=False)
     train_swarm = np.setdiff1d(idx_swarm, test_swarm)
 
-    # choosing random test/train indices for: no_event
+    # Choosing random test/train indices for: no_event
     test_no = np.random.choice(idx_no, size=test_count_no, replace=False)
     train_no = np.setdiff1d(idx_no, test_no)
 
-    # create an empty boolean array with length
+    # Create an empty boolean array with length of segment_class_id
     is_train = np.zeros(segment_class_id.shape[0], dtype=bool)
     is_test = np.zeros(segment_class_id.shape[0], dtype=bool)
 
+    # Configure boolean arrays
     is_train[train_swarm] = True
     is_train[train_no] = True
     is_test[test_swarm] = True
     is_test[test_no] = True
 
-    # Schneide auf gleiche Länge, falls ungerade
-    train_len = min(len(train_swarm) + len(train_no), len(is_train[is_train]))
-    test_len = min(len(test_swarm) + len(test_no), len(is_test[is_test]))
 
-    # Erzeuge Trainings- und Testsets
+    # Finally create training & test datasets
     x_train = segment_list[is_train, :, :]
     y_train = segment_class_id[is_train]
 
@@ -79,18 +77,16 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     logger.info(f'Ratio of test data: set value {test_size}; is value {len(x_test) / len(x_train)}')
     logger.info(f'Ratio of test data: set value {test_size}; is value {len(y_test) / len(y_train)}')
     logger.info(f'train_data is made of {np.sum(y_train == 1)} random swarm mels and {np.sum(y_train == 0)} random non swarm mels.')
-    logger.info(f'test_data is made of {np.sum(y_test == 1)} random swarm mels and {np.sum(y_test == 0)} random non swarm mels.')
-    #------------------------------------------------------------------
-    # Initialisiere Norm-Arrays
+    logger.info(f'test_data  is made of {np.sum(y_test == 1)} random swarm mels and {np.sum(y_test == 0)} random non swarm mels.')
+    #---------------------------------------------------------------
+
+    # Create empty norm-arrays for further processing
     x_train_norm = np.zeros_like(x_train)
     x_test_norm = np.zeros_like(x_test)
 
-    # Ausgabe (kann jetzt weiterverwendet werden)
-    print("Train set:", x_train.shape, y_train.shape)
-    print("Test set:", x_test.shape, y_test.shape)
-    print("Norm arrays:", x_train_norm.shape, x_test_norm.shape)
-
-
+    #print("Train set:", x_train.shape, y_train.shape)      --only for checking
+    #print("Test set:", x_test.shape, y_test.shape)
+    #print("Norm arrays:", x_train_norm.shape, x_test_norm.shape)
 
     # Transform the data
     for i in range(x_train.shape[0]):
