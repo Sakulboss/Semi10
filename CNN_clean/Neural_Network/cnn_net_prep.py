@@ -191,8 +191,10 @@ class CNN(nn.Module):
 
         if (layers or text) is None:
             working = False
-        logger.debug(f"Model structure: {layers}")
 
+        logger.debug(f"Model structure: {layers}")
+        logger.debug(f"Model structure text: {text}")
+        logger.debug(f"Model structure line: {line}")
 
         self.text:str        = text
         self.working:bool    = working
@@ -236,6 +238,9 @@ class CNN(nn.Module):
             else:
                 print(f"Error: Unknown layer type: {layer}")
         return x
+
+    def __int__(self):
+        return self.line
 
 
     def __str__(self):

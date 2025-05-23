@@ -101,14 +101,14 @@ def train(loader, args, logger) -> CNN | None:
 
         acc = check_accuracy(test_loader, model, device, logger)
         model.accuracy.append((1-acc)**2)
-        #model.mse.append(sum(model.accuracy)/len(model.accuracy))
+        model.mse.append(sum(model.accuracy)/len(model.accuracy))
         #if epoch > min_epoch and model.mse[-1] > model.mse[-2]:
         if epoch > min_epoch and model.accuracy[-1] > model.accuracy[-2]:
             model.epoch_max = epoch
             break
     else:
         model.epoch_max = max_epochs
-    logger.info(f"Finished training. MSE: {100*model.accuracy[-2]:.2f} in epoch {model.epoch_max} with on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
+    logger.info(f"Finished training. MSE: {model.mse[-2]:.2f} in epoch {model.epoch_max} with on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
     return model
 
 
@@ -158,10 +158,10 @@ def send_result(model, args, logger):
     server_url = args.get('server_url', 'https://survive.cermann.com/server.php')
 
     headers = {'Content-Type': 'application/json'}
-    payload = {'line_index': model.line,
-               'model':str(model),
-               'result': model.accuracy[-2],
-               'epoch': model.epoch_max-1}
+    payload = {'line_index': int(model),
+               'model':      str(model),
+               'result':     model.accuracy[-2],
+               'epoch':      model.epoch_max-1}
     params = {'key': device_uuid}
 
     try:
@@ -216,9 +216,9 @@ def check_accuracy(loader, model, device, logger):
         accuracy = float(num_correct) / float(num_samples)
 
         if loader.dataset.train:
-            logger.debug(f"train: Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
+            logger.debug(f"train: Got {num_correct}/{num_samples} with accuracy {100*accuracy:.2f}%")
         else:
-            logger.debug(f"test:  Got {num_correct}/{num_samples} with accuracy {accuracy:.2f}%")
+            logger.debug(f"test:  Got {num_correct}/{num_samples} with accuracy {100*accuracy:.2f}%")
 
     model.train()  # Set the model back to training mode
     return accuracy
