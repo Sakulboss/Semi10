@@ -1,5 +1,7 @@
 import numpy as np
-import random
+
+
+from numba.cpython.randomimpl import seed_impl
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import StandardScaler
 
@@ -19,18 +21,15 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     """
 
     # Initialize the working directory and variables
-    segment_file_mod_id  = setting.get('segment_file_mod_id', data[0])
+    #segment_file_mod_id  = setting.get('segment_file_mod_id', data[0]) --old unused
     segment_list         = setting.get('segment_list', data[1])
     segment_class_id     = setting.get('segment_class_id', data[2])
     printing             = setting.get('printing', False)
     test_size            = setting.get('test_size', 0.3)
+    #seed                = setting.get('seed', )                        --unused due to misunderstanding of seed
+    event_ratio          = setting.get('swarm_event_ratio', 0.5) #Anteil swarm_event in der finalen Auswahl (z.B. 0.5 = 50%)
 
-
-    event_ratio = 0.5  # Anteil swarm_event in der finalen Auswahl (z.B. 0.5 = 50%)
-    seed = 42  # Seed für Reproduzierbarkeit
-
-    np.random.seed(seed)
-    random.seed(seed)
+    #np.random.seed(seed)
 
     # Indizes der Klassen
     idx_swarm = np.where(segment_class_id == 1)[0]
