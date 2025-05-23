@@ -196,7 +196,22 @@ def check_accuracy(loader, model, device, logger):
     # Disable gradient calculation -> should only test model performance
     with no_grad():
         for x, y in loader:
+            x = x.to(device)
+            y = y.to(device)
+            print("CHANGED FUNDAMENTAL THINGS IN CNN_TRAIN_NET; CHECK ACCURACY")
+            # Get model predictions
+            scores = model(x)
+            _, predictions = scores.max(1)  # shape: [batch_size]
 
+            # Convert one-hot encoded labels to class indices if necessary;
+            # !!! is necessary, because we one hot encode first and here it only works with non hot encoded !!!
+            if y.ndim == 2 and y.size(1) > 1:
+                y = y.argmax(dim=1)
+
+            # Compare predictions to labels
+            num_correct += (predictions == y).sum().item()
+            num_samples += predictions.size(0)
+            '''                                                   <------------ Commented and replaced
             x = x.to(device)
             _, predictions = model(x).max(1)
             predictions_new = np.array(predictions.cpu())
@@ -206,12 +221,13 @@ def check_accuracy(loader, model, device, logger):
                 y_new = np.array(y.max(1))
                 y_new = np.array([int(i) for i in y_new[1]])
             else:
+                print(f"y shape: {y.shape}, y: {y}")
                 y_new = np.array([int(i) for i in y])
 
             # Calculate the number of correct predictions (takes the sum of the correct predictions pairs (if it works, it works))
             num_correct += (predictions_new == y_new).sum()
             num_samples += predictions.size(0)
-
+        '''
         # Calculate accuracy
         accuracy = float(num_correct) / float(num_samples)
 

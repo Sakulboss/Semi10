@@ -4,8 +4,8 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 def training_data(data: tuple, setting: dict, logger) -> tuple:
     segment_list = setting.get('segment_list', data[1])
     segment_class_id = setting.get('segment_class_id', data[2])
-    test_size = setting.get('test_size', 0.3)
-    event_ratio = setting.get('swarm_event_ratio', 0.5)
+    #test_size = setting.get('test_size', 0.3)
+    #event_ratio = setting.get('swarm_event_ratio', 0.5)
 
     # Normierung aller Samples
     x_all = np.zeros_like(segment_list)
@@ -18,6 +18,16 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
 
     y_all = segment_class_id
     y_all_oh = OneHotEncoder(sparse_output=False).fit_transform(y_all.reshape(-1, 1))
+    print("-----------")
+    print("-----------")
+    print(y_all_oh)
+    print("-----------")
+    print(y_all)
+    print("-----------")
+    print(x_all)
+    print("-----------")
+    print("-----------")
+
     return y_all_oh, y_all, x_all
 #--------------------------------------------------------------------------------------------------------------------------------------------
     '''

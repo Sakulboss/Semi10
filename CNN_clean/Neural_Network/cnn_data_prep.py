@@ -1,5 +1,8 @@
 import torch
 import numpy as np
+#from numba.core.typing.new_builtins import Print
+#from numba.core.typing.new_builtins import
+#Print
 from torch.utils.data import DataLoader, Dataset
 
 class CustomDataset(Dataset):
@@ -36,21 +39,37 @@ def data_prep(data, logger, args):
     test_size = args.get('test_size', 0.3)
     event_ratio = args.get('swarm_event_ratio', 0.5)
 
+    #Wichtig
+    test_size = test_size * 2
+
     y_all_oh, y_all, x_all = data
-    '''
+
+    """
+    print(data)
+    print("--------")
+    print(y_all_oh)
+    print("--------")
+    print(y_all)
+    print("--------")
+    print(x_all)
+    print("---------")
+    
     y_all_oh = data[0]
     print(y_all_oh)
     y_all = data[1]
     print(y_all)
     x_all = data[2]
     print(x_all)
-    '''
+    """
+
+
     #---Mixing
     # Jetzt Split logik nach Verhältnissen (aber alles ist schon normiert + encoded)
     idx_swarm = np.where(y_all == 1)[0]
     idx_no_swarm = np.where(y_all == 0)[0]
 
     min_class_count = min(len(idx_swarm), len(idx_no_swarm))
+    whole_class_count = min_class_count * 2 #wichtig
     idx_swarm = idx_swarm[:min_class_count]
     idx_no_swarm = idx_no_swarm[:min_class_count]
 
@@ -82,36 +101,48 @@ def data_prep(data, logger, args):
     n_classes = y_train_transformed.shape[1]
 
     # ---------------------------------------------------------------
-    logger.debug(f"Train set:   {x_train_norm.shape}, {y_train_transformed.shape}")
-    logger.debug(f"Test set:    {x_test_norm.shape}, {y_test_transformed.shape}")
-    logger.debug(f"Norm arrays: {x_train_norm.shape}, {x_test_norm.shape}")
+    logger.info(f"Train set:   {x_train_norm.shape}, {y_train_transformed.shape}")
+    logger.info(f"Test set:    {x_test_norm.shape}, {y_test_transformed.shape}")
+    logger.info(f"Norm arrays: {x_train_norm.shape}, {x_test_norm.shape}")
     # ---------------------------------------------------------------
 
+
     # --------------------------------------------------------------
+    '''
     logger.info(f"Ratio of test data: set value {test_size}; is value {len(x_test_norm) / len(x_train_norm)}")
     logger.info(
         f"Ratio of training data: set value {test_size}; is value {len(y_test_transformed) / len(y_train_transformed)}")
+    
     logger.info(
         f"train_data is made of {np.sum(np.argmax(y_train_transformed, axis=1) == 1)} random swarm mels and {np.sum(np.argmax(y_train_transformed, axis=1) == 0)} random non swarm mels.")
     logger.info(
         f"test_data  is made of {np.sum(np.argmax(y_test_transformed, axis=1) == 1)} random swarm mels and {np.sum(np.argmax(y_test_transformed, axis=1) == 0)} random non swarm mels.")
+    '''
     # ---------------------------------------------------------------
 
-    try:
-        assert n_classes == data[4]
-    except AssertionError:
-        logger.debug(f"Mismatch in class count: {n_classes} vs {data[4]}")
+    logger.info(f"Train data contains {np.sum(np.argmax(y_train_transformed, axis=1) == 1)} swarm samples and {np.sum(np.argmax(y_train_transformed, axis=1) == 0)} non swarm samples.")
+    logger.info(f"Test data contains {np.sum(np.argmax(y_test_transformed, axis=1) == 1)} swarm samples and {np.sum(np.argmax(y_test_transformed, axis=1) == 0)} non swarm samples.")
+
+    logger.info(f"Ratio of test data: set value {test_size/2}; is value {len(x_test_norm) / whole_class_count}")
+    logger.info(f"Ratio of training data: set value {1 - test_size/2}; is value {len(x_train_norm) / whole_class_count}")
+
+    print("MISSING ERROR HANDLING IN CNN_DATA PREP")
+
+    #try:
+    #    assert n_classes == x_test_norm                               #data[4] replaced through x test norm due to new saving
+    #except AssertionError:
+     #   logger.debug(f"Mismatch in class count: {n_classes} vs {x_test_norm}") #data[4]
 
     #return input_shape, n_classes, x_train_norm, y_train_transformed, x_test_norm, y_test_transformed, y_test, data[3], \data[4]
 
     #---Mixing
-    '''
-    Initialize variables
-    x_train_norm = data[2]
-    y_train_transformed = data[3]
-    x_test_norm = data[4]
-    y_test_transformed = data[6]
-    '''
+
+    #Initialize variables
+    #x_train_norm = data[2]
+    #y_train_transformed = data[3]
+    #x_test_norm = data[4]
+    #y_test_transformed = data[6]
+
     # Create torch.tensors from the numpy arrays for easier computation and GPU support
     x_train_tensor = torch.tensor(x_train_norm, dtype=torch.float32)
     y_train_tensor = torch.tensor(y_train_transformed, dtype=torch.float)

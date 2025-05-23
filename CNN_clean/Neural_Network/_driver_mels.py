@@ -37,9 +37,23 @@ def create_trainingdata(settings, logger) -> bool:
     trained_data = training_data(mels, settings, logger)
     logger.info(f'Saving training data...')
     # Save the training data
-    trained_data = np.array(trained_data, dtype=object)
+    #print(trained_data)
+    #trained_data = np.array(trained_data, dtype=object)
 
-    np.save(f'training_data_torch_{size}.npy', trained_data)
+    print("DEEEBUG")
+    print(type(trained_data))
+    if isinstance(trained_data, (tuple, list)):
+        print(len(trained_data))
+        for i, elem in enumerate(trained_data):
+            print(f"Element {i}: type={type(elem)}, shape={getattr(elem, 'shape', 'n/a')}")
+    else:
+        print("trained_data ist kein Tuple oder Liste")
+
+    #np.save(f'training_data_torch_{size}.npy', trained_data, allow_pickle=True)
+    trained_data_array = np.empty(1, dtype=object)
+    trained_data_array[0] = trained_data
+    np.save(f'training_data_torch_{size}.npy', trained_data_array, allow_pickle=True)
+    #np.save(f'training_data_torch_{size}.npy', trained_data)
     return False
 
 
@@ -51,8 +65,13 @@ def load_trainingdata(size='bees_1') -> tuple:
     Returns:
         contents of the file as a tuple
     """
-    data = np.load(f'training_data_torch_{size}.npy', allow_pickle=True)
-    return tuple(data)
+
+    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ALARM (in load_trainingsdata)')
+    #path = f'training_data_torch_{size}.npy'
+    #data = np.load(path, allow_pickle=True)
+    #return tuple(data)
+    data = np.load('../files/training_data_torch_bees_1.npy', allow_pickle=True)[0]
+    return data
 
 
 def trainingdata(settings: dict, logger) -> tuple:

@@ -28,9 +28,10 @@ def main():
     data = trainingdata(data_args, logger)
 
     # Set up the arguments for data preparation
-    x = data[2].shape
-    args['input_size'] = x[2] * x[3]
-    args['num_classes'] = data[1]
+    print("ACHTUNG IN DRIVER CNN")
+    #x = data[2].shape
+    #args['input_size'] = x[2] * x[3]
+    #args['num_classes'] = data[1]
 
     # Create the data loader
     loader = data_prep(data, logger, model_args)
