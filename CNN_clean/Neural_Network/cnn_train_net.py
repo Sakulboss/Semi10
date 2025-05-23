@@ -160,9 +160,10 @@ def send_result(model, args, logger):
     headers = {'Content-Type': 'application/json'}
     payload = {'line_index': int(model),
                'model':      str(model),
-               'result':     model.accuracy[-2],
-               'epoch':      model.epoch_max-1}
+               'result':     model.__acc__(),
+               'epoch':      model.__epoch__()}
     params = {'key': device_uuid}
+    logger.debug(f"Sending result to server: {payload}")
 
     try:
         logger.debug(f"POST {server_url} with payload {json.dumps(payload)}")
