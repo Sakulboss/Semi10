@@ -36,8 +36,15 @@ def data_prep(data, logger, args):
     test_size = args.get('test_size', 0.3)
     event_ratio = args.get('swarm_event_ratio', 0.5)
 
-    print(data)
     y_all_oh, y_all, x_all = data
+    '''
+    y_all_oh = data[0]
+    print(y_all_oh)
+    y_all = data[1]
+    print(y_all)
+    x_all = data[2]
+    print(x_all)
+    '''
     #---Mixing
     # Jetzt Split logik nach Verhältnissen (aber alles ist schon normiert + encoded)
     idx_swarm = np.where(y_all == 1)[0]
