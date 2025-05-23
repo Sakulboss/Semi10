@@ -18,7 +18,9 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
 
     y_all = segment_class_id
     y_all_oh = OneHotEncoder(sparse_output=False).fit_transform(y_all.reshape(-1, 1))
-
+    return y_all_oh, y_all, x_all
+#--------------------------------------------------------------------------------------------------------------------------------------------
+    '''
     # Jetzt Split logik nach Verhältnissen (aber alles ist schon normiert + encoded)
     idx_swarm = np.where(y_all == 1)[0]
     idx_no_swarm = np.where(y_all == 0)[0]
@@ -82,7 +84,7 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
 
 
 
-'''
+
 def training_data(data: tuple, setting: dict, logger) -> tuple:
     """
     This function prepares the training data: It splits the data into training and test data

@@ -33,7 +33,7 @@ def main():
     args['num_classes'] = data[1]
 
     # Create the data loader
-    loader = data_prep(data, model_args)
+    loader = data_prep(data, logger, model_args)
     logger.info('Training will begin')
 
     # Check if only a specific model should be trained or if the list with models should be continued
