@@ -55,7 +55,7 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     test_no = np.random.choice(idx_no, size=test_count_no, replace=False)
     train_no = np.setdiff1d(idx_no, test_no)
 
-    # create
+    # create an empty boolean array with length
     is_train = np.zeros(segment_class_id.shape[0], dtype=bool)
     is_test = np.zeros(segment_class_id.shape[0], dtype=bool)
 
@@ -79,7 +79,7 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     logger.info(f'Ratio of test data: set value {test_size}; is value {len(x_test) / len(x_train)}')
     logger.info(f'Ratio of test data: set value {test_size}; is value {len(y_test) / len(y_train)}')
     logger.info(f'train_data is made of {np.sum(y_train == 1)} random swarm mels and {np.sum(y_train == 0)} random non swarm mels.')
-    ĺogger.info(f'test_data is made of {np.sum(y_test == 1)} random swarm mels and {np.sum(y_test == 0)} random non swarm mels.')
+    logger.info(f'test_data is made of {np.sum(y_test == 1)} random swarm mels and {np.sum(y_test == 0)} random non swarm mels.')
     #------------------------------------------------------------------
     # Initialisiere Norm-Arrays
     x_train_norm = np.zeros_like(x_train)
