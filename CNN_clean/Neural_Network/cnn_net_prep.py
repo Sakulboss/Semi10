@@ -46,7 +46,7 @@ def get_next_line(server_url, logger, uuid_file_path=None):
         if 'line' in data and 'line_index' in data:
             return data['line'], data['line_index']
         else:
-            logger.debug('Server response:', data.get('message', 'No line found'))
+            logger.error('Server response:', data.get('message', 'No line found'))
             return None, None
     except requests.RequestException as e:
         logger.critical('Error during GET:', str(e))
@@ -119,11 +119,11 @@ def getlayers(logger, args:dict):
     move_working_directory()
     if training_once:
         original_model_text = omt
+    elif use_server:
+        print(f"Using server: {server_url}")
+        original_model_text, line = get_next_line(server_url, logger, uuid_file_path)
     else:
-        if use_server:
-            original_model_text = get_next_line(server_url, logger, uuid_file_path)
-        else:
-            original_model_text = getnextmodel(path)
+        original_model_text = getnextmodel(path)
 
     if original_model_text is None:
         return None, None
@@ -157,7 +157,10 @@ def getlayers(logger, args:dict):
         else:
             print(f'Error: Layer class not found: --{layer}')
 
-    return functions, original_model_text
+    if use_server and not training_once:
+        return functions, original_model_text, line
+    else:
+        return functions, original_model_text
 
 #stride:     how the filter moves
 #padding:    frame for the old picture added
@@ -177,7 +180,12 @@ class CNN(nn.Module):
 
         super(CNN, self).__init__()
 
-        layers, text = getlayers(logger, args)
+        if args.get('use_server', True) and not args.get('train_once', True):
+            layers, text, self.line = getlayers(logger, args)
+        else:
+            layers, text = getlayers(logger, args)
+            self.line = None
+
         working = True
 
         if (layers or text) is None:
@@ -230,5 +238,5 @@ class CNN(nn.Module):
         """
         if self.text.endswith('\n'):
             self.text = self.text[:-2]
-        return self.text
+        return self.text, self.line
 

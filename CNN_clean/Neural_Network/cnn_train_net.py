@@ -1,5 +1,7 @@
+import json
 import time
 
+import requests
 import torch
 from torch import optim, no_grad, nn
 from tqdm import tqdm
@@ -68,7 +70,7 @@ def train(loader, args, logger) -> tuple[CNN, list] | None:
     start = time.perf_counter()
 
     for epoch in range(max_epochs):
-        logger.info(f"\nEpoch [{epoch + 1}/{max_epochs}]")
+        logger.debug(f"Epoch [{epoch + 1}/{max_epochs}]")
         for batch_index, (data, targets) in enumerate(tqdm(train_loader, disable=True)):
 
             # Move data and targets to the device (GPU/CPU)
@@ -142,6 +144,34 @@ def save_model_structure(model: CNN, accuracy, path = None, save_weight: bool = 
         filename = get_new_filename('ckpt')
         torch.save(model, filename)
         print(f"Model weights saved to {filename}")
+
+
+def send_result(device_uuid, line_index, result, server_url, logger):
+    """
+    This function sends the result of the training back to the server.
+    Args:
+        device_uuid: The UUID of the device.
+        line_index:  The index of the line that was trained.
+        result:      The result of the training.
+        logger:      The logger for logging.
+    Returns:
+        None
+    """
+
+    headers = {'Content-Type': 'application/json'}
+    payload = {'line_index': line_index, 'result': result}
+    params = {'key': device_uuid}
+
+    try:
+        logger.debug(f"POST {server_url} with payload {json.dumps(payload)}")
+        response = requests.post(server_url, params=params, json=payload, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        logger.debug('Server response:', data.get('message', 'No response message'))
+    except requests.RequestException as e:
+        logger.critical('Error during POST:', str(e))
+    except json.JSONDecodeError:
+        logger.critical('Error decoding JSON response from server')
 
 
 def check_accuracy(loader, model, device, logger):

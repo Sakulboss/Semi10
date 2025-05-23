@@ -41,10 +41,7 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
 
     # Quantity of swarm & non swarm data; determined by: event_ratio
     test_count_swarm = int(min_class_count * test_size * event_ratio)
-    test_count_no = int(min_class_count * test_size * (1 - event_ratio))
-
-    #train_count_swarm = min_class_count - test_count_swarm         --deprecated
-    #train_count_no = min_class_count - test_count_no
+    test_count_no_event = int(min_class_count * test_size * (1 - event_ratio))
 
     # Choosing random test/train indices for: swarm_event
     test_swarm = np.random.choice(idx_swarm, size=test_count_swarm, replace=False)
