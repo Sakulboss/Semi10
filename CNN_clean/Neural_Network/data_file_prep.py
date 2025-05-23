@@ -94,23 +94,19 @@ def dataset(size: str, args: dict, logger) -> list[str]:
     if size == "esc50":
         """
         Wichtig -> muss gefixed werden
-        
         """
         sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_esc50')
         if not os.path.isdir(sorted_files):
             download_esc50(args)
         dir_dataset: str = '_esc50_sorted'
-
-
     elif size == 'bees_1':
         sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_bee_sounds')
-        if not os.path.isdir(sorted_files):
-            create_bee_1(args)
+        #if not os.path.isdir(sorted_files):
+        create_bee_1(args)
         dir_dataset: str = sorted_files
     else:
         raise ValueError('Invalid dataset size.')
 
     logger.critical('ESC50 Fixen!!! Umsetzung von Zielspeicherort für ZIP notwendig, wenn möglich auch unsere Daten als Zip zum herunterladen parat haben und das einbauen')
-
     return glob.glob(os.path.join(dir_dataset, '*'))
 

@@ -1,4 +1,5 @@
 import numpy as np
+import random
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import StandardScaler
 
@@ -24,23 +25,83 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     printing             = setting.get('printing', False)
     test_size            = setting.get('test_size', 0.3)
 
-    # Split the data into training and test data
-    logger.critical(f"Make that the data is splitted ramdomised into the datasets!!!")
-    np.random.seed(0)
-    #np.random.choice()
-    is_train = np.where(segment_file_mod_id <  test_size * 10)[0]
-    is_test  = np.where(segment_file_mod_id >= test_size * 10)[0]
+    test_ratio = 0.3  # Anteil Testdaten insgesamt
+    event_ratio = 0.5  # Anteil swarm_event in der finalen Auswahl (z.B. 0.5 = 50%)
+    seed = 42  # Seed für Reproduzierbarkeit
 
-    logger.info(f"The feature matrix is split into {len(is_train)} training and {len(is_test)} test examples.")
+    np.random.seed(seed)
+    random.seed(seed)
 
-    # Now the data itself is split with the indices
+    # Indizes der Klassen
+    idx_swarm = np.where(segment_class_id == 1)[0]
+    idx_no = np.where(segment_class_id == 0)[0]
+
+    # Balanciere auf Minimum
+    min_class_count = min(len(idx_swarm), len(idx_no))
+
+    idx_swarm = idx_swarm[:min_class_count]
+    idx_no = idx_no[:min_class_count]
+
+    # Anzahl Test pro Klasse
+    test_count_swarm = int(min_class_count * test_ratio * event_ratio)
+    test_count_no = int(min_class_count * test_ratio * (1 - event_ratio))
+
+    # Anzahl Train pro Klasse
+    train_count_swarm = min_class_count - test_count_swarm
+    train_count_no = min_class_count - test_count_no
+
+    # Wähle zufällig Test- und Train-Indizes für swarm_event
+    test_swarm = np.random.choice(idx_swarm, size=test_count_swarm, replace=False)
+    train_swarm = np.setdiff1d(idx_swarm, test_swarm)
+
+    # Wähle zufällig Test- und Train-Indizes für no_event
+    test_no = np.random.choice(idx_no, size=test_count_no, replace=False)
+    train_no = np.setdiff1d(idx_no, test_no)
+
+    # Kombiniere Indizes
+    is_train = np.zeros(segment_class_id.shape[0], dtype=bool)
+    is_test = np.zeros(segment_class_id.shape[0], dtype=bool)
+
+    is_train[train_swarm] = True
+    is_train[train_no] = True
+    is_test[test_swarm] = True
+    is_test[test_no] = True
+
+    # Schneide auf gleiche Länge, falls ungerade
+    train_len = min(len(train_swarm) + len(train_no), len(is_train[is_train]))
+    test_len = min(len(test_swarm) + len(test_no), len(is_test[is_test]))
+
+    # Erzeuge Trainings- und Testsets
     x_train = segment_list[is_train, :, :]
     y_train = segment_class_id[is_train]
+
     x_test = segment_list[is_test, :, :]
     y_test = segment_class_id[is_test]
+    #---------------------------------------------------------
+    print('x_test_len,y_test_len')
+    print(len(x_test),len(y_test))
+    #--------------------------------------------------------------
+    # Anzahl der Klassen im Trainingsset
+    anzahl_swarm_train = np.sum(y_train == 1)
+    anzahl_no_train = np.sum(y_train == 0)
 
+    # Anzahl der Klassen im Testset
+    anzahl_swarm_test = np.sum(y_test == 1)
+    anzahl_no_test = np.sum(y_test == 0)
+
+    print(f"Train - Swarm: {anzahl_swarm_train}, No Swarm: {anzahl_no_train}")
+    print(f"Test  - Swarm: {anzahl_swarm_test}, No Swarm: {anzahl_no_test}")
+    #------------------------------------------------------------------
+    # Initialisiere Norm-Arrays
     x_train_norm = np.zeros_like(x_train)
     x_test_norm = np.zeros_like(x_test)
+
+    # Ausgabe (kann jetzt weiterverwendet werden)
+    print("Train set:", x_train.shape, y_train.shape)
+    print("Test set:", x_test.shape, y_test.shape)
+    print("Norm arrays:", x_train_norm.shape, x_test_norm.shape)
+
+
 
     # Transform the data
     for i in range(x_train.shape[0]):
