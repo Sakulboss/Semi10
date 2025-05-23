@@ -243,6 +243,20 @@ class CNN(nn.Module):
         return self.line
 
 
+    def __acc__(self):
+        """
+        Returns the accuracy of the neural network.
+        """
+        return self.accuracy[-2] if self.accuracy else None
+
+
+    def __epoch__(self):
+        """
+        Returns the epoch of the neural network.
+        """
+        return self.epoch_max
+
+
     def __str__(self):
         """
         Returns start text of the neural network.
