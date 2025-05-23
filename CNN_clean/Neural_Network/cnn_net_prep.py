@@ -156,7 +156,7 @@ def getlayers(logger, args:dict):
         else:
             print(f'Error: Layer class not found: --{layer}')
 
-    if use_server and not training_once:
+    if use_server:
         return functions, original_model_text, line
     else:
         return functions, original_model_text

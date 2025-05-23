@@ -1,8 +1,88 @@
 import numpy as np
-#from numba.cpython.randomimpl import seed_impl
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
+def training_data(data: tuple, setting: dict, logger) -> tuple:
+    segment_list = setting.get('segment_list', data[1])
+    segment_class_id = setting.get('segment_class_id', data[2])
+    test_size = setting.get('test_size', 0.3)
+    event_ratio = setting.get('swarm_event_ratio', 0.5)
+
+    # Normierung aller Samples
+    x_all = np.zeros_like(segment_list)
+    for i in range(segment_list.shape[0]):
+        x_all[i, :, :] = StandardScaler().fit_transform(segment_list[i, :, :])
+
+    # Dimension hinzufügen für CNN (Channels)
+    if len(x_all.shape) == 3:
+        x_all = np.expand_dims(x_all, 1)
+
+    y_all = segment_class_id
+    y_all_oh = OneHotEncoder(sparse_output=False).fit_transform(y_all.reshape(-1, 1))
+
+    # Jetzt Split logik nach Verhältnissen (aber alles ist schon normiert + encoded)
+    idx_swarm = np.where(y_all == 1)[0]
+    idx_no_swarm = np.where(y_all == 0)[0]
+
+    min_class_count = min(len(idx_swarm), len(idx_no_swarm))
+    idx_swarm = idx_swarm[:min_class_count]
+    idx_no_swarm = idx_no_swarm[:min_class_count]
+
+    test_count_swarm = int(min_class_count * test_size * event_ratio)
+    test_count_no = int(min_class_count * test_size * (1 - event_ratio))
+
+    # Test/Train Indexwahl
+    test_swarm = np.random.choice(idx_swarm, size=test_count_swarm, replace=False)
+    train_swarm = np.setdiff1d(idx_swarm, test_swarm)
+
+    test_no = np.random.choice(idx_no_swarm, size=test_count_no, replace=False)
+    train_no = np.setdiff1d(idx_no_swarm, test_no)
+
+    # Finales Shuffle & Auswahl
+    train_idx = np.concatenate([train_swarm, train_no])
+    test_idx = np.concatenate([test_swarm, test_no])
+
+    np.random.shuffle(train_idx)
+    np.random.shuffle(test_idx)
+
+    x_train_norm = x_all[train_idx]
+    y_train_transformed = y_all_oh[train_idx]
+
+    x_test_norm = x_all[test_idx]
+    y_test_transformed = y_all_oh[test_idx]
+    y_test = y_all[test_idx]  # original labels für spätere Auswertung
+
+    input_shape = x_train_norm.shape[1:]
+    n_classes = y_train_transformed.shape[1]
+
+    # ---------------------------------------------------------------
+    logger.debug(f"Train set:   {x_train_norm.shape}, {y_train_transformed.shape}")
+    logger.debug(f"Test set:    {x_test_norm.shape}, {y_test_transformed.shape}")
+    logger.debug(f"Norm arrays: {x_train_norm.shape}, {x_test_norm.shape}")
+    # ---------------------------------------------------------------
+
+    # --------------------------------------------------------------
+    logger.info(f"Ratio of test data: set value {test_size}; is value {len(x_test_norm) / len(x_train_norm)}")
+    logger.info(f"Ratio of training data: set value {test_size}; is value {len(y_test_transformed) / len(y_train_transformed)}")
+    logger.info(f"train_data is made of {np.sum(np.argmax(y_train_transformed, axis=1) == 1)} random swarm mels and {np.sum(np.argmax(y_train_transformed, axis=1) == 0)} random non swarm mels.")
+    logger.info(f"test_data  is made of {np.sum(np.argmax(y_test_transformed, axis=1) == 1)} random swarm mels and {np.sum(np.argmax(y_test_transformed, axis=1) == 0)} random non swarm mels.")
+    # ---------------------------------------------------------------
+
+    try:
+        assert n_classes == data[4]
+    except AssertionError:
+        logger.debug(f"Mismatch in class count: {n_classes} vs {data[4]}")
+
+    return input_shape, n_classes, x_train_norm, y_train_transformed, x_test_norm, y_test_transformed, y_test, data[3], data[4]
+
+
+
+
+
+
+
+
+
+'''
 def training_data(data: tuple, setting: dict, logger) -> tuple:
     """
     This function prepares the training data: It splits the data into training and test data
@@ -112,3 +192,4 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
         logger.debug(f"Number of classes in data: {n_classes} vs. Number of classes in dir structure: {data[4]} - please correct")
 
     return input_shape, n_classes, x_train_norm, y_train_transformed, x_test_norm, y_test_transformed, y_test, data[3], data[4]
+'''
