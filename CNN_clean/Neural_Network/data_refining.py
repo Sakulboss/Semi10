@@ -1,6 +1,4 @@
 import numpy as np
-
-
 from numba.cpython.randomimpl import seed_impl
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import StandardScaler
@@ -26,37 +24,37 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     segment_class_id     = setting.get('segment_class_id', data[2])
     test_size            = setting.get('test_size', 0.3)
     #seed                = setting.get('seed', )                        --unused due to misunderstanding of seed
-    event_ratio          = setting.get('swarm_event_ratio', 0.5) #Anteil swarm_event in der finalen Auswahl (z.B. 0.5 = 50%)
+    event_ratio          = setting.get('swarm_event_ratio', 0.5)        #Ratio of swarm_event 0.5 -> swarm_event equals no_swarm
 
     #np.random.seed(seed)
 
-    # Indizes der Klassen
+    # indices of classes
     idx_swarm = np.where(segment_class_id == 1)[0]
     idx_no = np.where(segment_class_id == 0)[0]
 
-    # Balanciere auf Minimum
+    # choose the minimum; important for the following case: 600 Swarm_data & 500 non_swarm_data; we choose 500 samples from each and distribute them; determined by: test_size
     min_class_count = min(len(idx_swarm), len(idx_no))
 
+    # choose the the indices for the minimum
     idx_swarm = idx_swarm[:min_class_count]
     idx_no = idx_no[:min_class_count]
 
-    # Anzahl Test pro Klasse
+    # quantity of swarm & non swarm data; determined by: event_ratio
     test_count_swarm = int(min_class_count * test_size * event_ratio)
     test_count_no = int(min_class_count * test_size * (1 - event_ratio))
 
-    # Anzahl Train pro Klasse
-    train_count_swarm = min_class_count - test_count_swarm
-    train_count_no = min_class_count - test_count_no
+    #train_count_swarm = min_class_count - test_count_swarm         --deprecated
+    #train_count_no = min_class_count - test_count_no
 
-    # Wähle zufällig Test- und Train-Indizes für swarm_event
+    # choosing random test/train indices for: swarm_event
     test_swarm = np.random.choice(idx_swarm, size=test_count_swarm, replace=False)
     train_swarm = np.setdiff1d(idx_swarm, test_swarm)
 
-    # Wähle zufällig Test- und Train-Indizes für no_event
+    # choosing random test/train indices for: no_event
     test_no = np.random.choice(idx_no, size=test_count_no, replace=False)
     train_no = np.setdiff1d(idx_no, test_no)
 
-    # Kombiniere Indizes
+    # create an empty boolean array with length
     is_train = np.zeros(segment_class_id.shape[0], dtype=bool)
     is_test = np.zeros(segment_class_id.shape[0], dtype=bool)
 
