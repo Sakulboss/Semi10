@@ -6,7 +6,7 @@ import zipfile
 import shutil
 
 
-def compute_mel_spec_for_audio_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 22050., n_mels=64, mono = True, channel = 0):
+def compute_mel_spec_for_audio_file(fn_wav_name, n_fft=1024, hop_length=441, fss = 48000., n_mels=64, mono = True, channel = 0):
     """ Compute mel spectrogram
     Args:
         fn_wav_name (str): Audio file name

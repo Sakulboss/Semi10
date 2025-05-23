@@ -7,7 +7,7 @@ define('DATA_FILE', '_netstruct.txt');
 define('RESULTS_FILE', 'model_results.txt');
 // Whitelist of authorized UUIDs; add authorized device UUIDs here
 $UUID_WHITELIST = [
-    'uuid', //Konrad
+    'uuid',
 ];
 
 // Validate UUID format (basic)
@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Check if found index is negative - generate error if so
-    if ($foundIndex < 0) {
+    if ($lineIndex < 0) {
         http_response_code(400);
         echo json_encode(['error' => 'Found line index is invalid (negative)']);
         exit;
