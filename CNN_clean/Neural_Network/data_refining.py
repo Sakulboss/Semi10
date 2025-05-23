@@ -25,7 +25,7 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     printing             = setting.get('printing', False)
     test_size            = setting.get('test_size', 0.3)
 
-    test_ratio = 0.3  # Anteil Testdaten insgesamt
+
     event_ratio = 0.5  # Anteil swarm_event in der finalen Auswahl (z.B. 0.5 = 50%)
     seed = 42  # Seed für Reproduzierbarkeit
 
@@ -43,8 +43,8 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     idx_no = idx_no[:min_class_count]
 
     # Anzahl Test pro Klasse
-    test_count_swarm = int(min_class_count * test_ratio * event_ratio)
-    test_count_no = int(min_class_count * test_ratio * (1 - event_ratio))
+    test_count_swarm = int(min_class_count * test_size * event_ratio)
+    test_count_no = int(min_class_count * test_size * (1 - event_ratio))
 
     # Anzahl Train pro Klasse
     train_count_swarm = min_class_count - test_count_swarm
