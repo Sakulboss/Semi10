@@ -180,10 +180,12 @@ class CNN(nn.Module):
         super(CNN, self).__init__()
 
         if args.get('use_server', True) and not args.get('train_once', True):
-            layers, text, self.line = getlayers(logger, args)
+            layers, text, line = getlayers(logger, args)
         else:
             layers, text = getlayers(logger, args)
-            self.line = None
+            line = -1
+
+        self.line = line
 
         working = True
 

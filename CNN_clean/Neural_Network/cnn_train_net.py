@@ -108,7 +108,7 @@ def train(loader, args, logger) -> CNN | None:
             break
     else:
         model.epoch_max = max_epochs
-    logger.info(f"Finished training. MSE: {model.accuracy[-2]:.2f} in epoch {model.epoch_max} with on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
+    logger.info(f"Finished training. MSE: {100*model.accuracy[-2]:.2f} in epoch {model.epoch_max} with on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
     return model
 
 
@@ -158,7 +158,7 @@ def send_result(model, args, logger):
     server_url = args.get('server_url', 'https://survive.cermann.com/server.php')
 
     headers = {'Content-Type': 'application/json'}
-    payload = {'line_index': model.text,
+    payload = {'line_index': model.line,
                'model':str(model),
                'result': model.accuracy[-2],
                'epoch': model.epoch_max-1}
