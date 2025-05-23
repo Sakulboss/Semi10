@@ -78,9 +78,11 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     x_train_norm = np.zeros_like(x_train)
     x_test_norm = np.zeros_like(x_test)
 
-    logger.debug("Train set:", x_train.shape, y_train.shape)
-    logger.debug("Test set:", x_test.shape, y_test.shape)
-    logger.debug("Norm arrays:", x_train_norm.shape, x_test_norm.shape)
+    #---------------------------------------------------------------
+    logger.debug(f"Train set:   {x_train.shape}, {y_train.shape}")
+    logger.debug(f"Test set:    {x_test.shape}, {y_test.shape}")
+    logger.debug(f"Norm arrays: {x_train_norm.shape}, {x_test_norm.shape}")
+    #---------------------------------------------------------------
 
     # Transform the data
     for i in range(x_train.shape[0]):
