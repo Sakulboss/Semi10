@@ -2,11 +2,13 @@ import os
 import uuid
 import requests
 import json
-
+import logging
 
 SERVER_URL = 'https://survive.cermann.com/server.php'
-UUID_FILE = 'device_uuid.txt'
+UUID_FILE = '../../Neural_Network/device_uuid.txt'
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='myapp.log', level=logging.DEBUG)
 
 def load_or_create_uuid():
     """
@@ -27,7 +29,7 @@ def load_or_create_uuid():
 
 def get_next_line(device_uuid, logger):
     """
-    This fuction sends a GET request to the server to retrieve the layer to be trained.
+    This function sends a GET request to the server to retrieve the layer to be trained.
     Args:
         device_uuid: The UUID of the device, used as a key for the request.
         logger: The logger for logging.
@@ -40,14 +42,23 @@ def get_next_line(device_uuid, logger):
         logger.debug(f"GET {SERVER_URL} with params {params}")
         response = requests.get(SERVER_URL, params=params)
         response.raise_for_status()
-        data = response.json()
+
+        # Überprüfen Sie den Inhalt der Antwort
+        if not response.text:
+            logger.error("Leere Antwort vom Server erhalten")
+            return None, None
+        try:
+            data = response.json()
+        except json.JSONDecodeError as e:
+            logger.error(f"Ungültige JSON-Antwort vom Server: {response.text}")
+            return None, None
         if 'line' in data and 'line_index' in data:
             return data['line'], data['line_index']
         else:
-            logger.debug('Server response:', data.get('message', 'No line found'))
+            logger.debug(f'Server-Antwort: {data.get("message", "Keine Zeile gefunden")}')
             return None, None
     except requests.RequestException as e:
-        logger.critical('Error during GET:', str(e))
+        logger.error(f'Fehler während GET-Anfrage: {str(e)}')
         return None, None
 
 
@@ -64,7 +75,12 @@ def send_result(device_uuid, line_index, result, logger):
     """
 
     headers = {'Content-Type': 'application/json'}
-    payload = {'line_index': line_index, 'result': result}
+    payload = {
+        'line_index': line_index,
+        'result': result,
+        'model': 'default_model',  # Fügen Sie hier Ihr tatsächliches Modell ein
+        'epoch': 0                 # Fügen Sie hier Ihre tatsächliche Epoch-Nummer ein
+    }
     params = {'key': device_uuid}
 
     try:
@@ -72,11 +88,11 @@ def send_result(device_uuid, line_index, result, logger):
         response = requests.post(SERVER_URL, params=params, json=payload, headers=headers)
         response.raise_for_status()
         data = response.json()
-        logger.debug('Server response:', data.get('message', 'No response message'))
+        logger.debug('Server response: ' + str(data.get('message', 'No response message')))
     except requests.RequestException as e:
-        logger.critical('Error during POST:', str(e))
-    except json.JSONDecodeError:
-        logger.critical('Error decoding JSON response from server')
+        logger.critical(f'Error during POST: {str(e)}')
+    except json.JSONDecodeError as e:
+        logger.critical(f'Error decoding JSON response from server: {str(e)}')
 
 
 def main(logger):
@@ -88,4 +104,4 @@ def main(logger):
         send_result(device_uuid, line_index, line, logger)
 
 if __name__ == '__main__':
-    main()
+    main(logger)

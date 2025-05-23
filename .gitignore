@@ -10,6 +10,7 @@ Sound_processing/_viele_sounds_geordnet
 Sound_processing/_bee_sounds
 Sound_processing/_bees
 CNN_clean/files/training_data_torch_bees_1.npy
+CNN_clean/Server/device_testing/device_uuid.txt
 **/__pycache__/**
 /.idea/*
 *.tar.zst
