@@ -1,6 +1,7 @@
 import os
 import uuid
 import requests
+import json
 
 # Configuration
 SERVER_URL = 'https://survive.cermann.com/server.php'  # Change this to your server PHP URL
@@ -36,15 +37,18 @@ def get_first_line(device_uuid):
 def send_result(device_uuid, line_index, result):
     print(line_index)
     headers = {'Content-Type': 'application/json'}
-    payload = {'key': device_uuid, 'line_index': line_index, 'result': result}
+    payload = {'line_index': line_index, 'result': result}
+    params = {'key': device_uuid}
     try:
-        print(f"POST {SERVER_URL} with payload {payload}")
-        response = requests.post(SERVER_URL, json=payload, headers=headers)
+        print(f"POST {SERVER_URL} with payload {json.dumps(payload)}")
+        response = requests.post(SERVER_URL, params=params, json=payload, headers=headers)
         response.raise_for_status()
         data = response.json()
         print('Server response:', data.get('message', 'No response message'))
     except requests.RequestException as e:
         print('Error during POST:', str(e))
+    except json.JSONDecodeError:
+        print('Error decoding JSON response from server')
 
 def main():
     device_uuid = load_or_create_uuid()
@@ -56,6 +60,7 @@ def main():
         # Example processing: convert line to uppercase as result
         result = line.upper()
         send_result(device_uuid, line_index, result)
+    print("Clean up the files!!! Don't fill them with garbage!!!")
 
 if __name__ == '__main__':
     main()
