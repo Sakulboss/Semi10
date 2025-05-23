@@ -120,7 +120,6 @@ def getlayers(logger, args:dict):
     if training_once:
         original_model_text = omt
     elif use_server:
-        print(f"Using server: {server_url}")
         original_model_text, line = get_next_line(server_url, logger, uuid_file_path)
     else:
         original_model_text = getnextmodel(path)
@@ -191,8 +190,13 @@ class CNN(nn.Module):
         if (layers or text) is None:
             working = False
 
-        self.text = text
-        self.working = working
+        self.text:str        = text
+        self.working:bool    = working
+        self.accuracy:list   = []
+        self.mse:list        = []
+        self.epoch_time:list = []
+        self.scrore:int      = -1
+        self.epoch_max:int   = 1
 
         self.module_layers = nn.ModuleList(
             [layer for layer in layers if isinstance(layer, nn.Module)]
@@ -207,11 +211,9 @@ class CNN(nn.Module):
     def forward(self, x):
         """
         Define the forward pass of the neural network.
-
         Parameters:
             x: torch.Tensor
                 The input tensor.
-
         Returns:
             torch.Tensor
                 The output tensor after passing through the network.
@@ -238,5 +240,5 @@ class CNN(nn.Module):
         """
         if self.text.endswith('\n'):
             self.text = self.text[:-2]
-        return self.text, self.line
+        return self.text
 

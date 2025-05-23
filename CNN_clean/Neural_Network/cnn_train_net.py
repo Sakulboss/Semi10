@@ -7,6 +7,9 @@ from torch import optim, no_grad, nn
 from tqdm import tqdm
 import os
 import numpy as np
+
+from CNN_clean.Neural_Network.cnn_helpers import get_uuid
+from CNN_clean.Neural_Network.cnn_net_prep import CNN
 from cnn_net_prep import CNN
 
 
@@ -16,12 +19,9 @@ def move_working_directory():
         Returns:
             None
         """
-    working_directory = os.getcwd()
-    for i in range(3):
-        if os.path.basename(working_directory) != "Sound_processing":
-            os.chdir('../..')
-            break
-    os.chdir('modelle')
+
+    os.chdir('..')
+    os.chdir('files')
 
 
 def get_new_filename(file_extension: str) -> str:
@@ -36,7 +36,7 @@ def get_new_filename(file_extension: str) -> str:
     return f'model_torch_{count}.{file_extension}'
 
 
-def train(loader, args, logger) -> tuple[CNN, list] | None:
+def train(loader, args, logger) -> CNN | None:
     """
     Trains the model using the given data loader and arguments.
     Args:
@@ -54,9 +54,7 @@ def train(loader, args, logger) -> tuple[CNN, list] | None:
     learning_rate   = args.get('learning_rate', 0.01)
     min_epoch       = args.get('min_epoch', 5)
     device          = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    accuracy        = []
-    epoch_time      = []
-    mse             = []
+
 
     #Create the model and check if the model is working -> when all models are tested, model.working is False. After that move model to GPU or CPU.
     model = CNN(logger, args)
@@ -96,40 +94,36 @@ def train(loader, args, logger) -> tuple[CNN, list] | None:
 
         # measure the time for each epoch, it will be later used to calculate the average time for each epoch
         end = time.perf_counter()
-        epoch_time.append(end - start)
+        model.epoch_time.append(end - start)
         start = end
 
         #calculate the middle squared error of the model, if it gets worse, stop training.
 
         acc = check_accuracy(test_loader, model, device, logger)
-        accuracy.append((1-acc)**2)
-        mse.append(sum(accuracy)/len(accuracy))
-        if epoch > min_epoch and mse[-1] > mse[-2]:
-            epoch_max: int = epoch
+        model.accuracy.append((1-acc)**2)
+        model.mse.append(sum(model.accuracy)/len(model.accuracy))
+        if epoch > min_epoch and model.mse[-1] > model.mse[-2]:
+            model.epoch_max = epoch
             break
     else:
-        epoch_max: int = max_epochs
-    logger.info(f"Finished training. MSE: {100*mse[-1]:.2f}% in epoch {epoch_max} with on average {sum(epoch_time)/len(epoch_time):.3f} s and model {str(model)}")
-    return model, accuracy
+        model.epoch_max = max_epochs
+    logger.info(f"Finished training. MSE: {100*model.mse[-2]:.2f}% in epoch {model.epoch_max} with on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
+    return model
 
 
-def save_model_structure(model: CNN, accuracy, path = None, save_weight: bool = False):
+def save_model_structure(model: CNN, args):
     """
     Saves the model structure to a file.
 
     Parameters:
-        save_weight: bool
-            If the model weights should be saved.
-        model: nn.Module
-            The neural network model.
-        accuracy: list
-            The accuracy of the model.
-        path: str
-            The path to the dropbox to save the model structure. If None, it will be saved in models.
+        args:  Settings for the model, including the path to save the model.
+        model: The neural network model.
     Returns:
         None
     """
 
+    path = args.get('dropbox', None)
+    save_weight = args.get('save_weight', False)
 
     if path is None:
         move_working_directory()
@@ -137,7 +131,9 @@ def save_model_structure(model: CNN, accuracy, path = None, save_weight: bool = 
     path_to_file = os.path.join(path, 'model_results.txt')
 
     with open(path_to_file, 'a') as f:
-        f.write(f'{100 * accuracy[-2]:.5f}% {str(model)}\n')
+        f.write(f'{100 * model.accuracy[-2]:.5f}% {str(model)}\n')
+
+    send_result(model.accuracy[-2], )
 
     if save_weight:
         os.chdir(path)
@@ -146,20 +142,25 @@ def save_model_structure(model: CNN, accuracy, path = None, save_weight: bool = 
         print(f"Model weights saved to {filename}")
 
 
-def send_result(device_uuid, line_index, result, server_url, logger):
+def send_result(model, args, logger):
     """
     This function sends the result of the training back to the server.
     Args:
-        device_uuid: The UUID of the device.
-        line_index:  The index of the line that was trained.
-        result:      The result of the training.
+        model:         The trained model.
+        args:        The arguments for the training.
         logger:      The logger for logging.
     Returns:
         None
     """
 
+    device_uuid = get_uuid(args.get('device_uuid', 'device_uuid'))
+    server_url = args.get('server_url', 'https://survive.cermann.com/server.php')
+
     headers = {'Content-Type': 'application/json'}
-    payload = {'line_index': line_index, 'result': result}
+    payload = {'line_index': model.line,
+               'model':str(model),
+               'result': model.accuracy[-2],
+               'epoch': model.epoch_max}
     params = {'key': device_uuid}
 
     try:
@@ -178,8 +179,8 @@ def check_accuracy(loader, model, device, logger):
     """
     Checks the accuracy of the model on the given dataset loader.
     Parameters:
-        device: string The Device to run the model on.
         loader: DataLoader The DataLoader for the dataset to check accuracy on.
+        device: string The Device to run the model on.
         model: nn.Module The neural network model.
         logger: logger The logger for logging.
     """
