@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import torch
 import logging
 import os
@@ -10,11 +9,17 @@ from cnn_data_prep import data_prep
 from cnn_train_net import train, save_model_structure, get_new_filename, move_working_directory
 
 
-def setup_logging(args):
+def setup_logging(args: dict) -> logging.Logger:
+    """
+    This function sets up the logger. Each file has its own, but it is configured the same in every file.
+    Args:
+        args: dict The arguments for the logger, such as the level and handlers (like console logging)
+    Returns:
+        The logger object
+    """
     handlers = []
-    if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
+    if args.get('log_to_file', False):   handlers.append(logging.FileHandler(args.get('log_file', 'training.log')))
     if args.get('log_to_console', True): handlers.append(logging.StreamHandler())
-
     logging.basicConfig(
         level=args.get('level', 2),
         format=args.get('format', '%(asctime)s - %(name)s - %(levelname)s - %(message)s'),
@@ -25,9 +30,11 @@ def setup_logging(args):
 
 def load_args(path=None) -> dict:
     """
-    This function loads the arguments from a file. The file is created in the create_trainingdata function. The correct file is found by the size and model.
+    This function loads the configuration file.
+    Args:
+        path: str Path to the config.json file. If None, it will use the one in the current working directory.
     Returns:
-        contents of the file as a dictionary
+        configuration as dictionary
     """
     if path is None:
         path = os.path.join(os.getcwd(), 'config.json')
@@ -37,11 +44,14 @@ def load_args(path=None) -> dict:
     return args
 
 
+def main() -> None:
+    """
+    Main function to run the CNN training process.
+    Returns:
+        None
+    """
 
-def main():
-
-
-    path_to_config = None # Path to the config file, if None, use the one in this directory
+    path_to_config = None
 
     # Load arguments from JSON file
     args = load_args(path_to_config)
@@ -49,38 +59,37 @@ def main():
     model_args = args['model_settings']
     logging_args = args['logger_settings']
 
-    logger = setup_logging(logging_args)
-
     # Set up logging
+    logger = setup_logging(logging_args)
+    # These loggers are set to warning because in debug they produce too much output
     logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
     logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
 
+    # CUDA is the programm to compute on NVIDEA GPUs with workarounds also for AMD GPUs
     logger.info(f"CUDA acceleration available: {torch.cuda.is_available()}")
-
     data = trainingdata(data_args, logging_args)
-
-
     logger.info('Training will begin')
 
-    # Check if only a specific model should be trained or if the list with models should be continued
+    # Check for continous training
     if args.get('train_once', False):
+        # Create and train the model
         loader = data_prep(data, logging_args, model_args)
         trained_model = train(loader, model_args, logging_args)
-        move_working_directory()
+        move_working_directory('models')
+        # save the model structure
         torch.save(trained_model[0].state_dict(), get_new_filename('pt'))
 
     else:
         while True:
-
-            # Create the data loader
+            # create and train the model
             loader = data_prep(data, logging_args, model_args)
             trained_model, acc, epoch = train(loader, logging_args, model_args)
-
+            # save the model structure (possibly to the server) if the model recieved a line, otherwise break
             if trained_model is not None:
                 save_model_structure(trained_model, acc, epoch, logging_args, model_args)
                 continue
             else: break
 
-
+# Run the main function
 if __name__ == '__main__':
     main()

@@ -212,7 +212,7 @@ class CNN(nn.Module):
         self.text:str        = text
         self.working:bool    = working
         self.accuracy:list   = []
-        self.mse:list        = []
+        self.se:list         = []
         self.epoch_time:list = []
         self.scrore:int      = -1
         self.epoch_max:int   = 1
@@ -256,13 +256,13 @@ class CNN(nn.Module):
         return self.line
 
 
-    def acc(self, accuracy=None):
+    def se_func(self, se=None):
         """
-        Returns the accuracy of the neural network.
+        Sets or returns the squared error of the neural network in training.
         """
-        if accuracy is None:
-            return self.accuracy
-        self.accuracy.append(accuracy)
+        if se is None:
+            return self.mse
+        self.se.append(se)
 
     def epoch(self, epoch=None):
         """
