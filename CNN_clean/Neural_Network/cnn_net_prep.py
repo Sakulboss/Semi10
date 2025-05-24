@@ -103,6 +103,13 @@ def create_pooling_layer(layer_description: str):
 
 
 def create_conv_layer(layer_description: str):
+    """
+    Args:
+        layer_description: string with description for layer
+
+    Returns:
+        nn.Conv2d: a convolutional layer, built like layer_description
+    """
     parts = layer_description.split(';')
     channels = tuple(map(int, parts[2].strip().strip('()').split(',')))
     kernel_size = tuple(map(int, parts[3].strip().strip('()').split(',')))
@@ -112,6 +119,13 @@ def create_conv_layer(layer_description: str):
 
 
 def create_linear_layer(layer_description):
+    """
+    Args:
+        layer_description: string with description for layer
+
+    Returns:
+        nn.Linear: a linear layer, built like layer_description
+    """
     parts = layer_description.split(';')
     channels = tuple(map(int, parts[2].strip().strip('()').split(',')))
     return nn.Linear(in_features=channels[0], out_features=channels[1])
