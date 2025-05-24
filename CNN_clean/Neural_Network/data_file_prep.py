@@ -19,8 +19,8 @@ def setup_logging(args):
     return logging.getLogger(__name__)
 
 
-def change_cwd_to_training_files(logger):
-    logger = setup_logging(logger)
+def change_cwd_to_training_files(logging_args):
+    logger = setup_logging(logging_args)
 
     os.chdir('..')
     os.chdir('files')
@@ -92,7 +92,7 @@ def create_bee_1(args: dict = None) -> None:
             count += 1
 
 
-def dataset(size: str, args: dict, logger) -> list[str]:
+def dataset(size: str, args: dict, logging_args) -> list[str]:
     """
     This function defines the used dataset. Therefor the working directory is changed to the correct one. It then creates the sorted dataset if it doesn't exist yet. The dataset is then returned as a list of paths.
 
@@ -104,7 +104,7 @@ def dataset(size: str, args: dict, logger) -> list[str]:
     Returns:
         list[str]: list of paths to the dataset
     """
-    logger = setup_logging(logger)
+    logger = setup_logging(logging_args)
 
 
 

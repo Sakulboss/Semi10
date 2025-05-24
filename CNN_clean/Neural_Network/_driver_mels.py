@@ -20,7 +20,7 @@ def setup_logging(args):
     )
     return logging.getLogger(__name__)
 
-def create_trainingdata(settings, logger) -> bool:
+def create_trainingdata(settings, logging_args) -> bool:
     """
     This function creates the main datasets for the CNN. If the dataset exists earlier, it is not created again.
     Args:
@@ -29,7 +29,7 @@ def create_trainingdata(settings, logger) -> bool:
     Returns:
         bool: True if the dataset was created, False if it already exists.
     """
-    logger = setup_logging(logger)
+    logger = setup_logging(logging_args)
 
     #Initialize the working directory and variables
     os.chdir('..')
@@ -73,7 +73,7 @@ def load_trainingdata(size='bees_1') -> tuple:
     return data
 
 
-def trainingdata(settings: dict, logger) -> tuple:
+def trainingdata(settings: dict, logging_args) -> tuple:
     """
     This function is the later called function. It creates the training data and loads the file.
     Args:
@@ -82,9 +82,8 @@ def trainingdata(settings: dict, logger) -> tuple:
     Returns:
         contents of the training data file as a tuple
     """
-    logger = setup_logging(logger)
 
-    create_trainingdata(settings, logger)
+    create_trainingdata(settings, logging_args)
     return load_trainingdata(settings.get('size', 'bees_1'))
 
 

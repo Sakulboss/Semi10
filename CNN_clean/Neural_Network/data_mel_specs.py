@@ -18,7 +18,7 @@ def setup_logging(args):
     )
     return logging.getLogger(__name__)
 
-def mel_spec_file(fn_wav_name, logger, n_fft=1024, hop_length=441, fss = 48000, n_mels=64, stereo:bool=True):
+def mel_spec_file(fn_wav_name, logging_args, n_fft=1024, hop_length=441, fss = 48000, n_mels=64, stereo:bool=True):
     """
     Compute mel spectrogram from audio file with librosa.feature.melspectogram()
     Args:
@@ -32,7 +32,7 @@ def mel_spec_file(fn_wav_name, logger, n_fft=1024, hop_length=441, fss = 48000, 
     Returns:
         x_new (ndarray): Mel spectrogram
     """
-    logger = setup_logging(logger)
+    logger = setup_logging(logging_args)
 
     try:
         x_new, fss = librosa.load(fn_wav_name, sr=fss, mono=not stereo)
@@ -65,7 +65,7 @@ def mel_spec_file(fn_wav_name, logger, n_fft=1024, hop_length=441, fss = 48000, 
     return x_new
 
 
-def mel_specs(labels, setting, logger):
+def mel_specs(labels, setting, logging_args):
     """
     Create mel spectrograms from audio files and splits them into segments to generate more training data.
     Args:
@@ -79,7 +79,7 @@ def mel_specs(labels, setting, logger):
         data[2]: class names
         data[5]: number of classes
     """
-    logger = setup_logging(logger)
+    logger = setup_logging(logging_args)
 
     # Initialize variables
     size = setting.get('size', 'bienen_1')
