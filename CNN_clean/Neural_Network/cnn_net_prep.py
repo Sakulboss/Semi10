@@ -89,6 +89,13 @@ def getnextmodel(file_path: str) -> str | None:
 
 
 def create_pooling_layer(layer_description: str):
+    """
+    Args:
+        layer_description: string with description for layer
+
+    Returns:
+        nn.MaxPool2d: a pooling layer, built like layer_description
+    """
     parts = layer_description.split(';')
     pool_type = parts[1].strip()
     kernel_size = tuple(map(int, parts[2].strip().strip('()').split(',')))
