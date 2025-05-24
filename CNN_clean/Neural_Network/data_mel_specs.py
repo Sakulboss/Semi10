@@ -6,7 +6,7 @@ import librosa
 from tqdm import tqdm
 
 
-def setup_logging(args):
+def setup_logging(args: dict) -> logging.Logger
     handlers = []
     if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
     if args.get('log_to_console', True): handlers.append(logging.StreamHandler())
@@ -23,7 +23,7 @@ def mel_spec_file(fn_wav_name, logging_args, n_fft=1024, hop_length=441, fss = 4
     Compute mel spectrogram from audio file with librosa.feature.melspectogram()
     Args:
         fn_wav_name (str): Audio file name
-        logger : The logger for logging
+        logging_args: get arguments for logging
         n_fft (int): FFT size
         hop_length (int): Hop size in samples
         fss (float): Sample rate in Hz
@@ -71,7 +71,7 @@ def mel_specs(labels, setting, logging_args):
     Args:
         labels:  data from previous step
         setting: main settings like the type of dataset and injection of other labeled data.
-        logger:  The logger for logging.
+        logging_args: get arguments for logging
     Returns:
         segment_file_mod_id: file ids of the segments
         segment_list: list of mel spectrogram segments

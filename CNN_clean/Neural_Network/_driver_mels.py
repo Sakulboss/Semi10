@@ -5,7 +5,7 @@ import logging
 from data_file_prep import dataset
 from data_labeler import labeler
 from data_mel_specs import mel_specs
-from data_refining import training_data
+from data_refining import refine_data
 
 
 def setup_logging(args):
@@ -24,7 +24,7 @@ def create_trainingdata(settings, logging_args) -> bool:
     """
     This function creates the main datasets for the CNN. If the dataset exists earlier, it is not created again.
     Args:
-        logger: logger for logging
+        logging_args: get arguments for logging
         settings: main settings like the type of dataset, if it should be created new, etc.
     Returns:
         bool: True if the dataset was created, False if it already exists.
@@ -42,13 +42,13 @@ def create_trainingdata(settings, logging_args) -> bool:
     #Chain of creating the training data
     logger.info(f'Creating new dataset and saving it in {path}')
     logger.info(f'Downloading and sorting the files...')
-    dir_list = dataset(settings.get('size', 'bienen_1'), settings, logger)
+    dir_list = dataset(settings.get('size', 'bienen_1'), settings, logging_args)
     logger.info(f'Labeling each file...')
     labels = labeler(dir_list, settings.get('training_file_extensions', 'wav'))
     logger.info(f'Creating Mel-spectograms...')
-    mels = mel_specs(labels, settings, logger)
+    mels = mel_specs(labels, settings, logging_args)
     logger.info(f'Splitting into test and training dataset and adding the right dimensions for the model...')
-    trained_data = training_data(mels, settings, logger)
+    trained_data = refine_data(mels, settings)
     logger.info(f'Saving training data...')
 
     # Save the training data
@@ -77,7 +77,7 @@ def trainingdata(settings: dict, logging_args) -> tuple:
     """
     This function is the later called function. It creates the training data and loads the file.
     Args:
-        logger: logger for logging
+        logging_args: get arguments for logging
         settings: main settings like the type of dataset, if it should be created new, etc.
     Returns:
         contents of the training data file as a tuple

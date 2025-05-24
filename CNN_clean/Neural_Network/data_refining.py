@@ -1,7 +1,16 @@
 import numpy as np
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
-def training_data(data: tuple, setting: dict) -> tuple:
+def refine_data(data: tuple, setting: dict) -> tuple:
+    """
+
+    Args:
+        data: get the original data
+        setting: get the settings from
+
+    Returns:
+
+    """
     segment_list = setting.get('segment_list', data[1])
     segment_class_id = setting.get('segment_class_id', data[2])
 

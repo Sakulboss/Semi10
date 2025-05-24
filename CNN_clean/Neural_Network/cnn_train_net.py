@@ -11,7 +11,7 @@ from cnn_helpers import get_uuid
 from cnn_net_prep import CNN
 
 
-def setup_logging(args):
+def setup_logging(args: dict) -> logging.Logger:
     handlers = []
     if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
     if args.get('log_to_console', True): handlers.append(logging.StreamHandler())
