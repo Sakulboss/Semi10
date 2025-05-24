@@ -6,7 +6,7 @@ import librosa
 from tqdm import tqdm
 
 
-def setup_logging(args: dict) -> logging.Logger
+def setup_logging(args: dict) -> logging.Logger:
     handlers = []
     if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
     if args.get('log_to_console', True): handlers.append(logging.StreamHandler())
@@ -18,9 +18,9 @@ def setup_logging(args: dict) -> logging.Logger
     )
     return logging.getLogger(__name__)
 
-def mel_spec_file(fn_wav_name, logging_args, n_fft=1024, hop_length=441, fss = 48000, n_mels=64, stereo:bool=True):
+def mel_spec_file(fn_wav_name, logging_args, n_fft=1024, hop_length=441, fss = 48000, n_mels=64, stereo:bool=True) :
     """
-    Compute mel spectrogram from audio file with librosa.feature.melspectogram()
+    Compute mel cepstrogram from audio file with librosa.feature.melspectogram()
     Args:
         fn_wav_name (str): Audio file name
         logging_args: get arguments for logging
@@ -30,7 +30,7 @@ def mel_spec_file(fn_wav_name, logging_args, n_fft=1024, hop_length=441, fss = 4
         n_mels (int): Number of mel-bands
         stereo (bool): If False, convert to mono
     Returns:
-        x_new (ndarray): Mel spectrogram
+        x_new (ndarray): Mel cepstrogram
     """
     logger = setup_logging(logging_args)
 
@@ -43,7 +43,7 @@ def mel_spec_file(fn_wav_name, logging_args, n_fft=1024, hop_length=441, fss = 4
     if stereo:
         x_new = np.append(x_new[0], x_new[1])
 
-    #normalize to the audio file to a maximum absolute value of 1
+    # normalize to the audio file to a maximum absolute value of 1
     if np.max(np.abs(x_new)) > 0:
         x_new = x_new / np.max(np.abs(x_new))
 
@@ -65,16 +65,16 @@ def mel_spec_file(fn_wav_name, logging_args, n_fft=1024, hop_length=441, fss = 4
     return x_new
 
 
-def mel_specs(labels, setting, logging_args):
+def mel_specs(labels, setting, logging_args) -> tuple:
     """
-    Create mel spectrograms from audio files and splits them into segments to generate more training data.
+    Create mel cepstrogram from audio files and splits them into segments to generate more training data.
     Args:
         labels:  data from previous step
         setting: main settings like the type of dataset and injection of other labeled data.
         logging_args: get arguments for logging
     Returns:
         segment_file_mod_id: file ids of the segments
-        segment_list: list of mel spectrogram segments
+        segment_list: list of mel cepstrogram segments
         segment_class_id: class ids of the segments
         data[2]: class names
         data[5]: number of classes
@@ -95,34 +95,26 @@ def mel_specs(labels, setting, logging_args):
     segment_class_id = []
     error_files = []
 
-    # Create mel spectrograms
-    #if logger.getEffectiveLevel() == logging.INFO:
+    # Create mel cepstrogram
     for count in tqdm(range(len(fn_wav_list)), desc='Mel-Cepstogramm'):
         mel_spec = mel_spec_file(fn_wav_list[count], logger, stereo=(size == 'bees_1'))
         if mel_spec is None or count != 0 and mel_spec.shape != all_mel_specs[-1].shape:
             error_files.append(fn_wav_list[count])
         else:
             all_mel_specs.append(mel_spec)
-    '''else:
-        for count in range(len(fn_wav_list)):
-            mel_spec = mel_spec_file(fn_wav_list[count], stereo=(size == 'bees_1'))
-            if mel_spec is None or count != 0 and mel_spec.shape != all_mel_specs[-1].shape:
-                error_files.append(fn_wav_list[count])
-            else:
-                all_mel_specs.append(mel_spec)'''
-
+    # check for faulty files (can very rarely happen, when recording in flac)
     if not error_files == []:
         error_files = [(str(i) + "\n") for i in error_files]
         logger.error(f'Wrong file size, please remove the file(s): {error_files}')
 
-    #Combine the mel specs into one np.array
+    # combine the mel specs into one np.array
     all_mel_specs = np.stack(all_mel_specs, axis=0)
     max_segment_start_offset = all_mel_specs.shape[-1] - segment_length_frames
 
-    # Create segments from the mel spectrograms with random start points
+    # Create segments from the mel cepstrogram with random start points
     logger.error(f'Rewrite function so that no parts of one spec are used twice -> !!!IMPORTANT!!! - file: data_mel_spec.py')
     for i in range(len(all_mel_specs)):
-        # create ... segments from each spectrogram
+        # create ... segments from each cepstrogram
         for s in range(segments_per_spectrogram):
             segment_start_frames = int(np.random.rand(1).item() * max_segment_start_offset)
             segment_list.append(all_mel_specs[i, :, segment_start_frames:segment_start_frames + segment_length_frames])
@@ -130,7 +122,7 @@ def mel_specs(labels, setting, logging_args):
             segment_class_id.append(class_id[i])
 
 
-    # conversion from the list of spectrogram segments into a tensor (3D array)
+    # conversion from the list of cepstrogram segments into a tensor (3D array)
     segment_list = np.array(segment_list)
     segment_file_id = np.array(segment_file_id)
     segment_file_mod_id = np.mod(segment_file_id, 5)

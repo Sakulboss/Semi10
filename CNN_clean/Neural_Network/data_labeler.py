@@ -19,7 +19,6 @@ def labeler(data: list, extension: str) -> tuple:
     """
 
     n_sub = len(data)
-
     fn_wav_list = []
     class_label = []
     file_num_in_class = []
@@ -33,9 +32,7 @@ def labeler(data: list, extension: str) -> tuple:
             file_num_in_class.append(k)
 
     n_files = len(class_label)
-
     file_num_in_class = np.array(file_num_in_class)
-
     unique_classes = sorted(list(set(class_label)))
     class_id = np.array([unique_classes.index(_) for _ in class_label])
 
