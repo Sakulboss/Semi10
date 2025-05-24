@@ -18,11 +18,9 @@ def setup_logging(args):
 
     logging.basicConfig(
         level=args.get('level', 2),
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        format=args.get('format', '%(asctime)s - %(name)s - %(levelname)s - %(message)s'),
         handlers=handlers
     )
-    logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
-    logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
     return logging.getLogger(__name__)
 
 

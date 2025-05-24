@@ -3,6 +3,8 @@
 import torch
 import logging
 
+from tqdm.contrib.logging import logging_redirect_tqdm
+
 from _driver_mels import trainingdata
 from cnn_data_prep import data_prep
 from cnn_train_net import train, save_model_structure, get_new_filename, move_working_directory
@@ -25,14 +27,19 @@ def setup_logging(args):
 
 
 def main():
+
+
     path_to_config = None # Path to the config file, if None, use the one in this directory
 
     # Load arguments from JSON file
     args = load_args(path_to_config)
     data_args = args['training_data']
     model_args = args['model_settings']
+    logging_args = args['logging_settings']
 
     # Set up logging
+    logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
+    logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
     logger = setup_logging()
     logger.info(f"CUDA acceleration available: {torch.cuda.is_available()}")
 
