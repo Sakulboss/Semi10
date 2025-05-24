@@ -5,7 +5,6 @@ from torch import nn
 import os
 import logging
 from cnn_helpers import get_uuid
-from cnn_train_net import move_working_directory
 import torch
 
 
@@ -26,6 +25,19 @@ def setup_logging(args: dict) -> logging.Logger:
         handlers=handlers
     )
     return logging.getLogger(__name__)
+
+
+def move_working_directory(target='files') -> None:
+    """
+    This function changes the current working directory (cwd) to the specified target directory.
+    Args
+        target: str The target directory to change to, default is 'files'.
+    Returns:
+        None
+    """
+    os.chdir('..')
+    os.chdir(target)
+
 
 
 def get_next_line(server_url, logger, uuid_file_path=None):
