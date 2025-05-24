@@ -127,15 +127,18 @@ def getlayers(logger, args:dict):
     server_url:str     = args.get('server_url', 'https://survive.cermann.com/server.php')
     uuid_file_path:str = args.get('uuid_file_path', 'device_uuid.txt')
     use_server:bool    = args.get('use_server', True)
-    omt:str            = args.get('model_structure_text', '')
+    omt:str            = args.get('model_text', '')
     training_once      = args.get('train_once', True)
 
     move_working_directory()
+
     if training_once:
+
         original_model_text = omt
         line = -1
     elif use_server:
         original_model_text, line = get_next_line(server_url, logger, uuid_file_path)
+
     else:
         original_model_text = getnextmodel(path)
         line = -1
