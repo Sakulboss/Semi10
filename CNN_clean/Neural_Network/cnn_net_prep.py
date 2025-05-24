@@ -133,10 +133,12 @@ def getlayers(logger, args:dict):
     move_working_directory()
     if training_once:
         original_model_text = omt
+        line = -1
     elif use_server:
         original_model_text, line = get_next_line(server_url, logger, uuid_file_path)
     else:
         original_model_text = getnextmodel(path)
+        line = -1
 
     if original_model_text is None:
         return None, None
@@ -170,10 +172,8 @@ def getlayers(logger, args:dict):
         else:
             print(f'Error: Layer class not found: --{layer}')
 
-    if use_server:
-        return functions, original_model_text, line
-    else:
-        return functions, original_model_text
+    return functions, original_model_text, line
+
 
 #stride:     how the filter moves
 #padding:    frame for the old picture added
@@ -193,11 +193,7 @@ class CNN(nn.Module):
 
         super(CNN, self).__init__()
 
-        if args.get('use_server', True) and not args.get('train_once', True):
-            layers, text, line = getlayers(logger, args)
-        else:
-            layers, text = getlayers(logger, args)
-            line = -1
+        layers, text, line = getlayers(logger, args)
 
         self.line = line
 
