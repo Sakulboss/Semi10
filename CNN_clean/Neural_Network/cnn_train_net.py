@@ -196,14 +196,16 @@ def send_result(model, acc, epoch, args, logger):
         logger.critical('Error decoding JSON response from server')
 
 
-def check_accuracy(loader, model, device, logger):
+def check_accuracy(loader, model, device, logger) -> float:
     """
     Checks the accuracy of the model on the given dataset loader.
-    Parameters:
+    Args:
         loader: DataLoader  The DataLoader for the dataset to check accuracy on.
         device: string The  Device to run the model on.
         model:  nn.Module   The neural network model.
         logger: logger      The logger for logging.
+    Returns:
+
     """
 
     # Initialize variables
@@ -239,6 +241,6 @@ def check_accuracy(loader, model, device, logger):
             logger.debug(f"train: Got {num_correct}/{num_samples} with accuracy {100*accuracy:.2f}%")
         else:
             logger.debug(f"test:  Got {num_correct}/{num_samples} with accuracy {100*accuracy:.2f}%")
-
-    model.train()  # Set the model back to training mode
+    # Set the model back to training mode
+    model.train()
     return accuracy
