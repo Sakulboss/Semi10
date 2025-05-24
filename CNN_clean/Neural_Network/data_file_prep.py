@@ -6,7 +6,7 @@ import glob
 from tqdm import tqdm
 
 
-def setup_logging(args):
+def setup_logging(args: dict) -> logging.Logger:
     handlers = []
     if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
     if args.get('log_to_console', True): handlers.append(logging.StreamHandler())
@@ -62,6 +62,8 @@ def download_esc50(args):
 def create_bee_1(args: dict = None) -> None:
     """
     This function categorizes the bee sounds captured by us. The KNN was trained on this dataset.
+    Args:
+        args: dictionary with the settings for the dataset like file storage locations, etc.
     Returns: None
 
     """
@@ -99,8 +101,7 @@ def dataset(size: str, args: dict, logging_args) -> list[str]:
     Args:
         size: string, size of the dataset ('esc50' or 'bienen_1')
         args: dictionary with the settings for the dataset like file storage locations, etc.
-        logger: logger object
-
+        logging_args: get arguments for logging
     Returns:
         list[str]: list of paths to the dataset
     """

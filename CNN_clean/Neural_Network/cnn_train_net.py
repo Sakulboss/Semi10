@@ -11,7 +11,7 @@ from cnn_helpers import get_uuid
 from cnn_net_prep import CNN
 
 
-def setup_logging(args:dict) -> logging.Logger:
+def setup_logging(args: dict) -> logging.Logger:
     handlers = []
     if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
     if args.get('log_to_console', True): handlers.append(logging.StreamHandler())
@@ -53,9 +53,9 @@ def train(loader,  logging_args, args) -> tuple[CNN, float, int] | tuple[None, N
     """
     Trains the model using the given data loader and arguments.
     Args:
-        loader: data loader for the training and testing data
-        logging_args: logger for logging
-        args:   dictionary containing training parameters such as epochs, learning rate, etc.
+        loader:       DataLoaderdata  loader for the training and testing data
+        logging_args: dict            arguments for logging
+        args:         dict            dictionary containing training parameters such as epochs, learning rate, etc.
     Returns:
         the trained model and the accuracy of the trained model
     """
@@ -206,7 +206,7 @@ def send_result(model, acc, epoch, logging_args, args):
         logger.critical('Error decoding JSON response from server')
 
 
-def check_accuracy(loader, model, device, logger):
+def check_accuracy(loader, model, device, logger) -> float:
     """
     Checks the accuracy of the model on the given dataset loader.
     Parameters:
@@ -214,6 +214,8 @@ def check_accuracy(loader, model, device, logger):
         device: string The  Device to run the model on.
         model:  nn.Module   The neural network model.
         logger: logger      The logger for logging.
+    Returns:
+        accuracy: float       The accuracy of the Epoch
     """
 
     # Initialize variables
@@ -250,5 +252,6 @@ def check_accuracy(loader, model, device, logger):
         else:
             logger.debug(f"test:  Got {num_correct}/{num_samples} with accuracy {100*accuracy:.2f}%")
 
-    model.train()  # Set the model back to training mode
+    # Set the model back to training mode
+    model.train()
     return accuracy
