@@ -123,18 +123,19 @@ def train(loader,  logging_args, args) -> tuple[CNN, float, int] | tuple[None, N
     return model, model.acc()[-2], model.epoch()
 
 
-def save_model_structure(model: CNN, acc, epoch, logger, args):
+def save_model_structure(model: CNN, acc, epoch, logging_args, args):
     """
     Saves the model structure to a file.
     Parameters:
         args:  Settings for the model, including the path to save the model.
         acc:   The accuracy of the model.
         epoch: The epoch number of the training.
-        logger: The logger for logging.
+        logging_args: The logger for logging.
         model: The neural network model.
     Returns:
         None
     """
+    logger = setup_logging(logging_args)
 
     path = args.get('dropbox', None)
     save_weight = args.get('save_weight', False)
