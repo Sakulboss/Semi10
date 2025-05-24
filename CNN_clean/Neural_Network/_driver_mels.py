@@ -40,20 +40,29 @@ def create_trainingdata(settings, logger) -> bool:
     #print(trained_data)
     #trained_data = np.array(trained_data, dtype=object)
 
-    print("DEEEBUG")
-    print(type(trained_data))
+
+    """
+    With this trained_data may be checked, if errors occur when saving
+    
     if isinstance(trained_data, (tuple, list)):
-        print(len(trained_data))
+        logger.info(f"Trained data is: {type(trained_data)}; len:{len(trained_data)}")
         for i, elem in enumerate(trained_data):
             print(f"Element {i}: type={type(elem)}, shape={getattr(elem, 'shape', 'n/a')}")
     else:
-        print("trained_data ist kein Tuple oder Liste")
-
+        logger.critical("trained_data is no tuple or list => trained_data is faulty!")
+    
+    ------SAVING------
+    wont work like this, because trained data is OneHotEncoded before saving
     #np.save(f'training_data_torch_{size}.npy', trained_data, allow_pickle=True)
+    # np.save(f'training_data_torch_{size}.npy', trained_data)
+    """
+
+    # Create numpy array with one dimension: can hold python objects
     trained_data_array = np.empty(1, dtype=object)
+    # Assign trained data (object) to the first index in array
     trained_data_array[0] = trained_data
-    np.save(f'training_data_torch_{size}.npy', trained_data_array, allow_pickle=True)
-    #np.save(f'training_data_torch_{size}.npy', trained_data)
+    # Save the array as numpy file; needs pickle, because object is a non-primitive (tuple)
+    np.save(f"training_data_torch_{size}.npy", trained_data_array, allow_pickle=True)
     return False
 
 
@@ -66,11 +75,7 @@ def load_trainingdata(size='bees_1') -> tuple:
         contents of the file as a tuple
     """
 
-    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ALARM (in load_trainingsdata)')
-    #path = f'training_data_torch_{size}.npy'
-    #data = np.load(path, allow_pickle=True)
-    #return tuple(data)
-    data = np.load('../files/training_data_torch_bees_1.npy', allow_pickle=True)[0]
+    data = np.load(f"../files/training_data_torch_{size}.npy", allow_pickle=True)[0]
     return data
 
 
