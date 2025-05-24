@@ -53,6 +53,7 @@ def data_prep(data, logging_args, args):
 
     logger = setup_logging(logging_args)
 
+    # Get Args
     test_size = args.get('test_size', 0.3)
     event_ratio = args.get('swarm_event_ratio', 0.5)
 
@@ -102,12 +103,6 @@ def data_prep(data, logging_args, args):
     x_test_norm = x_all[test_idx]
     # Gets corresponding OneHotEncoded Labels
     y_test_transformed = y_all_oh[test_idx]
-
-    """
-    Unused at the moment
-    input_shape = x_train_norm.shape[1:]
-    n_classes = y_train_transformed.shape[1]
-    """
 
     # -------------------------LOGGING TO CHECK EVERYTHING IS OKAY----------------------------------
     logger.info("---------------DATA---------------".center(75))
