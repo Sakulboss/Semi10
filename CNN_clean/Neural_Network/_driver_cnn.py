@@ -44,7 +44,7 @@ def main():
 
     logger.info(f"CUDA acceleration available: {torch.cuda.is_available()}")
 
-    data = trainingdata(data_args, logger)
+    data = trainingdata(data_args, logging_args)
 
 
     logger.info('Training will begin')
