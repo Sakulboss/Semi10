@@ -9,6 +9,12 @@ from cnn_train_net import move_working_directory
 import torch
 
 
+# Hints for the layers:
+# stride:     how the filter moves
+# padding:    frame for the old picture added
+# diletation: not needed, but it adds space between filter kernels (pure brainfuck)
+
+
 def setup_logging(args: dict) -> logging.Logger:
     handlers = []
     if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
@@ -73,9 +79,9 @@ def getnextmodel(file_path: str) -> str | None:
 
 def create_pooling_layer(layer_description: str):
     """
+    Creates a pooling layer based on the provided layer description.
     Args:
         layer_description: string with description for layer
-
     Returns:
         nn.MaxPool2d: a pooling layer, built like layer_description
     """
@@ -94,6 +100,7 @@ def create_pooling_layer(layer_description: str):
 
 def create_conv_layer(layer_description: str):
     """
+    Creates a convolutional layer based on the provided layer description.
     Args:
         layer_description: string with description for layer
 
@@ -112,7 +119,6 @@ def create_linear_layer(layer_description):
     """
     Args:
         layer_description: string with description for layer
-
     Returns:
         nn.Linear: a linear layer, built like layer_description
     """
@@ -120,8 +126,16 @@ def create_linear_layer(layer_description):
     channels = tuple(map(int, parts[2].strip().strip('()').split(',')))
     return nn.Linear(in_features=channels[0], out_features=channels[1])
 
-def getlayers(logger, args:dict):
 
+def getlayers(logger: logging.Logger, args:dict) -> tuple:
+    """
+    This function prepares the layers of the neural network. It reads the model structure from a file or from a server and creates the layers based on the model text.
+    Args:
+        logger: logging.Logger The logger for logging.
+        args:   dict           The arguments for the neural network and server.
+    Returns:
+        list containing working layers, original model text and line index
+    """
     path:str           = args.get('model_structure_file', os.path.join(os.getcwd(), '_netstruct.txt'))
     server_url:str     = args.get('server_url', 'https://survive.cermann.com/server.php')
     uuid_file_path:str = args.get('uuid_file_path', 'device_uuid.txt')
@@ -131,22 +145,23 @@ def getlayers(logger, args:dict):
 
     move_working_directory()
 
+    # Get the right model text and set the line index
     if training_once:
-
         original_model_text = omt
         line = -1
     elif use_server:
         original_model_text, line = get_next_line(server_url, logger, uuid_file_path)
-
     else:
         original_model_text = getnextmodel(path)
         line = -1
 
     if original_model_text is None:
-        return None, None
+        return None, None, None
 
     layers = original_model_text.split(';;')
     functions = []
+
+    # Split the text into working layers with some fancy logic (just big if statements)
     for layer in layers:
         layer = layer.strip()
         if layer.startswith('l'):
@@ -176,11 +191,6 @@ def getlayers(logger, args:dict):
             print(f'Error: Layer class not found: --{layer}')
 
     return functions, original_model_text, line
-
-
-#stride:     how the filter moves
-#padding:    frame for the old picture added
-#diletation: not needed, but it adds space between filter kernels (pure brainfuck)
 
 
 class CNN(nn.Module):
