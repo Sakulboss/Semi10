@@ -160,7 +160,7 @@ def save_model_structure(model: CNN, acc: float, epoch: int, logging_args: dict,
     with open(path_to_file, 'a') as f:
         f.write(f'{100 * model.accuracy[-2]:.5f}% {str(model)}\n')
 
-    if args.get('use_server',  False): send_result(model.accuracy[-2], acc, epoch, args, logger)
+    if args.get('use_server',  False): send_result(model.accuracy[-2], acc, epoch, args, logging_args)
 
     if save_weight:
         os.chdir(path)
