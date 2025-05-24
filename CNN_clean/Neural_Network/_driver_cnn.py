@@ -64,7 +64,7 @@ def main():
             trained_model, acc, epoch = train(loader, logging_args, model_args)
 
             if trained_model is not None:
-                save_model_structure(trained_model, acc, epoch, logger, model_args)
+                save_model_structure(trained_model, acc, epoch, logging_args, model_args)
                 continue
             else: break
 
