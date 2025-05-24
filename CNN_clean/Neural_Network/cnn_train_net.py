@@ -111,6 +111,9 @@ def train(loader,  logging_args, args) -> tuple[CNN, float, int] | tuple[None, N
         #calculate the middle squared error of the model, if it gets worse, stop training.
 
         acc = check_accuracy(test_loader, model, device, logger)
+        if acc == 0.5:
+            return model, acc, -1
+
         model.acc((1-acc)**2)
         model.mse.append(sum(model.acc())/len(model.acc()))
         #if epoch > min_epoch and model.mse[-1] > model.mse[-2]:
