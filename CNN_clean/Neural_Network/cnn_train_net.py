@@ -131,8 +131,8 @@ def train(loader,  logging_args, args) -> tuple[CNN, float, int] | tuple[None, N
     else:
         model.epoch(max_epochs)
 
-    logger.info(f"Finished training with SE: {model.se[-2]:.2f} in epoch {model.epoch()} in on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
-    return model, model.acc()[-2], model.epoch()
+    logger.info(f"Finished training with SE: {model.se[-1]:.2f} in epoch {model.epoch()} in on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
+    return model, model.acc[-1], model.epoch
 
 
 def save_model_structure(model: CNN, acc: float, epoch: int, logging_args: dict, args: dict) -> None:
@@ -158,9 +158,9 @@ def save_model_structure(model: CNN, acc: float, epoch: int, logging_args: dict,
 
     # Even if use_server is activated, the results are saved to a file in case the sending goes wrong
     with open(path_to_file, 'a') as f:
-        f.write(f'{100 * model.accuracy[-2]:.5f}% {str(model)}\n')
+        f.write(f'{100 * model.accuracy[-1]:.5f}% {str(model)}\n')
 
-    if args.get('use_server',  False): send_result(model.accuracy[-2], acc, epoch, args, logging_args)
+    if args.get('use_server',  False): send_result(model.accuracy[-1], acc, epoch, args, logging_args)
 
     if save_weight:
         os.chdir(path)

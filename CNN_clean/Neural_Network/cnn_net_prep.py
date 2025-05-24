@@ -137,11 +137,6 @@ def create_linear_layer(layer_description):
     channels = tuple(map(int, parts[2].strip().strip('()').split(',')))
     return nn.Linear(in_features=channels[0], out_features=channels[1])
 
-
-def reshape_tensor(tensor):
-    return tensor.view(tensor.shape[0], -1)
-
-
 def getlayers(logger, args:dict):
 
     path:str           = args.get('model_structure_file', os.path.join(os.getcwd(), '_netstruct.txt'))
@@ -190,6 +185,7 @@ def getlayers(logger, args:dict):
             else:
                 print("Error: Activation function not found: --{}".format(layer))
         elif layer.startswith('v'):
+            reshape_tensor = lambda tensor: tensor.view(tensor.shape[0], -1)
             functions.append(reshape_tensor)
         elif layer == '':
             pass
