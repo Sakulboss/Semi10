@@ -62,6 +62,8 @@ def download_esc50(args):
 def create_bee_1(args: dict = None) -> None:
     """
     This function categorizes the bee sounds captured by us. The KNN was trained on this dataset.
+    Args:
+        args: dictionary with the settings for the dataset like file storage locations, etc.
     Returns: None
 
     """

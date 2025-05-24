@@ -108,7 +108,7 @@ def train(loader,  logging_args, args) -> tuple[CNN, float, int] | tuple[None, N
         model.epoch_time.append(end - start)
         start = end
 
-        #calculate the middle squared error of the model, if it gets worse, stop training.
+        # calculate the middle squared error of the model, if it gets worse, stop training.
 
         acc = check_accuracy(test_loader, model, device, logger)
         if acc == 0.5:
@@ -205,7 +205,7 @@ def check_accuracy(loader, model, device, logger) -> float:
         model:  nn.Module   The neural network model.
         logger: logger      The logger for logging.
     Returns:
-
+        accuracy: int       The accuracy of the Epoch
     """
 
     # Initialize variables
