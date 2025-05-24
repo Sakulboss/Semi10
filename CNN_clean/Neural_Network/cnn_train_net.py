@@ -35,7 +35,7 @@ def get_new_filename(file_extension: str) -> str:
     return f'model_torch_{count}.{file_extension}'
 
 
-def train(loader, args, logger) -> CNN | None:
+def train(loader, args, logger) -> tuple[CNN, float, int] | tuple[None, None, None]:
     """
     Trains the model using the given data loader and arguments.
     Args:
@@ -58,7 +58,7 @@ def train(loader, args, logger) -> CNN | None:
     #Create the model and check if the model is working -> when all models are tested, model.working is False. After that move model to GPU or CPU.
     model = CNN(logger, args)
     if model.working is False:
-        return None
+        return None, None, None
     model = model.to(device=device)
 
     #Initialize the loss function and optimizer as well as the timer
@@ -99,23 +99,25 @@ def train(loader, args, logger) -> CNN | None:
         #calculate the middle squared error of the model, if it gets worse, stop training.
 
         acc = check_accuracy(test_loader, model, device, logger)
-        model.accuracy.append((1-acc)**2)
-        model.mse.append(sum(model.accuracy)/len(model.accuracy))
+        model.acc((1-acc)**2)
+        model.mse.append(sum(model.acc())/len(model.acc()))
         #if epoch > min_epoch and model.mse[-1] > model.mse[-2]:
-        if epoch > min_epoch and model.accuracy[-1] > model.accuracy[-2]:
-            model.epoch_max = epoch
+        if epoch > min_epoch and model.acc()[-1] > model.acc()[-2]:
+            model.epoch(epoch)
             break
     else:
-        model.epoch_max = max_epochs
-    logger.info(f"Finished training. MSE: {model.mse[-2]:.2f} in epoch {model.epoch_max} with on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
-    return model
+        model.epoch(max_epochs)
+    logger.info(f"Finished training. MSE: {model.mse[-2]:.2f} in epoch {model.epoch()} with on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
+    return model, model.acc()[-2], model.epoch()
 
 
-def save_model_structure(model: CNN, logger, args):
+def save_model_structure(model: CNN, acc, epoch, logger, args):
     """
     Saves the model structure to a file.
     Parameters:
         args:  Settings for the model, including the path to save the model.
+        acc:   The accuracy of the model.
+        epoch: The epoch number of the training.
         logger: The logger for logging.
         model: The neural network model.
     Returns:
@@ -133,7 +135,7 @@ def save_model_structure(model: CNN, logger, args):
     with open(path_to_file, 'a') as f:
         f.write(f'{100 * model.accuracy[-2]:.5f}% {str(model)}\n')
 
-    send_result(model.accuracy[-2], args, logger)
+    send_result(model.accuracy[-2], acc, epoch, args, logger)
 
     if save_weight:
         os.chdir(path)
@@ -142,11 +144,13 @@ def save_model_structure(model: CNN, logger, args):
         logger.debug(f"Model weights saved to {filename}")
 
 
-def send_result(model, args, logger):
+def send_result(model, acc, epoch, args, logger):
     """
     This function sends the result of the training back to the server.
     Args:
         model:         The trained model.
+        acc:           The accuracy of the model.
+        epoch:         The max epoch number of the training.
         args:        The arguments for the training.
         logger:      The logger for logging.
     Returns:
@@ -159,8 +163,8 @@ def send_result(model, args, logger):
     headers = {'Content-Type': 'application/json'}
     payload = {'line_index': int(model),
                'model':      str(model),
-               'result':     model.__acc__(),
-               'epoch':      model.__epoch__()}
+               'result':     acc,
+               'epoch':      epoch}
     params = {'key': device_uuid}
     logger.debug(f"Sending result to server: {payload}")
 
@@ -180,10 +184,10 @@ def check_accuracy(loader, model, device, logger):
     """
     Checks the accuracy of the model on the given dataset loader.
     Parameters:
-        loader: DataLoader The DataLoader for the dataset to check accuracy on.
-        device: string The Device to run the model on.
-        model: nn.Module The neural network model.
-        logger: logger The logger for logging.
+        loader: DataLoader  The DataLoader for the dataset to check accuracy on.
+        device: string The  Device to run the model on.
+        model:  nn.Module   The neural network model.
+        logger: logger      The logger for logging.
     """
 
     # Initialize variables

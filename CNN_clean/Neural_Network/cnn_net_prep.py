@@ -243,18 +243,21 @@ class CNN(nn.Module):
         return self.line
 
 
-    def acc(self):
+    def acc(self, accuracy=None):
         """
         Returns the accuracy of the neural network.
         """
-        return self.accuracy[-2] if self.accuracy else None
+        if accuracy is None:
+            return self.accuracy
+        self.accuracy.append(accuracy)
 
-
-    def epoch(self):
+    def epoch(self, epoch=None):
         """
         Returns the epoch of the neural network.
         """
-        return self.epoch_max
+        if epoch is None:
+            return self.epoch_max
+        self.epoch_max = epoch
 
 
     def __str__(self):

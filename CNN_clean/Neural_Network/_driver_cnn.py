@@ -6,7 +6,7 @@ from threading import Thread
 from _driver_mels import trainingdata
 from cnn_data_prep import data_prep
 from cnn_train_net import train, save_model_structure, get_new_filename, move_working_directory
-from cnn_helpers import setup_logging, get_uuid, load_args
+from cnn_helpers import setup_logging, load_args
 
 waiting = False
 
@@ -49,11 +49,11 @@ def main():
             #thread_animation = Thread(target=animate)
             #thread_animation.start()
 
-            trained_model = train(loader, model_args, logger)
+            trained_model, acc, epoch = train(loader, model_args, logger)
             #waiting = False
 
             if trained_model is not None:
-                save_model_structure(trained_model, logger, model_args)
+                save_model_structure(trained_model, acc, epoch, logger, model_args)
                 continue
             else: break
 
