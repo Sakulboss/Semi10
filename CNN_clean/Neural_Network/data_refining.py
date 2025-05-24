@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
-def training_data(data: tuple, setting: dict, logger) -> tuple:
+def training_data(data: tuple, setting: dict) -> tuple:
     segment_list = setting.get('segment_list', data[1])
     segment_class_id = setting.get('segment_class_id', data[2])
 
@@ -21,4 +21,3 @@ def training_data(data: tuple, setting: dict, logger) -> tuple:
     y_all_oh = OneHotEncoder(sparse_output=False).fit_transform(y_all.reshape(-1, 1))
 
     return y_all_oh, y_all, x_all
-#--------------------------------------------------------------------------------------------------------------------------------------------

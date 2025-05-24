@@ -24,15 +24,15 @@ def get_uuid(uuid_file = 'uuid.txt'):
         return device_uuid
 
 
-def setup_logging(level=2):
-    # Konfiguriere das Logging-Format und Level
+def setup_logging(args):
+    handlers = []
+    if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
+    if args.get('log_to_console', True): handlers.append(logging.StreamHandler())
+
     logging.basicConfig(
-        level=level,
+        level=args.get('level',2),
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            #logging.FileHandler('training.log'), # output to file
-            logging.StreamHandler()                # concole output
-        ]
+        handlers=handlers
     )
     logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
     logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
@@ -51,12 +51,3 @@ def load_args(path=None) -> dict:
     with open(path, 'r') as file:
         args = json.load(file)
     return args
-
-
-def animate():
-    animation = "|/-\\"
-    idx = 0
-    while True:
-        print('Netz wird trainiert ', animation[idx % len(animation)], end="\r")
-        idx += 1
-        time.sleep(0.1)

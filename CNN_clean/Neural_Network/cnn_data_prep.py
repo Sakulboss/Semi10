@@ -1,6 +1,23 @@
 import torch
 import numpy as np
+import logging
 from torch.utils.data import DataLoader, Dataset
+
+
+def setup_logging(args):
+    handlers = []
+    if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
+    if args.get('log_to_console', True): handlers.append(logging.StreamHandler())
+
+    logging.basicConfig(
+        level=args.get('level', 2),
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=handlers
+    )
+    logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
+    logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
+    return logging.getLogger(__name__)
+
 
 class CustomDataset(Dataset):
     """Custom dataset class for loading features and labels. Workaround for the DataLoader to work with PyTorch.
@@ -28,6 +45,7 @@ def data_prep(data, logger, args):
     Prepares the data for training and testing by creating DataLoader objects.
     Args:
         data (tuple): Tuple containing the training and testing data
+        logger (Logger): Logger object for logging information
         args (dict): Dictionary containing the arguments for DataLoader
     Returns:
         train_loader (DataLoader): DataLoader for the training data

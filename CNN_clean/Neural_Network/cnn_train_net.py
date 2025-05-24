@@ -1,15 +1,29 @@
 import json
 import time
-
 import requests
 import torch
 from torch import optim, no_grad, nn
 from tqdm import tqdm
 import os
-import numpy as np
+import logging
 
 from cnn_helpers import get_uuid
 from cnn_net_prep import CNN
+
+
+def setup_logging(args):
+    handlers = []
+    if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
+    if args.get('log_to_console', True): handlers.append(logging.StreamHandler())
+
+    logging.basicConfig(
+        level=args.get('level', 2),
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=handlers
+    )
+    logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
+    logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
+    return logging.getLogger(__name__)
 
 
 def move_working_directory():

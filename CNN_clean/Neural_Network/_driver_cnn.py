@@ -1,12 +1,27 @@
 # -*- coding: utf-8 -*-
 
 import torch
+import logging
 
 from _driver_mels import trainingdata
 from cnn_data_prep import data_prep
 from cnn_train_net import train, save_model_structure, get_new_filename, move_working_directory
-from cnn_helpers import setup_logging, load_args
+from cnn_helpers import load_args
 
+
+def setup_logging(args):
+    handlers = []
+    if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
+    if args.get('log_to_console', True): handlers.append(logging.StreamHandler())
+
+    logging.basicConfig(
+        level=args.get('level', 2),
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=handlers
+    )
+    logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
+    logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
+    return logging.getLogger(__name__)
 
 
 def main():

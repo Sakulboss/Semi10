@@ -1,10 +1,26 @@
 import os.path
 import numpy as np
+import logging
 
 from data_file_prep import dataset
 from data_labeler import labeler
 from data_mel_specs import mel_specs
 from data_refining import training_data
+
+
+def setup_logging(args):
+    handlers = []
+    if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
+    if args.get('log_to_console', True): handlers.append(logging.StreamHandler())
+
+    logging.basicConfig(
+        level=args.get('level', 2),
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=handlers
+    )
+    logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
+    logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
+    return logging.getLogger(__name__)
 
 
 def create_trainingdata(settings, logger) -> bool:
@@ -25,7 +41,7 @@ def create_trainingdata(settings, logger) -> bool:
     # Check if the file already exists
     if os.path.isfile(path) and not settings.get('create_new', False): return True
 
-    # If the file does not exist, create it
+    #Chain of creating the training data
     logger.info(f'Creating new dataset and saving it in {path}')
     logger.info(f'Downloading and sorting the files...')
     dir_list = dataset(settings.get('size', 'bienen_1'), settings, logger)
@@ -36,31 +52,11 @@ def create_trainingdata(settings, logger) -> bool:
     logger.info(f'Splitting into test and training dataset and adding the right dimensions for the model...')
     trained_data = training_data(mels, settings, logger)
     logger.info(f'Saving training data...')
+
     # Save the training data
-    #print(trained_data)
-    #trained_data = np.array(trained_data, dtype=object)
-
-
-    """
-    With this trained_data may be checked, if errors occur when saving
-    
-    if isinstance(trained_data, (tuple, list)):
-        logger.info(f"Trained data is: {type(trained_data)}; len:{len(trained_data)}")
-        for i, elem in enumerate(trained_data):
-            print(f"Element {i}: type={type(elem)}, shape={getattr(elem, 'shape', 'n/a')}")
-    else:
-        logger.critical("trained_data is no tuple or list => trained_data is faulty!")
-    
-    ------SAVING------
-    wont work like this, because trained data is OneHotEncoded before saving
-    #np.save(f'training_data_torch_{size}.npy', trained_data, allow_pickle=True)
-    # np.save(f'training_data_torch_{size}.npy', trained_data)
-    """
-
-    # Create numpy array with one dimension: can hold python objects
     trained_data_array = np.empty(1, dtype=object)
-    # Assign trained data (object) to the first index in array
     trained_data_array[0] = trained_data
+
     # Save the array as numpy file; needs pickle, because object is a non-primitive (tuple)
     np.save(f"training_data_torch_{size}.npy", trained_data_array, allow_pickle=True)
     return False

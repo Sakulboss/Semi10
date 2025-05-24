@@ -6,6 +6,21 @@ import librosa
 from tqdm import tqdm
 
 
+def setup_logging(args):
+    handlers = []
+    if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
+    if args.get('log_to_console', True): handlers.append(logging.StreamHandler())
+
+    logging.basicConfig(
+        level=args.get('level', 2),
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=handlers
+    )
+    logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
+    logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
+    return logging.getLogger(__name__)
+
+
 def mel_spec_file(fn_wav_name, logger, n_fft=1024, hop_length=441, fss = 48000, n_mels=64, stereo:bool=True):
     """
     Compute mel spectrogram from audio file with librosa.feature.melspectogram()
