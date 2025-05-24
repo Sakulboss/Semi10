@@ -5,6 +5,8 @@ from torch import nn
 import os
 import logging
 from cnn_helpers import get_uuid
+from cnn_train_net import move_working_directory
+import torch
 
 
 def setup_logging(args: dict) -> logging.Logger:
@@ -20,35 +22,15 @@ def setup_logging(args: dict) -> logging.Logger:
     return logging.getLogger(__name__)
 
 
-
-def split_list(lst, delimiter):
-    result = []
-    current = []
-    for item in lst:
-        if item == delimiter:
-            result.append(current)
-            current = []
-        else:
-            current.append(item)
-    result.append(current)  # Letzten Abschnitt hinzufügen
-    return result
-
-
-def move_working_directory():
-    working_directory = os.getcwd()
-    os.chdir('..')
-    os.chdir('files')
-
-
 def get_next_line(server_url, logger, uuid_file_path=None):
     """
     This fuction sends a GET request to the server to retrieve the layer to be trained.
     Args:
-        server_url:      The URL of the server to send the request to.
-        logger:          The logger for logging.
-        uuid_file_path:  The path to the uuid file to use.
+        server_url:     str            The URL of the server to send the request to.
+        logger:         logging.Logger The logger for logging.
+        uuid_file_path: str            The path to the uuid file to use - if not given, the uuid will be created new.
     Returns:
-        The line and line index from the server response.
+        The line and line index from the server response. The line index is used only on the server to change the status of the trained line.
     """
 
     params = {'key': get_uuid(uuid_file_path)}
@@ -69,6 +51,7 @@ def get_next_line(server_url, logger, uuid_file_path=None):
 
 def getnextmodel(file_path: str) -> str | None:
     """
+    Ths function reads the model structure from the given file.
     Args:
         file_path: The path to the file with the model structures.
     Returns:
@@ -201,22 +184,18 @@ def getlayers(logger, args:dict):
 
 
 class CNN(nn.Module):
-    def __init__(self, logger, args:dict):
+    def __init__(self, logging_args: dict, args:dict):
         """
+        Initializes the CNN model with the given logging arguments and settings.
         Parameters:
-            logger: The logger for logging.
-            args:   The settings for the neural network
-
-
-        If not given, the structure is read from the _netstruct.txt file.
+            logging_args: dict The arguments for logging.
+            args:         dict The settings for the neural network
         """
-
+        # Initialize variables
         super(CNN, self).__init__()
-
+        logger = setup_logging(logging_args)
         layers, text, line = getlayers(logger, args)
-
         self.line = line
-
         working = True
 
         if (layers or text) is None:
@@ -234,6 +213,8 @@ class CNN(nn.Module):
         self.scrore:int      = -1
         self.epoch_max:int   = 1
 
+
+        # Split the layers into module layers and functions, needed for torch to remember the weights in the layers
         self.module_layers = nn.ModuleList(
             [layer for layer in layers if isinstance(layer, nn.Module)]
         )
@@ -244,20 +225,19 @@ class CNN(nn.Module):
         self.layers = layers
 
 
-    def forward(self, x):
+    def forward(self, x) -> torch.Tensor:
         """
         Define the forward pass of the neural network.
         Parameters:
-            x: torch.Tensor
-                The input tensor.
+            x: torch.Tensor input tensor
         Returns:
-            torch.Tensor
-                The output tensor after passing through the network.
+            The through the net passed tensor
         """
 
         layer_count = 0
         func_count = 0
 
+        # Some logic to undo the splitting in the __init__ method, it will create the network structure
         for layer in self.layers:
             if isinstance(layer, nn.Module):
                 x = self.module_layers[layer_count](x)
@@ -270,6 +250,9 @@ class CNN(nn.Module):
         return x
 
     def __int__(self):
+        """
+        Returns the line index from the server response.
+        """
         return self.line
 
 
@@ -283,7 +266,7 @@ class CNN(nn.Module):
 
     def epoch(self, epoch=None):
         """
-        Returns the epoch of the neural network.
+        Sets or returns the epoch of the neural network.
         """
         if epoch is None:
             return self.epoch_max
