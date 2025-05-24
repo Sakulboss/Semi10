@@ -158,7 +158,7 @@ def getlayers(logger, args:dict):
             if 'sigmoid' in layer:
                 functions.append(f.sigmoid)
             elif 'relu' in layer:
-                functions.append(f.relu)
+                functions.append(f.gelu)
             elif 'tanh' in layer:
                 functions.append(f.tanh)
             else:
