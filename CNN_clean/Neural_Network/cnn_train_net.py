@@ -47,13 +47,13 @@ def get_new_filename(file_extension: str) -> str:
     return f'model_torch_{count}.{file_extension}'
 
 
-def train(loader, args, logger) -> tuple[CNN, float, int] | tuple[None, None, None]:
+def train(loader,  logging_args, args) -> tuple[CNN, float, int] | tuple[None, None, None]:
     """
     Trains the model using the given data loader and arguments.
     Args:
         loader: data loader for the training and testing data
+        logging_args: logger for logging
         args:   dictionary containing training parameters such as epochs, learning rate, if it should print the accuracy, etc.
-        logger: logger for logging
     Returns:
         the trained model and the accuracy of the trained model
     """
@@ -65,7 +65,7 @@ def train(loader, args, logger) -> tuple[CNN, float, int] | tuple[None, None, No
     learning_rate   = args.get('learning_rate', 0.01)
     min_epoch       = args.get('min_epoch', 5)
     device          = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+    logger = setup_logging(logging_args)
 
     #Create the model and check if the model is working -> when all models are tested, model.working is False. After that move model to GPU or CPU.
     model = CNN(logger, args)

@@ -11,12 +11,11 @@ def setup_logging(args):
 
     logging.basicConfig(
         level=args.get('level', 2),
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        format=args.get('format', '%(asctime)s - %(name)s - %(levelname)s - %(message)s'),
         handlers=handlers
     )
-    logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
-    logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
     return logging.getLogger(__name__)
+
 
 
 class CustomDataset(Dataset):
@@ -40,17 +39,20 @@ class CustomDataset(Dataset):
         return self.features[idx], self.labels[idx]
 
 
-def data_prep(data, logger, args):
+def data_prep(data, logging_args, args):
     """
     Prepares the data for training and testing by creating DataLoader objects.
     Args:
         data (tuple): Tuple containing the training and testing data
-        logger (Logger): Logger object for logging information
+        logging_args (dict): Dictionary containing logging arguments
         args (dict): Dictionary containing the arguments for DataLoader
     Returns:
         train_loader (DataLoader): DataLoader for the training data
         test_loader (DataLoader): DataLoader for the testing data
     """
+
+    logger = setup_logging(logging_args)
+
     test_size = args.get('test_size', 0.3)
     event_ratio = args.get('swarm_event_ratio', 0.5)
 

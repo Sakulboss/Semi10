@@ -18,12 +18,11 @@ def setup_logging(args):
 
     logging.basicConfig(
         level=args.get('level', 2),
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        format=args.get('format', '%(asctime)s - %(name)s - %(levelname)s - %(message)s'),
         handlers=handlers
     )
-    logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
-    logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
     return logging.getLogger(__name__)
+
 
 
 def main():
@@ -35,12 +34,14 @@ def main():
     args = load_args(path_to_config)
     data_args = args['training_data']
     model_args = args['model_settings']
-    logging_args = args['logging_settings']
+    logging_args = args['logger_settings']
+
+    logger = setup_logging(logging_args)
 
     # Set up logging
     logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
     logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
-    logger = setup_logging()
+
     logger.info(f"CUDA acceleration available: {torch.cuda.is_available()}")
 
     data = trainingdata(data_args, logger)
@@ -50,8 +51,8 @@ def main():
 
     # Check if only a specific model should be trained or if the list with models should be continued
     if args.get('train_once', False):
-        loader = data_prep(data, logger, model_args)
-        trained_model = train(loader, model_args, logger)
+        loader = data_prep(data, logging_args, model_args)
+        trained_model = train(loader, model_args, logging_args)
         move_working_directory()
         torch.save(trained_model[0].state_dict(), get_new_filename('pt'))
 
@@ -59,8 +60,8 @@ def main():
         while True:
 
             # Create the data loader
-            loader = data_prep(data, logger, model_args)
-            trained_model, acc, epoch = train(loader, model_args, logger)
+            loader = data_prep(data, logging_args, model_args)
+            trained_model, acc, epoch = train(loader, logging_args, model_args)
 
             if trained_model is not None:
                 save_model_structure(trained_model, acc, epoch, logger, model_args)
