@@ -13,15 +13,15 @@ def setup_logging(args):
 
     logging.basicConfig(
         level=args.get('level', 2),
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        format=args.get('format', '%(asctime)s - %(name)s - %(levelname)s - %(message)s'),
         handlers=handlers
     )
-    logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
-    logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
     return logging.getLogger(__name__)
 
 
 def change_cwd_to_training_files(logger):
+    logger = setup_logging(logger)
+
     os.chdir('..')
     os.chdir('files')
     os.chdir('_esc50')
@@ -104,7 +104,7 @@ def dataset(size: str, args: dict, logger) -> list[str]:
     Returns:
         list[str]: list of paths to the dataset
     """
-
+    logger = setup_logging(logger)
 
 
 

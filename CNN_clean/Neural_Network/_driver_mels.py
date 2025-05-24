@@ -15,13 +15,10 @@ def setup_logging(args):
 
     logging.basicConfig(
         level=args.get('level', 2),
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        format=args.get('format', '%(asctime)s - %(name)s - %(levelname)s - %(message)s'),
         handlers=handlers
     )
-    logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
-    logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
     return logging.getLogger(__name__)
-
 
 def create_trainingdata(settings, logger) -> bool:
     """
@@ -32,8 +29,9 @@ def create_trainingdata(settings, logger) -> bool:
     Returns:
         bool: True if the dataset was created, False if it already exists.
     """
-    #Initialize the working directory and variables
+    logger = setup_logging(logger)
 
+    #Initialize the working directory and variables
     os.chdir('..')
     os.chdir('files')
     size = settings.get('size', 'bees_1')
@@ -84,6 +82,8 @@ def trainingdata(settings: dict, logger) -> tuple:
     Returns:
         contents of the training data file as a tuple
     """
+    logger = setup_logging(logger)
+
     create_trainingdata(settings, logger)
     return load_trainingdata(settings.get('size', 'bees_1'))
 
