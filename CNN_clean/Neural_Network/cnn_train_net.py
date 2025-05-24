@@ -70,7 +70,7 @@ def train(loader,  logging_args, args) -> tuple[CNN, float, int] | tuple[None, N
     logger          = setup_logging(logging_args)
 
     # Create the model and check if the model is working -> when all models are tested, model.working is set False, it should then break the training.
-    model = CNN(logger, args)
+    model = CNN(logging_args, args)
     if model.working is False:
         return None, None, None
 
