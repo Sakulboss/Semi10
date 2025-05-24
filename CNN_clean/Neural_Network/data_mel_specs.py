@@ -13,13 +13,10 @@ def setup_logging(args):
 
     logging.basicConfig(
         level=args.get('level', 2),
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        format=args.get('format', '%(asctime)s - %(name)s - %(levelname)s - %(message)s'),
         handlers=handlers
     )
-    logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
-    logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
     return logging.getLogger(__name__)
-
 
 def mel_spec_file(fn_wav_name, logger, n_fft=1024, hop_length=441, fss = 48000, n_mels=64, stereo:bool=True):
     """
@@ -35,6 +32,7 @@ def mel_spec_file(fn_wav_name, logger, n_fft=1024, hop_length=441, fss = 48000, 
     Returns:
         x_new (ndarray): Mel spectrogram
     """
+    logger = setup_logging(logger)
 
     try:
         x_new, fss = librosa.load(fn_wav_name, sr=fss, mono=not stereo)
@@ -81,6 +79,7 @@ def mel_specs(labels, setting, logger):
         data[2]: class names
         data[5]: number of classes
     """
+    logger = setup_logging(logger)
 
     # Initialize variables
     size = setting.get('size', 'bienen_1')
