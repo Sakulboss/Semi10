@@ -157,7 +157,7 @@ def send_result(model, acc, epoch, args, logger):
         None
     """
 
-    device_uuid = get_uuid(args.get('device_uuid', 'device_uuid'))
+    device_uuid = get_uuid(args.get('device_uuid', 'uuid.txt'))
     server_url = args.get('server_url', 'https://survive.cermann.com/server.php')
 
     headers = {'Content-Type': 'application/json'}
@@ -175,7 +175,7 @@ def send_result(model, acc, epoch, args, logger):
         data = response.json()
         logger.debug('Server response:', data.get('message', 'No response message'))
     except requests.RequestException as e:
-        logger.critical('Error during POST:', str(e))
+        logger.critical(f'Error during POST: {str(e)}')
     except json.JSONDecodeError:
         logger.critical('Error decoding JSON response from server')
 
