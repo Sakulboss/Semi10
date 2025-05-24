@@ -2,13 +2,12 @@
 
 import torch
 import logging
-
-from tqdm.contrib.logging import logging_redirect_tqdm
+import os
+import json
 
 from _driver_mels import trainingdata
 from cnn_data_prep import data_prep
 from cnn_train_net import train, save_model_structure, get_new_filename, move_working_directory
-from cnn_helpers import load_args
 
 
 def setup_logging(args):
@@ -22,6 +21,20 @@ def setup_logging(args):
         handlers=handlers
     )
     return logging.getLogger(__name__)
+
+
+def load_args(path=None) -> dict:
+    """
+    This function loads the arguments from a file. The file is created in the create_trainingdata function. The correct file is found by the size and model.
+    Returns:
+        contents of the file as a dictionary
+    """
+    if path is None:
+        path = os.path.join(os.getcwd(), 'config.json')
+
+    with open(path, 'r') as file:
+        args = json.load(file)
+    return args
 
 
 
