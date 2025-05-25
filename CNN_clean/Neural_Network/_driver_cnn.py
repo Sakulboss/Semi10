@@ -10,7 +10,7 @@ def setup_logging(args: dict) -> logging.Logger:
     """
     This function sets up the logger. Each file has its own, but it is configured the same in every file.
     Args:
-        args: dict The arguments for the logger, such as the level and handlers (like console logging)
+        args: dict with arguments for logging, such as the level and handlers (like console logging)
     Returns:
         The logger object
     """
@@ -47,8 +47,6 @@ def main() -> None:
     Returns:
         None
     """
-
-
     # Load arguments from JSON file, leave path_to_config as None to use the default config.json in the current directory
     path_to_config = None
     args = load_args(path_to_config)

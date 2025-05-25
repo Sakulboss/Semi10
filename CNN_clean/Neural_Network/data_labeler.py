@@ -3,19 +3,19 @@ import os
 import glob
 
 
-def labeler(data: list, extension: str) -> tuple:
+def labeler(data: list, extension: str) -> tuple[list, np.ndarray, list, int, np.ndarray, int]:
     """
     This function labels the data. It takes a list of paths to subdirectories and creates a list of the file names with their labels.
     Args:
-        data: list of paths to subdirectories
-        extension: file extension of the files to be labeled
+        data:      list of paths to subdirectories
+        extension: str  file extension of the files to be labeled
     Returns:
-        fn_wav_list: list of file names
-        class_id: list of class ids - easier for computation
-        unique_classes: list of class labels - used for human readability
-        n_files: number of all used files
-        file_num_in_class: list of file numbers in class - used for human readability
-        n_sub: number of subdirectories -> number of classes
+        fn_wav_list:       list  of file names
+        class_id:          list  of class ids - easier for computation
+        unique_classes:    list  of class labels - used for human readability
+        n_files:           int   of all used files
+        file_num_in_class: list  of file numbers in class - used for human readability
+        n_sub:             int   of subdirectories -> number of classes
     """
 
     n_sub = len(data)

@@ -22,15 +22,15 @@ def mel_spec_file(fn_wav_name, logging_args, n_fft=1024, hop_length=441, fss = 4
     """
     Compute mel cepstrogram from audio file with librosa.feature.melspectogram()
     Args:
-        fn_wav_name:  str  Audio file name
-        logging_args: dict get arguments for logging
-        n_fft (int): FFT size
-        hop_length (int): Hop size in samples
-        fss (float): Sample rate in Hz
-        n_mels (int): Number of mel-bands
-        stereo (bool): If False, convert to mono
+        fn_wav_name:  str   Audio file name
+        logging_args: dict  with arguments for logging
+        n_fft:        int   FFT size
+        hop_length:   int   Hop size in samples
+        fss:          float Sample rate in Hz
+        n_mels:       int   Number of mel-bands
+        stereo:       bool  If False, convert to mono
     Returns:
-        x_new (ndarray): Mel cepstrogram
+        np.ndarray: Mel cepstrogram
     """
     logger = setup_logging(logging_args)
 
@@ -65,19 +65,19 @@ def mel_spec_file(fn_wav_name, logging_args, n_fft=1024, hop_length=441, fss = 4
     return x_new
 
 
-def mel_specs(labels, setting, logging_args) -> tuple:
+def mel_specs(labels: tuple, setting, logging_args) -> tuple:
     """
     Create mel cepstrogram from audio files and splits them into segments to generate more training data.
     Args:
-        labels:  data from previous step
-        setting: main settings like the type of dataset and injection of other labeled data.
-        logging_args: get arguments for logging
+        labels:       tuple of data from previous step
+        setting:      dict  with main settings like the type of dataset and injection of other labeled data.
+        logging_args: dict  with arguments for logging
     Returns:
-        segment_file_mod_id: file ids of the segments
-        segment_list: list of mel cepstrogram segments
-        segment_class_id: class ids of the segments
-        data[2]: class names
-        data[5]: number of classes
+        segment_file_mod_id: list of file ids of the segments
+        segment_list:        list of mel cepstrogram segments
+        segment_class_id:    list of class ids of the segments
+        data[2]:             list of class names
+        data[5]:             int  of classes
     """
     logger = setup_logging(logging_args)
 
@@ -112,9 +112,8 @@ def mel_specs(labels, setting, logging_args) -> tuple:
     max_segment_start_offset = all_mel_specs.shape[-1] - segment_length_frames
 
     # Create segments from the mel cepstrogram with random start points
-    logger.error(f'Rewrite function so that no parts of one spec are used twice -> !!!IMPORTANT!!! - file: data_mel_spec.py')
     for i in range(len(all_mel_specs)):
-        # create ... segments from each cepstrogram
+        # create n segments from each cepstrogram
         for s in range(segments_per_spectrogram):
             segment_start_frames = int(np.random.rand(1).item() * max_segment_start_offset)
             segment_list.append(all_mel_specs[i, :, segment_start_frames:segment_start_frames + segment_length_frames])

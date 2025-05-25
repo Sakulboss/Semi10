@@ -23,7 +23,7 @@ def create_trainingdata(settings: dict, logging_args:dict) -> bool:
     """
     This function creates the main datasets for the CNN. If the dataset exists earlier, it is not created again.
     Args:
-        logging_args: dict get arguments for logging
+        logging_args: dict with arguments for logging
         settings:     dict main settings like the type of dataset, if it should be created new, etc.
     Returns:
         bool: True if the dataset was created, False if it already exists.
@@ -49,7 +49,7 @@ def create_trainingdata(settings: dict, logging_args:dict) -> bool:
     logger.info(f'Creating Mel-spectograms...')
     mels = mel_specs(labels, settings, logging_args)
     logger.info(f'Splitting into test and training dataset and adding the right dimensions for the model...')
-    trained_data = refine_data(mels, settings)
+    trained_data = refine_data(mels)
     logger.info(f'Saving training data...')
 
     # Save the training data
@@ -78,8 +78,8 @@ def trainingdata(settings:dict, logging_args:dict) -> tuple:
     """
     This function is the later called function. It creates the training data and loads the file.
     Args:
-        logging_args: dict get arguments for logging
-        settings:     dict main settings like the type of dataset, if it should be created new, etc.
+        logging_args: dict with arguments for logging
+        settings:     dict with main settings like the type of dataset, if it should be created new, etc.
     Returns:
         contents of the training data file as a tuple
     """

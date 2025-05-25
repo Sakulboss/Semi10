@@ -24,8 +24,8 @@ def use_esc50(args:dict) -> None:
     Returns:
         None
     """
-    source_folder: str = args.get('training_files_storage_location', os.path.join(os.getcwd(), 'esc50'))
-    target_base_folder: str = os.path.join(args.get('sorted_files_storage_location', os.getcwd()), 'esc50_sorted')
+    source_folder: str = args.get('training_files_storage_location', os.path.join(os.getcwd(), '_esc50'))
+    target_base_folder: str = os.path.join(args.get('sorted_files_storage_location', os.getcwd()), '_esc50_sorted')
     entries: list = []
     directories: list = []
     with open(args.get('esc50_file','esc50.csv'), 'r') as f:
@@ -50,7 +50,7 @@ def create_bee_1(args: dict = None) -> None:
     """
     This function categorizes the bee sounds captured by us. The KNN was trained on this dataset.
     Args:
-        args: dictionary with the settings for the dataset like file storage locations, etc.
+        args: dict with the settings for the dataset like file storage locations, etc.
     Returns:
         None
     """
@@ -87,7 +87,7 @@ def dataset(size: str, logging_args: dict, args: dict) -> list[str]:
     Args:
         size:         str  size of the dataset ('esc50' or 'bees_1')
         logging_args: dict with arguments for logging
-        args:         dict with the settings for the dataset like file storage locations, etc.
+        args:         dict with main settings for the dataset like file storage locations, etc.
     Returns:
         list of paths to the dataset
     """
@@ -95,7 +95,7 @@ def dataset(size: str, logging_args: dict, args: dict) -> list[str]:
 
     if size == "esc50":
 
-        sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), 'esc50_sorted')
+        sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_esc50_sorted')
         if not os.path.isdir(sorted_files):
             use_esc50(args)
         dir_dataset: str = '_esc50_sorted'
@@ -107,7 +107,6 @@ def dataset(size: str, logging_args: dict, args: dict) -> list[str]:
     else:
         raise ValueError('Invalid dataset size.')
 
-    logger.critical('ESC50 Fixen!!! Umsetzung von Zielspeicherort für ZIP notwendig, wenn möglich auch unsere Daten als Zip zum herunterladen parat haben und das einbauen')
     logger.warning(f'Using the following directories: {glob.glob(os.path.join(dir_dataset, '*'))}')
     return glob.glob(os.path.join(dir_dataset, '*'))
 
