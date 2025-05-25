@@ -1,6 +1,5 @@
-import os.path
+import os.path, logging
 import numpy as np
-import logging
 
 from data_file_prep import dataset
 from data_labeler import labeler
@@ -8,7 +7,7 @@ from data_mel_specs import mel_specs
 from data_refining import refine_data
 
 
-def setup_logging(args):
+def setup_logging(args:dict) -> logging.Logger:
     handlers = []
     if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
     if args.get('log_to_console', True): handlers.append(logging.StreamHandler())
@@ -20,12 +19,12 @@ def setup_logging(args):
     )
     return logging.getLogger(__name__)
 
-def create_trainingdata(settings, logging_args) -> bool:
+def create_trainingdata(settings: dict, logging_args:dict) -> bool:
     """
     This function creates the main datasets for the CNN. If the dataset exists earlier, it is not created again.
     Args:
-        logging_args: get arguments for logging
-        settings: main settings like the type of dataset, if it should be created new, etc.
+        logging_args: dict get arguments for logging
+        settings:     dict main settings like the type of dataset, if it should be created new, etc.
     Returns:
         bool: True if the dataset was created, False if it already exists.
     """
@@ -37,10 +36,12 @@ def create_trainingdata(settings, logging_args) -> bool:
     size = settings.get('size', 'bees_1')
     path = os.path.join(os.getcwd(), f'training_data_torch_{size}.npy')
     # Check if the file already exists
-    if os.path.isfile(path) and not settings.get('create_new', False): return True
+    if os.path.isfile(path) and not settings.get('create_new', False):
+        logger.info(f'Dataset {size} already exists, skipping creation.')
+        return True
 
     #Chain of creating the training data
-    logger.info(f'Creating new dataset and saving it in {path}')
+    logger.info(f'Creating new dataset and saving it in {path}.')
     logger.info(f'Downloading and sorting the files...')
     dir_list = dataset(settings.get('size', 'bienen_1'), settings, logging_args)
     logger.info(f'Labeling each file...')
@@ -60,11 +61,11 @@ def create_trainingdata(settings, logging_args) -> bool:
     return False
 
 
-def load_trainingdata(size='bees_1') -> tuple:
+def load_trainingdata(size:str ='bees_1') -> tuple:
     """
     This function loads the training data from the file. The file is created in the create_trainingdata function. The correct file is found by the specified size.
     Args:
-        size: which size of the dataset is used ('esc50', 'bees_1')
+        size: str which one of the dataset is used ('esc50', 'bees_1')
     Returns:
         contents of the file as a tuple
     """
@@ -73,12 +74,12 @@ def load_trainingdata(size='bees_1') -> tuple:
     return data
 
 
-def trainingdata(settings: dict, logging_args) -> tuple:
+def trainingdata(settings:dict, logging_args:dict) -> tuple:
     """
     This function is the later called function. It creates the training data and loads the file.
     Args:
-        logging_args: get arguments for logging
-        settings: main settings like the type of dataset, if it should be created new, etc.
+        logging_args: dict get arguments for logging
+        settings:     dict main settings like the type of dataset, if it should be created new, etc.
     Returns:
         contents of the training data file as a tuple
     """

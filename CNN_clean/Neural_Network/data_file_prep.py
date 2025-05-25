@@ -1,7 +1,4 @@
-import os
-import logging
-import shutil
-import glob
+import os, logging, shutil, glob
 from tqdm import tqdm
 
 
@@ -18,23 +15,15 @@ def setup_logging(args: dict) -> logging.Logger:
     return logging.getLogger(__name__)
 
 
-def change_cwd_to_training_files(logging_args):
-    logger = setup_logging(logging_args)
-
-    os.chdir('..')
-    os.chdir('files')
-    os.chdir('_esc50')
-    logger.debug(f'Set training files storage location to: {os.getcwd()}')
-
-
-def use_esc50(args):
+def use_esc50(args:dict) -> None:
     """
     This function categorizes the ESC-50 dataset. It was only used to check whether CNN could work
     with big datasets. CNN was not trained on this dataset.
+    Args:
+        args: dict with the settings for the dataset like file storage locations, etc.
     Returns:
         None
     """
-
     source_folder: str = args.get('training_files_storage_location', os.path.join(os.getcwd(), 'esc50'))
     target_base_folder: str = os.path.join(args.get('sorted_files_storage_location', os.getcwd()), 'esc50_sorted')
     entries: list = []
@@ -62,8 +51,8 @@ def create_bee_1(args: dict = None) -> None:
     This function categorizes the bee sounds captured by us. The KNN was trained on this dataset.
     Args:
         args: dictionary with the settings for the dataset like file storage locations, etc.
-    Returns: None
-
+    Returns:
+        None
     """
     ext = args.get("training_file_extensions","wav")
     source_folder: str = args.get("training_files_storage_location", os.path.join(os.getcwd(),'_bees\\27-28_April'))
@@ -92,38 +81,33 @@ def create_bee_1(args: dict = None) -> None:
             count += 1
 
 
-def dataset(size: str, args: dict, logging_args) -> list[str]:
+def dataset(size: str, logging_args: dict, args: dict) -> list[str]:
     """
     This function defines the used dataset. Therefor the working directory is changed to the correct one. It then creates the sorted dataset if it doesn't exist yet. The dataset is then returned as a list of paths.
-
     Args:
-        size: string, size of the dataset ('esc50' or 'bienen_1')
-        args: dictionary with the settings for the dataset like file storage locations, etc.
-        logging_args: get arguments for logging
+        size:         str  size of the dataset ('esc50' or 'bees_1')
+        logging_args: dict with arguments for logging
+        args:         dict with the settings for the dataset like file storage locations, etc.
     Returns:
-        list[str]: list of paths to the dataset
+        list of paths to the dataset
     """
     logger = setup_logging(logging_args)
 
-
-
     if size == "esc50":
-        """
-        Wichtig -> muss gefixed werden
-        """
-        sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_esc50')
+
+        sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), 'esc50_sorted')
         if not os.path.isdir(sorted_files):
             use_esc50(args)
         dir_dataset: str = '_esc50_sorted'
     elif size == 'bees_1':
         sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_bee_sounds')
-        #if not os.path.isdir(sorted_files):
-        create_bee_1(args)
+        if not os.path.isdir(sorted_files):
+            create_bee_1(args)
         dir_dataset: str = sorted_files
     else:
         raise ValueError('Invalid dataset size.')
 
     logger.critical('ESC50 Fixen!!! Umsetzung von Zielspeicherort für ZIP notwendig, wenn möglich auch unsere Daten als Zip zum herunterladen parat haben und das einbauen')
-    logger.warning(glob.glob(os.path.join(dir_dataset, '*')))
+    logger.warning(f'Using the following directories: {glob.glob(os.path.join(dir_dataset, '*'))}')
     return glob.glob(os.path.join(dir_dataset, '*'))
 

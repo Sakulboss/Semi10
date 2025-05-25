@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-import torch
-import logging
-import os
-import json
+import torch, logging, os, json
 
 from _driver_mels import trainingdata
 from cnn_data_prep import data_prep
@@ -28,7 +25,7 @@ def setup_logging(args: dict) -> logging.Logger:
     return logging.getLogger(__name__)
 
 
-def load_args(path=None) -> dict:
+def load_args(path:str =None) -> dict:
     """
     This function loads the configuration file.
     Args:
@@ -61,6 +58,7 @@ def main() -> None:
 
     # Set up logging
     logger = setup_logging(logging_args)
+
     # These loggers are set to warning because in debug they produce too much output
     logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
     logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
@@ -68,29 +66,31 @@ def main() -> None:
     # CUDA is the programm to compute on NVIDEA GPUs, with workarounds also for AMD GPUs
     logger.info(f"CUDA acceleration available: {torch.cuda.is_available()}")
     data = trainingdata(data_args, logging_args)
-    logger.info('Training will begin')
+    logger.info('Training will begin..')
 
     # Check for continous training
     if model_args.get('train_once', False):
-        print(1)
         # Create and train the model
         loader = data_prep(data, logging_args, model_args)
         trained_model = train(loader, logging_args, model_args)
-        move_working_directory('models')
+
         # save the model structure
+        move_working_directory('models')
         torch.save(trained_model[0].state_dict(), get_new_filename('pt'))
         logger.info('Training ended and the model was saved.')
+
     else:
-        print(0)
         while True:
-            # create and train the model
+            # Create and train the model
             loader = data_prep(data, logging_args, model_args)
             trained_model, acc, epoch = train(loader, logging_args, model_args)
-            # save the model structure (possibly to the server) if the model recieved a line, otherwise break
+
+            # Save the model structure (possibly to the server) if the model recieved a line, otherwise break
             if trained_model is not None:
                 save_model_structure(trained_model, acc, epoch, logging_args, model_args)
                 continue
             else: break
+
         logger.info('Training ended, because no more models are available for training.')
 
 # Run the main function
