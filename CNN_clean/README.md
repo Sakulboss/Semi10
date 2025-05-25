@@ -31,13 +31,13 @@ pip install librosa
 ---
 
 ### 1. *logger_settings*:
-| Key            | Explanation |
-|----------------|-------------|
-| log_level      |             |
-| log_to_console |             |
-| log_to_file    |             |
-| log_file       |             |
-| log_format     |             |
+| Key            | Explanation                                                                                               |
+|----------------|-----------------------------------------------------------------------------------------------------------|
+| log_level      | level of logger;<br/> 0  = not set,<br/> 10 = debug,<br/> 20 = info,<br/> 30 = warnings,<br/> 40 = errors |
+| log_to_console | True: <br/> False:                                                                                        |
+| log_to_file    | True: logs are saved in: *log_file* <br/> False: logs aren't saved                                        |
+| log_file       | path to the logging file                                                                                  |
+| log_format     | format of *logger* <br/> use: ```%(asctime)s - %(name)s - %(levelname)s - %(message)s```                  |
 
 ### 2. *training_data*:
 | Key                             | Explanation |
