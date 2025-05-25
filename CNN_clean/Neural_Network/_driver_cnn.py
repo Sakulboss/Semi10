@@ -65,7 +65,7 @@ def main() -> None:
     logging.getLogger('numba.core.byteflow').setLevel(logging.WARNING)
     logging.getLogger('numba.core.interpreter').setLevel(logging.WARNING)
 
-    # CUDA is the programm to compute on NVIDEA GPUs with workarounds also for AMD GPUs
+    # CUDA is the programm to compute on NVIDEA GPUs, with workarounds also for AMD GPUs
     logger.info(f"CUDA acceleration available: {torch.cuda.is_available()}")
     data = trainingdata(data_args, logging_args)
     logger.info('Training will begin')
