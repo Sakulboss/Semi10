@@ -82,13 +82,13 @@ def create_bee_1(args: dict = None) -> str:
     return target_base_folder
 
 
-def dataset(size: str, logging_args: dict, args: dict) -> list[str]:
+def dataset(size: str, args: dict, logging_args: dict) -> list[str]:
     """
     This function defines the used dataset. Therefor the working directory is changed to the correct one. It then creates the sorted dataset if it doesn't exist yet. The dataset is then returned as a list of paths.
     Args:
         size:         str  size of the dataset ('esc50' or 'bees_1')
-        logging_args: dict with arguments for logging
         args:         dict with main settings for the dataset like file storage locations, etc.
+        logging_args: dict with arguments for logging
     Returns:
         list of paths to the dataset
     """
