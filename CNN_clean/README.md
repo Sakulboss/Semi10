@@ -1,57 +1,63 @@
 # Setup:
 ### 1. Install dependencies:
+The following packages are required to run the code. You can install them using pip. Make sure you have Python and pip installed on your system.
+
 
 ---
-1. Install torch
+0. Install and update pip:
+```bash
+  python -m pip install --upgrade pip
 ```
-pip install torch
+
+1. Install torch
+```bash
+  pip install torch
 ```
 2. Install numpy
-```
-pip install numpy
+```bash
+  pip install numpy
 ```
 3. Install tqdm
-```
-pip install tqdm
+```bash
+  pip install tqdm
 ```
 4. Install librosa
-```
-pip install librosa
+```bash
+  pip install librosa
 ```
 ### 1.1 Summed up:
 
-```
-pip install torch
-pip install numpy
-pip install tqdm
-pip install librosa
+```bash
+  pip install torch
+  pip install numpy
+  pip install tqdm
+  pip install librosa
 ```
 # 2. config.json explained:
 
 ---
 
 ### 1. *logger_settings*:
-| Key            | Explanation                                                                                               |  Standard value  |
-|----------------|-----------------------------------------------------------------------------------------------------------|:----------------:|
-| log_level      | level of logger;<br/> 0  = not set,<br/> 10 = debug,<br/> 20 = info,<br/> 30 = warnings,<br/> 40 = errors |                  |
-| log_to_console | True: <br/> False:                                                                                        |                  |
-| log_to_file    | True: logs are saved in: *log_file* <br/> False: logs aren't saved                                        |                  |
-| log_file       | path to the logging file                                                                                  |                  |
-| log_format     | format of *logger* <br/> use: ```%(asctime)s - %(name)s - %(levelname)s - %(message)s```                  |                  |
+| Key            | Explanation                                                                                                                      |                       Standard value                       |
+|----------------|----------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------:|
+| log_level      | level of logger;<br/> 0  = not set,<br/> 10 = debug,<br/> 20 = info,<br/> 30 = warnings,<br/> 40 = errors                        |                             20                             |
+| log_to_console | True: logs are displayed in console <br/> False logs aren't displayed:                                                           |                            true                            |
+| log_to_file    | True: logs are saved in: *log_file* <br/> False: logs aren't saved                                                               |                           false                            |
+| log_file       | path to the logging file                                                                                                         |                          not set                           |
+| log_format     | format of *logger* <br/> asctime: time <br/> name: name of file <br/> levelname: *log_level* <br/> messages: message from logger | ```%(asctime)s - %(name)s - %(levelname)s - %(message)s``` |
 
 ### 2. *training_data*:
-| Key                             | Explanation |  Standard value  |
-|---------------------------------|-------------|:----------------:|
-| create_new_source               |             |                  |
-| training_files_storage_location |             |                  |
-| sorted_files_storage_location   |             |                  |
-| mel_specs_storage_location      |             |                  |
-| training_file_extensions        |             |                  |
-| size                            |             |                  |
-| segment_length_frames           |             |                  |
-| create_new                      |             |                  |
-| printing                        |             |                  |
-
+| Key                             | Explanation                                                                                                                          | Standard value |
+|---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|:--------------:|
+| training_files_storage_location | Path to the unsorted training files                                                                                                  |   cwd/_bees    |
+| sorted_files_storage_location   | Path to the sorted training files, needs to be parent folder of the folder containing the class folders, empty folder if not run yet |      cwd       |
+| mel_specs_storage_location      | where the mel cepstograms should be stored                                                                                           |      cwd       |
+| training_file_extensions        | file extension of training files                                                                                                     |      flac      |
+| size                            | type of the dataset to be used, implemented are ESC50 (enviromental sound classification - 50 classes) and bees_1 (our files)        |     bees_1     |
+| segment_length_frames           | length of the mel cepstograms                                                                                                        |      100       |
+| create_new                      | if true, create new mel specs <br/> (when running the script for the first time, this will be set true)                              |     false      |
+| create_new_source               | if true, sort training files again <br/> (when running the script for the first time, this will be set true)                         |     false      |
+cwd = current working directory
 ### 3. *model_settings*
 | Key               | Explanation                                                          | Standard value |
 |-------------------|----------------------------------------------------------------------|:--------------:|
