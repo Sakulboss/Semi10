@@ -15,14 +15,14 @@ def setup_logging(args: dict) -> logging.Logger:
     return logging.getLogger(__name__)
 
 
-def use_esc50(args:dict) -> None:
+def use_esc50(args:dict) -> str:
     """
     This function categorizes the ESC-50 dataset. It was only used to check whether CNN could work
     with big datasets. CNN was not trained on this dataset.
     Args:
         args: dict with the settings for the dataset like file storage locations, etc.
     Returns:
-        None
+        path with the sorted files
     """
     source_folder: str = args.get('training_files_storage_location', os.path.join(os.getcwd(), '_esc50'))
     target_base_folder: str = os.path.join(args.get('sorted_files_storage_location', os.getcwd()), '_esc50_sorted')
@@ -44,15 +44,15 @@ def use_esc50(args:dict) -> None:
             source_file = os.path.join(source_folder, entries[i][0])
             shutil.copy(source_file, target_file)
         directories.append(entries[i][3] + '/' + entries[i][0])
+    return target_base_folder
 
-
-def create_bee_1(args: dict = None) -> None:
+def create_bee_1(args: dict = None) -> str:
     """
     This function categorizes the bee sounds captured by us. The KNN was trained on this dataset.
     Args:
         args: dict with the settings for the dataset like file storage locations, etc.
     Returns:
-        None
+        path with the sorted files
     """
     ext = args.get("training_file_extensions","wav")
     source_folder: str = args.get("training_files_storage_location", os.path.join(os.getcwd(),'_bees/27-28_April'))
@@ -79,6 +79,7 @@ def create_bee_1(args: dict = None) -> None:
                 shutil.copy(source_file, target_file)
             directories.append(target_folder + '/' + entries[count])
             count += 1
+    return target_base_folder
 
 
 def dataset(size: str, logging_args: dict, args: dict) -> list[str]:
@@ -96,12 +97,12 @@ def dataset(size: str, logging_args: dict, args: dict) -> list[str]:
     if size == "esc50":
         sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_esc50_sorted')
         if new_folder or not os.path.isdir(sorted_files):
-            use_esc50(args)
-        dir_dataset: str = '_esc50_sorted'
+            sorted_files = use_esc50(args)
+        dir_dataset: str = sorted_files
     elif size == 'bees_1':
         sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_bee_sounds')
         if new_folder or not os.path.isdir(sorted_files):
-            create_bee_1(args)
+            sorted_files = create_bee_1(args)
         dir_dataset: str = sorted_files
     else:
         raise ValueError('Invalid dataset size.')
