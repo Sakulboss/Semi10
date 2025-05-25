@@ -1,5 +1,4 @@
 import logging
-
 import numpy as np
 import librosa.feature as mf
 import librosa
@@ -115,18 +114,20 @@ def mel_specs(labels: tuple, setting, logging_args) -> tuple:
     for i in range(len(all_mel_specs)):
         # create n segments from each cepstrogram
         for s in range(segments_per_spectrogram):
-            segment_start_frames = int(np.random.rand(1).item() * max_segment_start_offset)
-            segment_list.append(all_mel_specs[i, :, segment_start_frames:segment_start_frames + segment_length_frames])
+            # Use as many parts of the mel cepstrogram as possible, if more are needed, select a random start point
+            if (s+1) * segment_length_frames <= all_mel_specs.shape[-1]:
+                segment_list.append(all_mel_specs[i, :, s*segment_length_frames:(s+1)*segment_length_frames])
+            else:
+                segment_start_frames = int(np.random.rand(1).item() * max_segment_start_offset)
+                segment_list.append(all_mel_specs[i, :, segment_start_frames:segment_start_frames + segment_length_frames])
             segment_file_id.append(i)
             segment_class_id.append(class_id[i])
 
-
-    # conversion from the list of cepstrogram segments into a tensor (3D array)
+    # conversion from the list of cepstrogram segments into a np.array for faster processing
     segment_list = np.array(segment_list)
     segment_file_id = np.array(segment_file_id)
     segment_file_mod_id = np.mod(segment_file_id, 5)
     segment_class_id = np.array(segment_class_id)
-
 
     return segment_file_mod_id, segment_list, segment_class_id, data[2], data[5]
 
