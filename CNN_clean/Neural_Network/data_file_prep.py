@@ -107,6 +107,6 @@ def dataset(size: str, logging_args: dict, args: dict) -> list[str]:
     else:
         raise ValueError('Invalid dataset size.')
 
-    logger.warning(f'Using the following directories: {glob.glob(os.path.join(dir_dataset, '*'))}')
+    logger.warning(f'Using the following directories: {glob.glob(os.path.join(dir_dataset, "*"))}')
     return glob.glob(os.path.join(dir_dataset, '*'))
 
