@@ -71,15 +71,16 @@ def main() -> None:
     logger.info('Training will begin')
 
     # Check for continous training
-    if args.get('train_once', False):
+    if model_args.get('train_once', False):
+        print(1)
         # Create and train the model
         loader = data_prep(data, logging_args, model_args)
-        trained_model = train(loader, model_args, logging_args)
+        trained_model = train(loader, logging_args, model_args)
         move_working_directory('models')
         # save the model structure
         torch.save(trained_model[0].state_dict(), get_new_filename('pt'))
-
     else:
+        print(0)
         while True:
             # create and train the model
             loader = data_prep(data, logging_args, model_args)
