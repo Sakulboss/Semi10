@@ -31,40 +31,40 @@ pip install librosa
 ---
 
 ### 1. *logger_settings*:
-| Key            | Explanation                                                                                               |
-|----------------|-----------------------------------------------------------------------------------------------------------|
-| log_level      | level of logger;<br/> 0  = not set,<br/> 10 = debug,<br/> 20 = info,<br/> 30 = warnings,<br/> 40 = errors |
-| log_to_console | True: <br/> False:                                                                                        |
-| log_to_file    | True: logs are saved in: *log_file* <br/> False: logs aren't saved                                        |
-| log_file       | path to the logging file                                                                                  |
-| log_format     | format of *logger* <br/> use: ```%(asctime)s - %(name)s - %(levelname)s - %(message)s```                  |
+| Key            | Explanation                                                                                               | Standard value |
+|----------------|-----------------------------------------------------------------------------------------------------------|----------------|
+| log_level      | level of logger;<br/> 0  = not set,<br/> 10 = debug,<br/> 20 = info,<br/> 30 = warnings,<br/> 40 = errors |                |
+| log_to_console | True: <br/> False:                                                                                        |                |
+| log_to_file    | True: logs are saved in: *log_file* <br/> False: logs aren't saved                                        |                |
+| log_file       | path to the logging file                                                                                  |                |
+| log_format     | format of *logger* <br/> use: ```%(asctime)s - %(name)s - %(levelname)s - %(message)s```                  |                |
 
 ### 2. *training_data*:
-| Key                             | Explanation |
-|---------------------------------|-------------|
-| create_new_source               |             |
-| training_files_storage_location |             |
-| sorted_files_storage_location   |             |
-| mel_specs_storage_location      |             |
-| training_file_extensions        |             |
-| size                            |             |
-| segment_length_frames           |             |
-| create_new                      |             |
-| printing                        |             |
+| Key                             | Explanation | Standard value |
+|---------------------------------|-------------|----------------|
+| create_new_source               |             |                |
+| training_files_storage_location |             |                |
+| sorted_files_storage_location   |             |                |
+| mel_specs_storage_location      |             |                |
+| training_file_extensions        |             |                |
+| size                            |             |                |
+| segment_length_frames           |             |                |
+| create_new                      |             |                |
+| printing                        |             |                |
 
 ### 3. *model_settings*
-| Key               | Explanation |
-|-------------------|-------------|
-| swarm_event_ratio |             |
-| test_size         |             |
-| batch_size        |             |
-| learning_rate     |             |
-| max_epochs        |             |
-| min_epoch         |             |
-| train_once        |             |
-| model_text        |             |
-| dropbox           |             |
-| printing          |             |
+| Key               | Explanation                                              | Standard value |
+|-------------------|----------------------------------------------------------|----------------|
+| swarm_event_ratio | ratio of the swarm event data in datasets<br/> best: 0.5 |                |
+| test_size         |                                                          |                |
+| batch_size        |                                                          |                |
+| learning_rate     |                                                          |                |
+| max_epochs        |                                                          |                |
+| min_epoch         |                                                          |                |
+| train_once        |                                                          |                |
+| model_text        |                                                          |                |
+| dropbox           |                                                          |                |
+| printing          |                                                          |                |
 
 
   - which file to run
