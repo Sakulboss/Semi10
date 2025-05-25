@@ -95,12 +95,12 @@ def dataset(size: str, logging_args: dict, args: dict) -> list[str]:
     new_folder = args.get("create_new_source", True)
     if size == "esc50":
         sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_esc50_sorted')
-        if new_folder and not os.path.isdir(sorted_files):
+        if new_folder or not os.path.isdir(sorted_files):
             use_esc50(args)
         dir_dataset: str = '_esc50_sorted'
     elif size == 'bees_1':
         sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_bee_sounds')
-        if new_folder and not os.path.isdir(sorted_files):
+        if new_folder or not os.path.isdir(sorted_files):
             create_bee_1(args)
         dir_dataset: str = sorted_files
     else:
