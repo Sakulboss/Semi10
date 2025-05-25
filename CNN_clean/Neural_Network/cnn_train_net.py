@@ -43,11 +43,11 @@ def get_new_filename(file_extension: str, text:str = 'model_torch_') -> str:
     return f'{text}{count}.{file_extension}'
 
 
-def train(loader,  logging_args, args) -> tuple[CNN, float, int] | tuple[None, None, None]:
+def train(loader, logging_args: dict, args: dict) -> tuple[CNN, float, int] | tuple[None, None, None]:
     """
     Trains the model using the given data loader and arguments.
     Args:
-        loader:       DataLoaderdata  loader for the training and testing data
+        loader:       DataLoader      for the training and testing data
         logging_args: dict            arguments for logging
         args:         dict            dictionary containing training parameters such as epochs, learning rate, etc.
     Returns:
@@ -166,7 +166,7 @@ def save_model_structure(model: CNN, acc: float, epoch: int, logging_args: dict,
         logger.debug(f"Model weights saved to {filename}")
 
 
-def send_result(model, acc, epoch, logging_args, args):
+def send_result(model: CNN, acc: float, epoch: int, logging_args: dict, args: dict):
     """
     This function sends the result of the training back to the server.
     Args:
@@ -203,16 +203,16 @@ def send_result(model, acc, epoch, logging_args, args):
         logger.critical('Error decoding JSON response from server')
 
 
-def check_accuracy(loader, model, device, logger) -> float:
+def check_accuracy(loader, model: CNN, device: torch.device, logger) -> float:
     """
     Checks the accuracy of the model on the given dataset loader.
     Parameters:
-        loader: DataLoader  The DataLoader for the dataset to check accuracy on.
-        device: string The  Device to run the model on.
-        model:  nn.Module   The neural network model.
-        logger: logger      The logger for logging.
+        loader: DataLoader   for the dataset to check accuracy on
+        device: torch.device device to run the model on
+        model:  CNN          trained model
+        logger: logger       logger for logging
     Returns:
-        accuracy: float       The accuracy of the Epoch
+        accuracy: float       accuracy of the model on the dataset
     """
 
     # Initialize variables

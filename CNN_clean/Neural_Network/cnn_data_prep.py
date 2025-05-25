@@ -19,11 +19,12 @@ def setup_logging(args: dict) -> logging.Logger:
 
 
 class CustomDataset(Dataset):
-    """Custom dataset class for loading features and labels. Workaround for the DataLoader to work with PyTorch.
+    """
+    Custom dataset class for loading features and labels. Workaround for the DataLoader to work with PyTorch.
     Args:
-        features (torch.Tensor): Tensor containing the features
-        labels (torch.Tensor): Tensor containing the labels
-        train (bool): Flag indicating if the dataset is for training or testing
+        features: torch.Tensor containing the features
+        labels:   torch.Tensor containing the labels
+        train:    bool         Flag indicating if the dataset is for training or testing
     """
 
     def __init__(self, features, labels, train = True):
@@ -43,9 +44,9 @@ def data_prep(data, logging_args, args):
     """
     Prepares the data for training and testing by creating DataLoader objects.
     Args:
-        data (tuple): Tuple containing the training and testing data
-        logging_args (dict): Dictionary containing logging arguments
-        args (dict): Dictionary containing the arguments for DataLoader
+        data:         tuple Tuple containing the training and testing data
+        logging_args: dict  with the arguments for logging
+        args:         dict  containing the arguments for DataLoader
     Returns:
         train_loader (DataLoader): DataLoader for the training data
         test_loader (DataLoader): DataLoader for the testing data

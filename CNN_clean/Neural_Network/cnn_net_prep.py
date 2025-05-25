@@ -14,11 +14,11 @@ import uuid
 # diletation: not needed, but it adds space between filter kernels (pure brainfuck)
 
 
-def move_working_directory(target='files') -> None:
+def move_working_directory(target:str ='files') -> None:
     """
     This function changes the current working directory (cwd) to the specified target directory.
     Args
-        target: str The target directory to change to, default is 'files'.
+        target: str target directory to change to, default is 'files'
     Returns:
         None
     """
@@ -26,11 +26,11 @@ def move_working_directory(target='files') -> None:
     os.chdir(target)
 
 
-def get_uuid(uuid_file = 'device_uuid.txt'):
+def get_uuid(uuid_file:str = 'device_uuid.txt') -> str:
     """
     This function loads the UUID from a file if it exists, otherwise it creates a new UUID and saves it to the file.
     Args:
-        uuid_file: The path to the UUID file.
+        uuid_file: str path to the UUID file
     Returns:
         UUID as a string
     """
@@ -90,7 +90,7 @@ def getnextmodel(file_path: str) -> str | None:
     """
     Ths function reads the model structure from the given file.
     Args:
-        file_path: The path to the file with the model structures.
+        file_path: str path to the file with the model structures
     Returns:
         model structure
     """
@@ -108,11 +108,11 @@ def getnextmodel(file_path: str) -> str | None:
     return lines[position][2:]
 
 
-def create_pooling_layer(layer_description: str):
+def create_pooling_layer(layer_description: str) -> nn.MaxPool2d | nn.AvgPool2d:
     """
     Creates a pooling layer based on the provided layer description.
     Args:
-        layer_description: string with description for layer
+        layer_description: str description for pooling layer
     Returns:
         nn.MaxPool2d: a pooling layer, built like layer_description
     """
@@ -129,12 +129,11 @@ def create_pooling_layer(layer_description: str):
         raise ValueError(f"Unbekannter Pooling-Typ: {pool_type}")
 
 
-def create_conv_layer(layer_description: str):
+def create_conv_layer(layer_description: str) -> nn.Conv2d:
     """
     Creates a convolutional layer based on the provided layer description.
     Args:
-        layer_description: string with description for layer
-
+        layer_description: str description for convolutional layer
     Returns:
         nn.Conv2d: a convolutional layer, built like layer_description
     """
@@ -146,10 +145,10 @@ def create_conv_layer(layer_description: str):
     return nn.Conv2d(in_channels=channels[0], out_channels=channels[1], kernel_size=kernel_size, stride=stride, padding=padding)
 
 
-def create_linear_layer(layer_description):
+def create_linear_layer(layer_description: str) -> nn.Linear:
     """
     Args:
-        layer_description: string with description for layer
+        layer_description: str description for linear layer
     Returns:
         nn.Linear: a linear layer, built like layer_description
     """
@@ -268,7 +267,7 @@ class CNN(nn.Module):
 
     def forward(self, x) -> torch.Tensor:
         """
-        Define the forward pass of the neural network.
+        This function defines the forward pass of the CNN.
         Parameters:
             x: torch.Tensor input tensor
         Returns:
