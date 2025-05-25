@@ -35,16 +35,15 @@ def use_esc50(args):
         None
     """
 
-    source_folder: str = args.get('training_files_storage_location', os.path.join('data', ''))
-    target_base_folder: str = '_viele_sounds_geordnet'
+    source_folder: str = args.get('training_files_storage_location', os.path.join(os.getcwd(), 'esc50'))
+    target_base_folder: str = os.path.join(args.get('sorted_files_storage_location', os.getcwd()), 'esc50_sorted')
     entries: list = []
     directories: list = []
-    with open('esc50.csv', 'r') as f:
+    with open(args.get('esc50_file','esc50.csv'), 'r') as f:
         for line in f:
             if line.startswith('#'):
                 continue
-            else:
-                entries.append(line.split(','))
+            entries.append(line.split(','))
     if not os.path.isdir(target_base_folder):
         os.mkdir(target_base_folder)
     for i in range(len(entries)):

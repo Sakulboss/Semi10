@@ -51,9 +51,9 @@ def main() -> None:
         None
     """
 
-    path_to_config = None
 
-    # Load arguments from JSON file
+    # Load arguments from JSON file, leave path_to_config as None to use the default config.json in the current directory
+    path_to_config = None
     args = load_args(path_to_config)
     data_args = args['training_data']
     model_args = args['model_settings']
@@ -79,6 +79,7 @@ def main() -> None:
         move_working_directory('models')
         # save the model structure
         torch.save(trained_model[0].state_dict(), get_new_filename('pt'))
+        logger.info('Training ended and the model was saved.')
     else:
         print(0)
         while True:
@@ -90,6 +91,7 @@ def main() -> None:
                 save_model_structure(trained_model, acc, epoch, logging_args, model_args)
                 continue
             else: break
+        logger.info('Training ended, because no more models are available for training.')
 
 # Run the main function
 if __name__ == '__main__':
