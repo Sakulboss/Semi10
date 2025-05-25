@@ -55,7 +55,7 @@ def create_bee_1(args: dict = None) -> None:
         None
     """
     ext = args.get("training_file_extensions","wav")
-    source_folder: str = args.get("training_files_storage_location", os.path.join(os.getcwd(),'_bees\\27-28_April'))
+    source_folder: str = args.get("training_files_storage_location", os.path.join(os.getcwd(),'_bees/27-28_April'))
     target_base_folder: str = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_bee_sounds')
     entries: list = []
     directories: list = []
@@ -92,16 +92,15 @@ def dataset(size: str, logging_args: dict, args: dict) -> list[str]:
         list of paths to the dataset
     """
     logger = setup_logging(logging_args)
-
+    new_folder = args.get("create_new_source", True)
     if size == "esc50":
-
         sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_esc50_sorted')
-        if not os.path.isdir(sorted_files):
+        if new_folder and not os.path.isdir(sorted_files):
             use_esc50(args)
         dir_dataset: str = '_esc50_sorted'
     elif size == 'bees_1':
         sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_bee_sounds')
-        if not os.path.isdir(sorted_files):
+        if new_folder and not os.path.isdir(sorted_files):
             create_bee_1(args)
         dir_dataset: str = sorted_files
     else:
