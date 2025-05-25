@@ -28,7 +28,7 @@ def change_cwd_to_training_files(logging_args):
     logger.debug(f'Set training files storage location to: {os.getcwd()}')
 
 
-def download_esc50(args):
+def use_esc50(args):
     """
     This function categorizes the ESC-50 dataset. It was only used to check whether CNN could work
     with big datasets. CNN was not trained on this dataset.
@@ -115,7 +115,7 @@ def dataset(size: str, args: dict, logging_args) -> list[str]:
         """
         sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_esc50')
         if not os.path.isdir(sorted_files):
-            download_esc50(args)
+            use_esc50(args)
         dir_dataset: str = '_esc50_sorted'
     elif size == 'bees_1':
         sorted_files = os.path.join(args.get("sorted_files_storage_location", os.getcwd()), '_bee_sounds')
