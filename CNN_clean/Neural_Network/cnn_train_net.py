@@ -68,6 +68,7 @@ def train(loader,  logging_args, args) -> tuple[CNN, float, int] | tuple[None, N
     min_epoch       = args.get('min_epoch', 5)
     device          = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logger          = setup_logging(logging_args)
+    acc_scores      = []
 
     # Create the model and check if the model is working -> when all models are tested, model.working is set False, it should then break the training.
     model = CNN(logging_args, args)
@@ -123,27 +124,27 @@ def train(loader,  logging_args, args) -> tuple[CNN, float, int] | tuple[None, N
             return model, acc, -1
 
         # calculate the squared error and check if it gets bigger (worse), then break the training loop.
-        model.se_func((1-acc)**2)
-        if epoch > min_epoch and model.se[-1] > model.se[-2]:
+        acc_scores.append((1-acc)**2)
+        if epoch > min_epoch and acc_scores[-1] > acc_scores[-2]:
             # Set the highest reached epoch.
-            model.epoch(epoch)
+            reached_epoch = epoch
             break
     else:
-        model.epoch(max_epochs)
+        reached_epoch = max_epochs
 
-    logger.info(f"Finished training with SE: {model.se[-1]:.2f} in epoch {model.epoch()} in on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
-    return model, model.acc[-1], model.epoch
+    logger.info(f"Finished training with SE: {acc_scores[-1]:.2f} in epoch {reached_epoch} in on average {sum(model.epoch_time)/len(model.epoch_time):.3f} s and model {str(model)}")
+    return model, acc_scores[-1], reached_epoch
 
 
 def save_model_structure(model: CNN, acc: float, epoch: int, logging_args: dict, args: dict) -> None:
     """
     Saves the model structure to a file.
     Parameters:
-        model:        CNN   The neural network model.
-        acc:          float accuracy of the model
-        epoch:        int   max epoch number reached in training
-        logging_args: dict  arguments for logging
-        args:         dict  settings for the training
+        model:        CNN;   trained neural network model
+        acc:          float; accuracy of the model
+        epoch:        int;   max epoch number reached in training
+        logging_args: dict;  arguments for logging
+        args:         dict;  settings for training and server settings
     Returns:
         None
     """
@@ -158,7 +159,7 @@ def save_model_structure(model: CNN, acc: float, epoch: int, logging_args: dict,
 
     # Even if use_server is activated, the results are saved to a file in case the sending goes wrong
     with open(path_to_file, 'a') as f:
-        f.write(f'{100 * model.accuracy[-1]:.5f}% {str(model)}\n')
+        f.write(f'{100 * acc:.5f}% {str(model)}\n')
 
     if args.get('use_server',  False): send_result(model.accuracy[-1], acc, epoch, args, logging_args)
 

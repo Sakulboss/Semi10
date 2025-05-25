@@ -22,8 +22,8 @@ def mel_spec_file(fn_wav_name, logging_args, n_fft=1024, hop_length=441, fss = 4
     """
     Compute mel cepstrogram from audio file with librosa.feature.melspectogram()
     Args:
-        fn_wav_name (str): Audio file name
-        logging_args: get arguments for logging
+        fn_wav_name:  str  Audio file name
+        logging_args: dict get arguments for logging
         n_fft (int): FFT size
         hop_length (int): Hop size in samples
         fss (float): Sample rate in Hz
@@ -97,7 +97,7 @@ def mel_specs(labels, setting, logging_args) -> tuple:
 
     # Create mel cepstrogram
     for count in tqdm(range(len(fn_wav_list)), desc='Mel-Cepstogramm'):
-        mel_spec = mel_spec_file(fn_wav_list[count], logger, stereo=(size == 'bees_1'))
+        mel_spec = mel_spec_file(fn_wav_list[count], logging_args, stereo=(size == 'bees_1'))
         if mel_spec is None or count != 0 and mel_spec.shape != all_mel_specs[-1].shape:
             error_files.append(fn_wav_list[count])
         else:
