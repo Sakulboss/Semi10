@@ -10,5 +10,6 @@ if data.ndim == 2:
     right_channel = data[:, 1]
 
     # Speichere die Mono-Daten in neuen WAV-Dateien
-    sf.write("mono_left1.wav", left_channel, samplerate)
-    sf.write("mono_right1.wav", right_channel, samplerate)
+    sf.write("mono_left.wav", left_channel, samplerate)
+    sf.write("mono_right.wav", right_channel, samplerate)
+    #11. Mai

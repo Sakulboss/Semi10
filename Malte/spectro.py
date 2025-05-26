@@ -1,7 +1,8 @@
 import numpy as np
+import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import librosa
-import sys
+import os
 
 def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss=2000., n_mels=64):
     """ Compute mel spectrogram
@@ -51,7 +52,224 @@ def plot_spectrogram(spectrogram, title='Mel-Spectrogram'):
     plt.tight_layout()
     plt.show()
 
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+
+def plot_two_spectrograms(cmap, spec1, spec2, title1='Mel-Spectrogram 1', title2='Mel-Spectrogram 2', fig_width=14, fig_height=5, save_path=None):
+    vmin = min(spec1.min(), spec2.min())
+    vmax = max(spec1.max(), spec2.max())
+
+    fig = plt.figure(figsize=(fig_width, fig_height))
+    gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 0.05], wspace=0.3)
+
+    ax1 = fig.add_subplot(gs[0])
+    img1 = ax1.imshow(spec1, origin='lower', aspect='auto', interpolation='none', vmin=vmin, vmax=vmax, cmap=cmap)
+    ax1.set_title(title1)
+    ax1.set_xlabel('Time (frames)')
+    ax1.set_ylabel('Mel Frequency Bands')
+
+    a=0.09
+    color='yellow'
+    line_color='red'
+    red_lines = [10, 15, 20, 30, 39, 45, 56, 59]
+    for y in red_lines:
+        ax1.axhline(y=y, color=line_color, linestyle='--', linewidth=1)
+    highlight_areas = [(10,15),(20,30),(39,45),(56,59)]
+    for start, end in highlight_areas:
+        ax1.axhspan(start, end, facecolor=color, alpha=a)
+
+
+    ax2 = fig.add_subplot(gs[1])
+    img2 = ax2.imshow(spec2, origin='lower', aspect='auto', interpolation='none', vmin=vmin, vmax=vmax, cmap=cmap)
+    ax2.set_title(title2)
+    ax2.set_xlabel('Time (frames)')
+    ax2.set_ylabel('Mel Frequency Bands')
+    red_lines = [10, 15, 20, 30, 42, 49]
+    for y in red_lines:
+        ax2.axhline(y=y, color=line_color, linestyle='--', linewidth=1)
+    highlight_areas = [(10,15),(20,30),(42,49)]
+    for start, end in highlight_areas:
+        ax2.axhspan(start, end, facecolor=color, alpha=a)
+
+
+    cbar_ax = fig.add_subplot(gs[2])
+    cbar = fig.colorbar(img2, cax=cbar_ax, format='%+2.0f dB')
+    cbar.set_label('Amplitude (dB)')
+
+    plt.tight_layout()
+    plt.subplots_adjust(left=0.06, right=0.95)
+
+    if save_path:
+        plt.savefig(save_path)
+        plt.close()
+    else:
+        plt.show()
+
+
+# Funktion zur Anzeige der Colormaps
+def plot_colormaps():
+    colormap_categories = {
+        'Perceptually Uniform Sequential': [
+            'viridis', 'plasma', 'inferno', 'magma', 'cividis'
+        ],
+        'Sequential': [
+            'Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds',
+            'YlOrBr', 'YlOrRd', 'OrRd', 'PuRd', 'RdPu', 'BuPu',
+            'GnBu', 'PuBu', 'YlGnBu', 'PuBuGn', 'BuGn', 'YlGn'
+        ],
+        'Sequential (2)': [
+            'binary', 'gist_yarg', 'gist_gray', 'gray', 'bone', 'pink',
+            'spring', 'summer', 'autumn', 'winter', 'cool', 'Wistia',
+            'hot', 'afmhot', 'gist_heat', 'copper'
+        ],
+        'Diverging': [
+            'PiYG', 'PRGn', 'BrBG', 'PuOr', 'RdGy', 'RdBu',
+            'RdYlBu', 'RdYlGn', 'Spectral', 'coolwarm', 'bwr', 'seismic'
+        ],
+        'Cyclic': ['twilight', 'twilight_shifted', 'hsv'],
+        'Qualitative': [
+            'Pastel1', 'Pastel2', 'Paired', 'Accent',
+            'Dark2', 'Set1', 'Set2', 'Set3', 'tab10', 'tab20', 'tab20b', 'tab20c'
+        ],
+        'Miscellaneous': [
+            'flag', 'prism', 'ocean', 'gist_earth', 'terrain', 'gist_stern',
+            'gnuplot', 'gnuplot2', 'CMRmap', 'cubehelix', 'brg',
+            'gist_rainbow', 'rainbow', 'jet', 'nipy_spectral', 'gist_ncar'
+        ]
+    }
+
+    gradient = np.linspace(0, 1, 256)
+    gradient = np.vstack([gradient] * 2)
+
+    fig_height = sum(len(maps) for maps in colormap_categories.values()) * 0.22
+    fig, axs = plt.subplots(nrows=sum(len(maps) for maps in colormap_categories.values()),
+                            figsize=(10, fig_height))
+    fig.subplots_adjust(top=1, bottom=0, left=0.2, right=0.99)
+
+    i = 0
+    for category, colormaps in colormap_categories.items():
+        for cmap in colormaps:
+            axs[i].imshow(gradient, aspect='auto', cmap=plt.get_cmap(cmap))
+            axs[i].text(-0.01, 0.5, cmap, va='center', ha='right', fontsize=9,
+                        transform=axs[i].transAxes)
+            axs[i].set_axis_off()
+            i += 1
+
+    plt.show()
+
 def main():
+    '''
+    colormap_categories = {
+        'Perceptually Uniform Sequential': ['viridis', 'plasma', 'inferno', 'magma', 'cividis'],
+        'Sequential': ['Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds', 'YlOrBr', 'YlOrRd', 'OrRd', 'PuRd',
+                       'RdPu', 'BuPu', 'GnBu', 'PuBu', 'YlGnBu', 'PuBuGn', 'BuGn', 'YlGn'],
+        'Sequential (2)': ['binary', 'gist_yarg', 'gist_gray', 'gray', 'bone', 'pink', 'spring', 'summer', 'autumn',
+                           'winter', 'cool', 'Wistia', 'hot', 'afmhot', 'gist_heat', 'copper'],
+        'Diverging': ['PiYG', 'PRGn', 'BrBG', 'PuOr', 'RdGy', 'RdBu', 'RdYlBu', 'RdYlGn', 'Spectral', 'coolwarm', 'bwr',
+                      'seismic'],
+        'Cyclic': ['twilight', 'twilight_shifted', 'hsv'],
+        'Qualitative': ['Pastel1', 'Pastel2', 'Paired', 'Accent', 'Dark2', 'Set1', 'Set2', 'Set3',
+                        'tab10', 'tab20', 'tab20b', 'tab20c'],
+        'Miscellaneous': ['flag', 'prism', 'ocean', 'gist_earth', 'terrain', 'gist_stern', 'gnuplot', 'gnuplot2',
+                          'CMRmap', 'cubehelix', 'brg', 'gist_rainbow', 'rainbow', 'jet', 'nipy_spectral', 'gist_ncar']
+    }
+    '''
+    colormap_categories = {'Qualitative': ['Accent', 'Pastel1', 'Pastel2', 'Set1', 'tab10'], 'Sequential': ['BuPu', 'Greys', 'OrRd'], 'Sequential (2)': ['gist_gray', 'gist_yarg'], 'Miscellaneous': ['gnuplot2', 'terrain'], 'Perceptually Uniform Sequential': ['inferno']}
+
+
+    #plot_colormaps()
+    spec1 = mel_spec_file('mono_left.wav')
+    spec2 = mel_spec_file('mono_right.wav')
+    x     = 1
+    plot_two_spectrograms('terrain',spec1, spec2, title1='Keine Schwarmstimmung', title2=f'Schwarmstimmung {x} Tage vor Schwarmereignis', fig_width=18, fig_height=5)
+
+    '''
+    # Basisordner für alle Bilder
+    base_dir = 'colormap_spectrograms_all_in_one'
+    os.makedirs(base_dir, exist_ok=True)
+
+    output_dir = 'spectrogram_colormaps_final'
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Iteration über alle Colormaps (ein gemeinsamer Ordner)
+    for cmap_list in colormap_categories.values():
+        for cmap in cmap_list:
+            filename = f'{cmap}.png'
+            save_path = os.path.join(output_dir, filename)
+            print(f"Creating: {save_path}")
+            plot_two_spectrograms(cmap, spec1, spec2, save_path=save_path)
+
+    base_dir = 'colormap_spectrograms_all_in_one'
+
+    #new_colormap_categories = {{'Qualitative': ['Accent', 'Pastel1', 'Pastel2', 'Set1', 'tab10'], 'Sequential': ['BuPu', 'Greys', 'OrRd'], 'Sequential (2)': ['gist_gray', 'gist_yarg'], 'Miscellaneous': ['gnuplot2', 'terrain'], 'Perceptually Uniform Sequential': ['inferno']}
+    
+    for file in os.listdir(base_dir):
+        if file.endswith('.png'):
+            try:
+                # Entferne .png-Endung und splitte anhand der doppelten Unterstriche
+                cmap_name, category_suffix = os.path.splitext(file)[0].split('__')
+                category_name = category_suffix.replace('_', ' ')  # Kategorie zurück in lesbare Form
+
+                if category_name not in new_colormap_categories:
+                    new_colormap_categories[category_name] = []
+
+                new_colormap_categories[category_name].append(cmap_name)
+            except ValueError:
+                print(f"Dateiname nicht im erwarteten Format: {file}")
+
+    print(new_colormap_categories)
+
+    
+    for category, cmaps in colormap_categories.items():
+        # Kategorie als Teil des Dateinamens, Leerzeichen durch Unterstrich ersetzen
+        category_suffix = category.replace(" ", "_")
+
+        for cmap_name in cmaps:
+            # Neuer Dateiname mit Kategorie als Suffix
+            filename = f"{cmap_name}__{category_suffix}.png"
+            save_file = os.path.join(base_dir, filename)
+
+            try:
+                plot_two_spectrograms(
+                    cmap_name,
+                    spec1,
+                    spec2,
+                    title1='Keine Schwarmstimmung',
+                    title2=f'Schwarmstimmung {x} Tage vor Schwarmereignis',
+                    save_path=save_file
+                )
+                print(f"Saved: {save_file}")
+            except Exception as e:
+                print(f"Error with colormap {cmap_name}: {e}")
+
+    new_colormap_categories = {}
+
+    #os.makedirs(base_dir, exist_ok=True)
+    
+        for category_dir in os.listdir(base_dir):
+        category_path = os.path.join(base_dir, category_dir)
+        if os.path.isdir(category_path):
+            # Dateinamen ohne Erweiterung sammeln
+            colormaps = [os.path.splitext(f)[0] for f in os.listdir(category_path) if
+                         os.path.isfile(os.path.join(category_path, f))]
+            # Leerzeichen zurücksetzen, falls notwendig (wenn Ordnernamen '_' statt ' ')
+            category_name = category_dir.replace('_', ' ')
+            new_colormap_categories[category_name] = colormaps
+    
+    print(new_colormap_categories)
+    
+    for category, cmaps in colormap_categories.items():
+        category_dir = os.path.join(base_dir, category.replace(" ", "_"))
+        os.makedirs(category_dir, exist_ok=True)
+
+        for cmap_name in cmaps:
+            save_file = os.path.join(category_dir, f'{cmap_name}.png')
+            try:
+                plot_two_spectrograms(cmap_name, spec1, spec2, title1= 'Keine Schwarmstimmung', title2=f'Schwarmstimmung {x} Tage vor Schwarmereignis', save_path=save_file)
+                print(f"Saved: {save_file}")
+            except Exception as e:
+                print(f"Error with colormap {cmap_name}: {e}")
+    
     input_wav = 'mono_left.wav'
     print(f"Processing file: {input_wav}")
 
@@ -60,6 +278,7 @@ def main():
 
     # Plot the mel spectrogram
     plot_spectrogram(mel_spectrogram)
-
+    '''
 if __name__ == '__main__':
     main()
+
