@@ -24,7 +24,7 @@ def move_working_directory():
 
 def create_trainingdata(settings) -> bool:
     """
-    This function creates the main datasets for the ANN. If the dataset exists earlier, it is not created again.
+    This function creates the main datasets for the CNN. If the dataset exists earlier, it is not created again.
     Args:
         settings: main settings like the type of dataset, if it should be created new, etc.
     Returns:
@@ -33,17 +33,18 @@ def create_trainingdata(settings) -> bool:
     #Initialize the working directory and variables
     move_working_directory()
     model = settings.get('model', 'torch')
-    size = settings.get('size', 'small')
+    size = settings.get('size', 'bienen_1')
 
     path = os.path.join(os.getcwd(), f'training_data_{model}_{size}.npy')
     # Check if the file already exists
-    if os.path.isfile(path) and settings.get('create_new', False): print('Mels exist!'); return True
+    if os.path.isfile(path) and not settings.get('create_new', False): return True
 
     # If the file does not exist, create it
-    dir_list = dataset(settings.get('size', 'bienen_1'))
+    dir_list = dataset(settings.get('size', 'bees_1'), settings)
     labels = labeler(dir_list)
     mels = mel_specs(labels, settings)
     trained_data = training_data(mels, settings)
+
     # Save the training data
     trained_data = np.array(trained_data, dtype=object)
     os.chdir('training_files')
@@ -61,8 +62,8 @@ def load_trainingdata(model='torch', size='bienen_1') -> tuple:
     Returns:
         contents of the file as a tuple
     """
-    ladung = np.load(f'training_data_{model}_{size}.npy', allow_pickle=True)
-    return tuple(ladung)
+    data = np.load(f'training_data_{model}_{size}.npy', allow_pickle=True)
+    return tuple(data)
 
 
 def trainingdata(settings: dict) -> tuple:
@@ -74,7 +75,8 @@ def trainingdata(settings: dict) -> tuple:
         contents of the training data file as a tuple
     """
     create_trainingdata(settings)
-    return load_trainingdata(settings['model'], settings['size'])
+    return load_trainingdata(settings.get('model', 'torch'), settings['size'])
+    ''
 
 
 def main(settings):

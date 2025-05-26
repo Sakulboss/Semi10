@@ -66,12 +66,13 @@ def create_linear_layer(layer_description):
 def reshape_tensor(tensor):
     return tensor.view(tensor.shape[0], -1)
 
-def getlayers(omt:str = None):
+def getlayers(path:str = '_netstruct.txt', omt:str = None):
     move_working_directory()
     if omt is None:
-        original_model_text = getnextmodel('_netstruct.txt')
+        original_model_text = getnextmodel(path)
     else:
         original_model_text = omt
+
     if original_model_text is None:
         return None, None
     layers = original_model_text.split(';;')
@@ -110,7 +111,7 @@ def getlayers(omt:str = None):
 #diletation: not needed, but it adds space between filter kernels (pure brainfuck)
 
 class CNN(nn.Module):
-    def __init__(self, text=None):
+    def __init__(self, path = os.getcwd(), text=None):
         """
         Parameters:
             text: str
@@ -120,7 +121,13 @@ class CNN(nn.Module):
 
         super(CNN, self).__init__()
 
-        layers, text = getlayers(text)
+        move_working_directory()
+
+        if path is None:
+            path = os.getcwd()
+        path = os.path.join(path, '_netstruct.txt')
+
+        layers, text = getlayers(path, text)
         working = True
 
         if (layers or text) is None:

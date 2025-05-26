@@ -2,12 +2,21 @@ https://www.geeksforgeeks.org/mel-frequency-cepstral-coefficients-mfcc-for-speec
 https://machinelistening.github.io/casm/lectures/CASM_0_Introduction.pdf (Folie 11)
 https://www.mdpi.com/2624-6120/3/4/48
 https://machinelistening.github.io/casm/ - Audio Verarbeitung
-
+https://michaelceber.medium.com/gpu-monitoring-on-windows-10-for-machine-learning-cuda-41088de86d65 <-- they have the same GPU as us
 Malte:
 https://wasmer.io/amberjblue/estratto@0.2.5
 https://docs.rs/wavers/latest/wavers/
 https://crates.io/crates/mel_spec
 FULL SVM DOCK: https://github.com/cjlin1/libsvm
 Rust Crate for usage of trained SVM: https://docs.rs/ffsvm/latest/ffsvm/
+---
+Training - Datasets: 
+https://cermann.myqnapcloud.com/share.cgi?ssid=4ac53e271b7f4061bd3665655bdbb53b
+
+___
+Docker-Interpreter packs installieren:
+CMD: docker run -it rocm/rocm-terminal:5.6 /bin/bash
+dann installieren
 
 CNN: https://github.com/mikecvet/cnn-rs
+

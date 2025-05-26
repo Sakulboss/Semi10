@@ -1,0 +1,22 @@
+{
+  "training_data": {
+    "training_files_storage_location": "D:\\Daten_Semi10\\26-27_April",
+    "sorted_files_storage_location": "D:\\Daten_Semi10",
+    "training_file_extensions": "flac",
+    "size": "bees_1",
+    "create_new": true,
+    "printing": true,
+    "test_size": 0.3
+  },
+  "model_settings": {
+    "batch_size": 128,
+    "learning_rate": 0.001,
+    "num_epochs": 100,
+    "epochs": 100,
+    "min_epoch": 5,
+    "train_once": false,
+    "model__structure_text": "l; conv2d; (1, 16); (3, 3); 1; (1, 1);; p; avgpool; (3, 3); 1; (1, 1);; l; conv2d; (16, 48); (3, 3); 1; (1, 1);; p; avgpool; (3, 3); 1; (1, 1);; l; conv2d; (48, 48); (3, 3); 1; (1, 1);; p; maxpool; (3, 3); 1; (1, 1);; v: view;; l; linear; (307200, 10);; l; linear; (10, 10);; l; linear; (10, 2);",
+    "dropbox": "",
+    "printing": true
+  }
+}

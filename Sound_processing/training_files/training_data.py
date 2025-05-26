@@ -52,7 +52,7 @@ def training_data(data: tuple, setting: dict, ) -> tuple:
     y_train_transformed = OneHotEncoder(categories='auto', sparse_output=False).fit_transform(y_train.reshape(-1, 1))
     y_test_transformed = OneHotEncoder(categories='auto', sparse_output=False).fit_transform(y_test.reshape(-1, 1))
 
-    # Put the
+    # Create the right dimensions
     if len(x_train_norm.shape) == 3 and model == 'torch':
         x_train_norm = np.expand_dims(x_train_norm, 1)
         x_test_norm = np.expand_dims(x_test_norm, 1)
@@ -65,6 +65,7 @@ def training_data(data: tuple, setting: dict, ) -> tuple:
     # The input shape is the "time-frequency shape" of our segments plus the number of channels, which is 1 (needed for the model -> channel dimension)
     input_shape = x_train_norm.shape[1:]
     n_classes = y_train_transformed.shape[1]
+    print(n_classes, data[4])
     assert n_classes == data[4]
 
     return input_shape, n_classes, x_train_norm, y_train_transformed, x_test_norm, y_test_transformed, y_test, data[3], data[4]
