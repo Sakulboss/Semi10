@@ -41,7 +41,7 @@ class NetStruct:
         Args:
             layer:   the created layers, to each will be all possibilities of this layer added
             channel: number of channels in the layer, defines the number of filters
-            stride:  movement of the filter, here set to standard (1)
+            stride:  movement of the filter, here set to the standard (1)
 
         Returns:
             list: list with all possible layers

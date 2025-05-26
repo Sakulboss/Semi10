@@ -1,6 +1,6 @@
 import logging
 import numpy as np
-import librosa.feature as mf
+import librosa.feature as lf
 import librosa
 from tqdm import tqdm
 
@@ -17,7 +17,7 @@ def setup_logging(args: dict) -> logging.Logger:
     )
     return logging.getLogger(__name__)
 
-def mel_spec_file(fn_wav_name, logging_args, n_fft=1024, hop_length=441, fss = 48000, n_mels=64, stereo:bool=True) :
+def mel_cepstrogram_from_file(fn_wav_name, logging_args, n_fft=1024, hop_length=441, fss = 48000, n_mels=64, stereo:bool=True) :
     """
     Compute mel cepstrogram from audio file with librosa.feature.melspectogram()
     Args:
@@ -46,7 +46,7 @@ def mel_spec_file(fn_wav_name, logging_args, n_fft=1024, hop_length=441, fss = 4
     if np.max(np.abs(x_new)) > 0:
         x_new = x_new / np.max(np.abs(x_new))
 
-    x_new = mf.melspectrogram(y=x_new,
+    x_new = lf.melspectrogram(y=x_new,
                                 sr=fss,
                                 n_fft=n_fft,
                                 hop_length=hop_length,
@@ -96,7 +96,7 @@ def mel_specs(labels: tuple, setting, logging_args) -> tuple:
 
     # Create mel cepstrogram
     for count in tqdm(range(len(fn_wav_list)), desc='Mel-Cepstogramm'):
-        mel_spec = mel_spec_file(fn_wav_list[count], logging_args, stereo=(size == 'bees_1'))
+        mel_spec = mel_cepstrogram_from_file(fn_wav_list[count], logging_args, stereo=(size == 'bees_1'))
         if mel_spec is None or count != 0 and mel_spec.shape != all_mel_specs[-1].shape:
             error_files.append(fn_wav_list[count])
         else:

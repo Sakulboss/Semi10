@@ -1,8 +1,12 @@
 import numpy as np
+from scipy.signal import spectrogram
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import librosa
 import os
+import random
+import soundfile as sf
+
 
 def mel_spec_file(fn_wav_name, n_fft=1024, hop_length=441, fss=2000., n_mels=64):
     """ Compute mel spectrogram
@@ -55,7 +59,9 @@ def plot_spectrogram(spectrogram, title='Mel-Spectrogram'):
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
-def plot_two_spectrograms(cmap, spec1, spec2, title1='Mel-Spectrogram 1', title2='Mel-Spectrogram 2', fig_width=14, fig_height=5, save_path=None):
+def plot_two_spectrograms(cmap, spec1, spec2, title1='Mel-Spectrogram 1', title2='Mel-Spectrogram 2', fig_width=14, fig_height=5, save_path=True):
+    label_left = 5
+    pad = 20
     vmin = min(spec1.min(), spec2.min())
     vmax = max(spec1.max(), spec2.max())
 
@@ -65,10 +71,11 @@ def plot_two_spectrograms(cmap, spec1, spec2, title1='Mel-Spectrogram 1', title2
     ax1 = fig.add_subplot(gs[0])
     img1 = ax1.imshow(spec1, origin='lower', aspect='auto', interpolation='none', vmin=vmin, vmax=vmax, cmap=cmap)
     ax1.set_title(title1)
+    ax1.tick_params(axis='y', pad=pad)
     ax1.set_xlabel('Time (frames)')
-    ax1.set_ylabel('Mel Frequency Bands')
+    ax1.set_ylabel('Mel Frequency Bands', labelpad=label_left)
 
-    a=0.09
+    a=0.00
     color='yellow'
     line_color='red'
     red_lines = [10, 15, 20, 30, 39, 45, 56, 59]
@@ -77,19 +84,48 @@ def plot_two_spectrograms(cmap, spec1, spec2, title1='Mel-Spectrogram 1', title2
     highlight_areas = [(10,15),(20,30),(39,45),(56,59)]
     for start, end in highlight_areas:
         ax1.axhspan(start, end, facecolor=color, alpha=a)
+    arrow_position = [12, 22, 42, 57]
+    for y in arrow_position:
+        ax1.annotate(
+            '',
+            xy=(-0.005, y),  # Pfeilspitze: ganz links an der Achse (x=0 in Achsenkoordinaten)
+            xycoords=('axes fraction', 'data'),  # x in Achsenkoordinaten, y in Datenkoordinaten
+            xytext=(-0.05, y),  # Pfeilanfang: 10% links außerhalb der Achse (x=-0.1 in Achsenkoordinaten)
+            textcoords=('axes fraction', 'data'),
+            arrowprops=dict(
+                arrowstyle='-|>',
+                color='red',
+                lw=3
+            )
+        )
 
 
     ax2 = fig.add_subplot(gs[1])
     img2 = ax2.imshow(spec2, origin='lower', aspect='auto', interpolation='none', vmin=vmin, vmax=vmax, cmap=cmap)
     ax2.set_title(title2)
     ax2.set_xlabel('Time (frames)')
-    ax2.set_ylabel('Mel Frequency Bands')
+    ax2.tick_params(axis='y', pad=pad)
+    ax2.set_ylabel('Mel Frequency Bands', labelpad=label_left)
     red_lines = [10, 15, 20, 30, 42, 49]
     for y in red_lines:
         ax2.axhline(y=y, color=line_color, linestyle='--', linewidth=1)
     highlight_areas = [(10,15),(20,30),(42,49)]
     for start, end in highlight_areas:
         ax2.axhspan(start, end, facecolor=color, alpha=a)
+    arrow_position = [12,22,36,45]
+    for y in arrow_position:
+        ax2.annotate(
+            '',
+            xy=(-0.005, y),  # Pfeilspitze: ganz links an der Achse (x=0 in Achsenkoordinaten)
+            xycoords=('axes fraction', 'data'),  # x in Achsenkoordinaten, y in Datenkoordinaten
+            xytext=(-0.05, y),  # Pfeilanfang: 10% links außerhalb der Achse (x=-0.1 in Achsenkoordinaten)
+            textcoords=('axes fraction', 'data'),
+            arrowprops=dict(
+                arrowstyle='-|>',
+                color='red',
+                lw=3
+            )
+        )
 
 
     cbar_ax = fig.add_subplot(gs[2])
@@ -104,7 +140,6 @@ def plot_two_spectrograms(cmap, spec1, spec2, title1='Mel-Spectrogram 1', title2
         plt.close()
     else:
         plt.show()
-
 
 # Funktion zur Anzeige der Colormaps
 def plot_colormaps():
@@ -158,32 +193,86 @@ def plot_colormaps():
     plt.show()
 
 def main():
+    path= 'F:/Aufnahmen/Zuhause/10_Mai/konrad_17_162_2025-05-10-03-11-00.wav'
+    data, sr = sf.read(path)
+    left_channel = data[:, 0]
+    right_channel = data[:, 1]
+    left_wav = f"left_temp_{1}.wav"
+    right_wav = f"right_temp_{2}.wav"
+    sf.write(left_wav, left_channel, sr)
+    sf.write(right_wav, right_channel, sr)
+    left_spec = mel_spec_file(left_wav)
+    right_spec = mel_spec_file(right_wav)
+    plot_two_spectrograms(
+        cmap='terrain',
+        spec1=left_spec,
+        spec2=right_spec,
+        title1='Keine Schwarmstimmung',
+        title2='Schwarmstimmung, ein Tag vor Schwarmereignis',
+        fig_width=18,
+        fig_height=5,
+        save_path= 'C:/Users/SFZ Rechner/Desktop/Mels/schwarmstimmung_01_tage_vor_event.png'
+    )
+    os.remove(left_wav)
+    os.remove(right_wav)
     '''
-    colormap_categories = {
-        'Perceptually Uniform Sequential': ['viridis', 'plasma', 'inferno', 'magma', 'cividis'],
-        'Sequential': ['Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds', 'YlOrBr', 'YlOrRd', 'OrRd', 'PuRd',
-                       'RdPu', 'BuPu', 'GnBu', 'PuBu', 'YlGnBu', 'PuBuGn', 'BuGn', 'YlGn'],
-        'Sequential (2)': ['binary', 'gist_yarg', 'gist_gray', 'gray', 'bone', 'pink', 'spring', 'summer', 'autumn',
-                           'winter', 'cool', 'Wistia', 'hot', 'afmhot', 'gist_heat', 'copper'],
-        'Diverging': ['PiYG', 'PRGn', 'BrBG', 'PuOr', 'RdGy', 'RdBu', 'RdYlBu', 'RdYlGn', 'Spectral', 'coolwarm', 'bwr',
-                      'seismic'],
-        'Cyclic': ['twilight', 'twilight_shifted', 'hsv'],
-        'Qualitative': ['Pastel1', 'Pastel2', 'Paired', 'Accent', 'Dark2', 'Set1', 'Set2', 'Set3',
-                        'tab10', 'tab20', 'tab20b', 'tab20c'],
-        'Miscellaneous': ['flag', 'prism', 'ocean', 'gist_earth', 'terrain', 'gist_stern', 'gnuplot', 'gnuplot2',
-                          'CMRmap', 'cubehelix', 'brg', 'gist_rainbow', 'rainbow', 'jet', 'nipy_spectral', 'gist_ncar']
-    }
-    '''
-    colormap_categories = {'Qualitative': ['Accent', 'Pastel1', 'Pastel2', 'Set1', 'tab10'], 'Sequential': ['BuPu', 'Greys', 'OrRd'], 'Sequential (2)': ['gist_gray', 'gist_yarg'], 'Miscellaneous': ['gnuplot2', 'terrain'], 'Perceptually Uniform Sequential': ['inferno']}
+    ordner = r"F:/Aufnahmen/Zuhause/10_Mai"
+    anzahl_dateien = 40
+    alle_dateien = sorted(
+        [f for f in os.listdir(ordner) if f.startswith("konrad_17") and f.endswith(".wav")]
+    )
+    ziel_dateien = alle_dateien[:anzahl_dateien]
+    print(ziel_dateien)
 
+    for i, datei in enumerate(ziel_dateien, 1):
+        pfad = os.path.join(ordner, datei)
+        try:
+            print(pfad, f"[{i}/{anzahl_dateien}]")
+            # Original WAV laden (Stereo)
+            data, sr = sf.read(pfad)
 
-    #plot_colormaps()
-    spec1 = mel_spec_file('mono_left.wav')
-    spec2 = mel_spec_file('mono_right.wav')
-    x     = 1
-    plot_two_spectrograms('terrain',spec1, spec2, title1='Keine Schwarmstimmung', title2=f'Schwarmstimmung {x} Tage vor Schwarmereignis', fig_width=18, fig_height=5)
+            if data.ndim != 2 or data.shape[1] != 2:
+                raise ValueError("Datei ist nicht stereo!")
 
-    '''
+            left_channel = data[:, 0]
+            right_channel = data[:, 1]
+
+            # Temporäre Mono-WAVs speichern
+            left_wav = f"left_temp_{i}.wav"
+            right_wav = f"right_temp_{i}.wav"
+            sf.write(left_wav, left_channel, sr)
+            sf.write(right_wav, right_channel, sr)
+
+            # Mel-Spektrogramme laden mit deiner Funktion
+            left_spec = mel_spec_file(left_wav)
+            right_spec = mel_spec_file(right_wav)
+
+            # Speicherpfad für Bild
+            bildordner = "C:/Users/SFZ Rechner/Desktop/Mels"
+            safe_filename = f"schwarmstimmung_{i:02d}_tage_vor_event.png"
+            speicherpfad = os.path.join(bildordner, safe_filename)
+
+            # Plotten
+            plot_two_spectrograms(
+                cmap='terrain',
+                spec1=left_spec,
+                spec2=right_spec,
+                title1='Keine Schwarmstimmung',
+                title2='Schwarmstimmung, ein Tag vor Schwarmereignis',
+                fig_width=18,
+                fig_height=5,
+                save_path=speicherpfad
+            )
+            print(f"[✓] Gespeichert: {speicherpfad}")
+
+            # Temporäre WAVs löschen
+            os.remove(left_wav)
+            os.remove(right_wav)
+
+        except Exception as e:
+            print(f"[Fehler] {datei}: {e}")
+
+    
     # Basisordner für alle Bilder
     base_dir = 'colormap_spectrograms_all_in_one'
     os.makedirs(base_dir, exist_ok=True)

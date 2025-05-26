@@ -3,7 +3,7 @@ import numpy as np
 
 from data_file_prep import dataset
 from data_labeler import labeler
-from data_mel_specs import mel_specs
+from data_mel_cepstrograms import mel_specs
 from data_refining import refine_data
 
 
@@ -56,8 +56,10 @@ def create_trainingdata(settings: dict, logging_args:dict) -> bool:
     trained_data_array = np.empty(1, dtype=object)
     trained_data_array[0] = trained_data
 
+    storage_path = settings.get('mel_ceps_storage_location', os.getcwd())
+
     # Save the array as numpy file; needs pickle, because object is a non-primitive (tuple)
-    np.save(f"training_data_torch_{size}.npy", trained_data_array, allow_pickle=True)
+    np.save(os.path.join(storage_path, f"training_data_torch_{size}.npy"), trained_data_array, allow_pickle=True)
     return False
 
 
