@@ -152,7 +152,7 @@ data_mel_cepstrograms.py:
 data_refining.py:
 - shapes the data to fit the model
 
-### Used packages:
+# Used packages:
 The following packages were not created by the authors of this code, but are used to run the code.
 Not Python native packages are:
 - numpy
