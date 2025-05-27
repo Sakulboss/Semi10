@@ -145,7 +145,7 @@ def save_model_structure(model: CNN, acc: float, epoch: int, logging_args: dict,
         None
     """
     logger = setup_logging(logging_args)
-    path = args.get('dropbox', None)
+    path = args.get('save_model_to', None)
     save_weight = args.get('save_weight', False)
 
     if path is None:

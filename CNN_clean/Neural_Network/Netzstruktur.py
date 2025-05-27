@@ -1,14 +1,15 @@
 
 r"""
-This script generates a neural network structure for a convolutional neural network in a self-made format after the following structure.
-l; layertype;          channels (in, out); kernel_size (h, w); stride; padding;;
-l; conv2d;             (3,3);             (3,3);               1;      1;;
-l; linear;             (204800,2);;
-p; pooltype;           size (h, w);       stride;              padding;;
-p; avgpool, maxpool;   (2,2);             1;                   0;;
-a; activation_funtion;;
-a; sigmoid, relu, tanh;;
-v; view;;
+This script generates a neural network structure for a convolutional neural network in a self-made format after the following structure:
+l; layer type;          channels (in, out); kernel_size (h, w); stride; padding;;
+-> l; conv2d;             (3,3);             (3,3);               1;      1;;
+-> l; linear;             (204800,2);;
+p; pool type;           size (h, w);       stride;              padding;;
+-> p; avgpool, maxpool;   (2,2);             1;                   0;;
+a; activation functions;;
+-> a; sigmoid, relu, tanh;;
+v; view layer, converts 2D plane from the convolutional layers to 1D plane for the hidden layers;;
+-> v; view;;
 
 Example:
 l; conv2d; (1,16); (3,3); 1; 1;; a; relu;; p; maxpool; (3,3); 1; 1;; l; conv2d; (16, 32); (3,3); 1; 1;; v; view;; l; linear; (204800,2);;
@@ -23,8 +24,8 @@ class NetStruct:
         self.start_layers = ["- "]                                  # Start characters of the layer
         self.conv_sizes  :list[tuple] = [ (3,3), (11,21)]           # convolutional kernel sizes
         self.pool_sizes  :list[tuple] = [(3,3), (5,5)]              # pooling kernel sizes
-        self.pool_types  :list[str]   = ["maxpool"]      # pooling types
-        self.act_types   :list[str]   = [None]              # activation functions
+        self.pool_types  :list[str]   = ["avgpool","maxpool"]       # pooling types
+        self.act_types   :list[str]   = [None, "relu"]              # activation functions
         self.dim         :list[int]   = [1,64,100]                  # dimensions of the tensor in the CNN -> Channel, Height, Width
         self.output_dim  :int         = 2                           # number of output dimensions
         self.linear_dim  :int         = 10                          # number of linear neurons after the first linear layer
@@ -58,7 +59,7 @@ class NetStruct:
         Create a pooling layer with the given parameters.
         Args:
             layer:  the created layers, to each will be all possibilities of this layer added
-            stride: movement of the filter, here set to standard (1)
+            stride: movement of the filter, here set to 1
 
         Returns:
             list: list with all possible layers
@@ -72,6 +73,14 @@ class NetStruct:
         return pool_list
 
     def first_linear(self, layer:list, input_filters:int):
+        """
+        Create the first linear layer if more than one is used with the given parameters. There are self.linear_dim exit neurons.
+        Args:
+            layer:          the created layers, to each will be all possibilities of this layer added
+            input_filters:  number of input filters to calculate the input size of the linear layer
+        Returns:
+            list: list with all possible layers
+        """
         linear_list, size = [], input_filters * self.dim[1] * self.dim[2]
         kernel_size = (size, self.linear_dim)
         for start_str in layer:
@@ -79,6 +88,13 @@ class NetStruct:
         return self.activation(linear_list)
 
     def middle_linear(self, layer:list):
+        """
+        Create the middle linear layer if three linear layers are used with the given parameters. There are self.linear_dim entry and exit neurons.
+        Args:
+            layer:          the created layers, to each will be all possibilities of this layer added
+        Returns:
+            list: list with all possible layers
+        """
         linear_list = []
         kernel_size = (self.linear_dim, self.linear_dim)
         for start_str in layer:
@@ -86,6 +102,13 @@ class NetStruct:
         return self.activation(linear_list)
 
     def last_linear(self, layer:list):
+        """
+        Create the last linear layer if more than one linear layer is used with the given parameters. There are self.linear_dim entry and self.output_dim exit neurons.
+        Args:
+            layer:  the created layers, to each will be all possibilities of this layer added
+        Returns:
+            list: list with all possible layers
+        """
         last_list = []
         kernel_size = (self.linear_dim, self.output_dim)
         for start_str in layer:
@@ -93,6 +116,14 @@ class NetStruct:
         return last_list
 
     def linear_only(self, layer:list, input_filters:int):
+        """
+        Create a special linear layer if only one is used with the given parameters. There are self.output_dim exit neurons.
+        Args:
+            layer:          the created layers, to each will be all possibilities of this layer added
+            input_filters:  number of input filters to calculate the input size of the linear layer
+        Returns:
+            list: list with all possible layers
+        """
         linear_list = []
         kernel_size = (input_filters * self.dim[1] * self.dim[2], self.output_dim)
         for start_str in layer:
@@ -250,7 +281,7 @@ class NetStruct:
         )
 
     def save_net(self):
-        with open('_netstruct1.txt', 'w') as f:
+        with open('_netstruct.txt', 'w') as f:
             for layer in self.layers:
                 f.write(layer + '\n')
         print('Netzstruktur gespeichert: {} Modelle.'.format(len(self.layers)))

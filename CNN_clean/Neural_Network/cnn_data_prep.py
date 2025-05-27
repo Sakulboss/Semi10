@@ -108,7 +108,7 @@ def data_prep(data, logging_args, args):
     # Gets corresponding OneHotEncoded Labels
     y_test_transformed = y_all_oh[test_idx]
 
-    # -------------------------LOGGING TO CHECK EVERYTHING IS OKAY----------------------------------
+
     logger.info("---------------DATA---------------".center(75))
     logger.info(f"Train set:                                    {x_train_norm.shape}, {y_train_transformed.shape}")
     logger.info(f"Test set:                                     {x_test_norm.shape}, {y_test_transformed.shape}")
@@ -121,8 +121,8 @@ def data_prep(data, logging_args, args):
     logger.info(f"Ratio of training data:                       set value {1 - test_size}; is value {len(x_train_norm) / whole_class_count}")
 
     logger.info(f"Ratio of swarm and non swarm in test data:    set value {event_ratio} / {1 - event_ratio}; is value {test_count_swarm / (test_count_swarm + test_count_no)} / {1 - test_count_swarm / (test_count_swarm + test_count_no)}")
-    logger.info("---------------DATA---------------".center(75))
-    # ----------------------------------------------------------------------------------------------
+    logger.info("------------END-OF-DATA-----------".center(75))
+
 
     # Create torch.tensors from the numpy arrays for easier computation and GPU support
     x_train_tensor = torch.tensor(x_train_norm, dtype=torch.float32)

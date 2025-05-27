@@ -216,7 +216,7 @@ def main():
     path = r"F:\Aufnahmen\Zuhause\8-9_Mai\output_2025-05-09-03-15-29_433_17.wav" #2
 
 
-    v = 9
+    v = 2
     data, sr = sf.read(path)
     left_channel = data[:, 0]
     right_channel = data[:, 1]

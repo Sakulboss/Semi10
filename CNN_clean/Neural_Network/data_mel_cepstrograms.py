@@ -81,10 +81,10 @@ def mel_specs(labels: tuple, setting, logging_args) -> tuple:
     logger = setup_logging(logging_args)
 
     # Initialize variables
-    size = setting.get('size', 'bienen_1')
-    data = setting.get('classified_samples', labels)
-    fn_wav_list = setting.get('fn_wav_list', data[0])
-    class_id = setting.get('class_id', data[1])
+    data = labels
+    fn_wav_list = data[0]
+    class_id = data[1]
+    size = setting.get('size', 'bees_1')
     segments_per_spectrogram = int(setting.get('segments_per_spectrogram', 10))
     segment_length_frames = int(setting.get('segment_length_frames', 100))
 
@@ -95,7 +95,7 @@ def mel_specs(labels: tuple, setting, logging_args) -> tuple:
     error_files = []
 
     # Create mel cepstrogram
-    for count in tqdm(range(len(fn_wav_list)), desc='Mel-Cepstogramm'):
+    for count in tqdm(range(len(fn_wav_list)), desc='Mel-Cepstrogram'):
         mel_spec = mel_cepstrogram_from_file(fn_wav_list[count], logging_args, stereo=(size == 'bees_1'))
         if mel_spec is None or count != 0 and mel_spec.shape != all_mel_specs[-1].shape:
             error_files.append(fn_wav_list[count])
@@ -104,7 +104,7 @@ def mel_specs(labels: tuple, setting, logging_args) -> tuple:
     # check for faulty files (can very rarely happen, when recording in flac)
     if not error_files == []:
         error_files = [(str(i) + "\n") for i in error_files]
-        logger.error(f'Wrong file size, please remove the file(s): {error_files}')
+        logger.warning(f'Wrong file size or faulty file(s), please remove the file(s): {error_files}')
 
     # combine the mel specs into one np.array
     all_mel_specs = np.stack(all_mel_specs, axis=0)
