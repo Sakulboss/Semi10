@@ -170,7 +170,7 @@ def getlayers(logger: logging.Logger, args:dict) -> tuple:
     server_url:str     = args.get('server_url', 'https://survive.cermann.com/server.php')
     uuid_file_path:str = args.get('uuid_file_path', 'device_uuid.txt')
     use_server:bool    = args.get('use_server', True)
-    omt:str            = args.get('model_text', '')
+    omt:str            = args.get('model_text', 'l; conv2d; (1, 16); (3, 3); 1; (1, 1);; a; relu;; p; maxpool; (5, 5); 1; (2, 2);; l; conv2d; (16, 48); (3, 3); 1; (1, 1);; a; relu;; p; avgpool; (3, 3); 1; (1, 1);; l; conv2d; (48, 48); (11, 21); 1; (5, 10);; p; avgpool; (5, 5); 1; (2, 2);; v: view;; l; linear; (307200, 10);; l; linear; (10, 10);; l; linear; (10, 2);;')
     training_once      = args.get('train_once', True)
 
     move_working_directory()

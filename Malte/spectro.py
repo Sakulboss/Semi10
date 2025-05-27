@@ -75,16 +75,23 @@ def plot_two_spectrograms(cmap, spec1, spec2, title1='Mel-Spectrogram 1', title2
     ax1.set_xlabel('Time (frames)')
     ax1.set_ylabel('Mel Frequency Bands', labelpad=label_left)
 
-    a=0.00
+    a=0.09
+
     color='yellow'
     line_color='red'
-    red_lines = [10, 15, 20, 30, 39, 45, 56, 59]
+    '''
+    red_lines = [9, 14, 20, 30, 39]
     for y in red_lines:
         ax1.axhline(y=y, color=line_color, linestyle='--', linewidth=1)
-    highlight_areas = [(10,15),(20,30),(39,45),(56,59)]
+
+    ax1.axhline(y=50, color=line_color, linestyle='dashdot', linewidth=1)
+    ax1.axhline(y=60, color=line_color, linestyle='dashdot', linewidth=1)
+
+    highlight_areas = [(9,14),(20,30),(39,45),(56,59)]
     for start, end in highlight_areas:
         ax1.axhspan(start, end, facecolor=color, alpha=a)
-    arrow_position = [12, 22, 42, 57]
+
+    arrow_position = [12, 22, 45, 55]
     for y in arrow_position:
         ax1.annotate(
             '',
@@ -98,7 +105,7 @@ def plot_two_spectrograms(cmap, spec1, spec2, title1='Mel-Spectrogram 1', title2
                 lw=3
             )
         )
-
+    '''
 
     ax2 = fig.add_subplot(gs[1])
     img2 = ax2.imshow(spec2, origin='lower', aspect='auto', interpolation='none', vmin=vmin, vmax=vmax, cmap=cmap)
@@ -106,13 +113,18 @@ def plot_two_spectrograms(cmap, spec1, spec2, title1='Mel-Spectrogram 1', title2
     ax2.set_xlabel('Time (frames)')
     ax2.tick_params(axis='y', pad=pad)
     ax2.set_ylabel('Mel Frequency Bands', labelpad=label_left)
-    red_lines = [10, 15, 20, 30, 42, 49]
+    '''
+    red_lines = [9, 14, 20, 30, 42]
     for y in red_lines:
         ax2.axhline(y=y, color=line_color, linestyle='--', linewidth=1)
-    highlight_areas = [(10,15),(20,30),(42,49)]
+    ax2.axhline(y=49, color=line_color, linestyle='dashdot', linewidth=1)
+    ax2.axhline(y=60, color=line_color, linestyle='dashdot', linewidth=1)
+    
+    highlight_areas = [(9,14),(20,30),(42,49)]
     for start, end in highlight_areas:
         ax2.axhspan(start, end, facecolor=color, alpha=a)
-    arrow_position = [12,22,36,45]
+    
+    arrow_position = [12,22,33,45,55]
     for y in arrow_position:
         ax2.annotate(
             '',
@@ -126,7 +138,7 @@ def plot_two_spectrograms(cmap, spec1, spec2, title1='Mel-Spectrogram 1', title2
                 lw=3
             )
         )
-
+    '''
 
     cbar_ax = fig.add_subplot(gs[2])
     cbar = fig.colorbar(img2, cax=cbar_ax, format='%+2.0f dB')
@@ -193,7 +205,18 @@ def plot_colormaps():
     plt.show()
 
 def main():
-    path= 'F:/Aufnahmen/Zuhause/10_Mai/konrad_17_162_2025-05-10-03-11-00.wav'
+    #path = r"F:\Aufnahmen\Zuhause\3-4_Mai\output_2025-05-02-18-32-59_13_17.wav" #9
+    #path = r"F:\Aufnahmen\Zuhause\2_Mai\output_2025-05-02-02-33-52_19_17.wav"
+    #path = r"F:\Aufnahmen\Zuhause\3-4_Mai\output_2025-05-04-08-00-41_2107_17.wav" #8
+    #path = r"F:\Aufnahmen\Zuhause\4-5_Mai\output_2025-05-04-15-19-58_87_17.wav" #7
+    #path = r"F:\Aufnahmen\Zuhause\4-5_Mai\output_2025-05-05-10-01-39_1165_17.wav" #6
+    #path = r"F:\Aufnahmen\Zuhause\6-7_Mai\output_2025-05-06-07-11-12_367_17.wav" #5
+    #path = r"F:\Aufnahmen\Zuhause\7-8_Mai\output_2025-05-07-11-36-22_2_17.wav" #4
+    #path = r"F:\Aufnahmen\Zuhause\7-8_Mai\output_2025-05-08-09-10-54_1213_17.wav" #3
+    path = r"F:\Aufnahmen\Zuhause\8-9_Mai\output_2025-05-09-03-15-29_433_17.wav" #2
+
+
+    v = 9
     data, sr = sf.read(path)
     left_channel = data[:, 0]
     right_channel = data[:, 1]
@@ -203,16 +226,19 @@ def main():
     sf.write(right_wav, right_channel, sr)
     left_spec = mel_spec_file(left_wav)
     right_spec = mel_spec_file(right_wav)
-    plot_two_spectrograms(
-        cmap='terrain',
-        spec1=left_spec,
-        spec2=right_spec,
-        title1='Keine Schwarmstimmung',
-        title2='Schwarmstimmung, ein Tag vor Schwarmereignis',
-        fig_width=18,
-        fig_height=5,
-        save_path= 'C:/Users/SFZ Rechner/Desktop/Mels/schwarmstimmung_01_tage_vor_event.png'
-    )
+    liste=['Accent', 'BuPu','gnuplot2','Greys','inferno','Pastel1','Pastel2','terrain']
+    for i in liste:
+        plot_two_spectrograms(
+            cmap=i,
+            spec1=left_spec,
+            spec2=right_spec,
+            title1='Keine Schwarmstimmung',
+            title2=f'Schwarmstimmung, {v} Tage vor Schwarmereignis',
+            fig_width=18,
+            fig_height=5,
+            save_path=f'C:/Users/SFZ Rechner/Desktop/{v} Tage/schwarmstimmung_{i}_{v}_tage_vor_event.png'
+        )
+
     os.remove(left_wav)
     os.remove(right_wav)
     '''

@@ -4,6 +4,8 @@ import logging
 from torch.utils.data import DataLoader, Dataset
 
 
+
+
 def setup_logging(args: dict) -> logging.Logger:
     handlers = []
     if args.get('log_to_file', False):   logging.FileHandler(args.get('log_file', 'training.log'))
@@ -57,6 +59,7 @@ def data_prep(data, logging_args, args):
     # Get Args
     test_size = args.get('test_size', 0.3)
     event_ratio = args.get('swarm_event_ratio', 0.5)
+    batch_size = args.get('batch_size', 64)
 
     # Unpack data
     y_all_oh, y_all, x_all = data
@@ -132,7 +135,7 @@ def data_prep(data, logging_args, args):
     test_dataset = CustomDataset(x_test_tensor, y_test_tensor, train=False)
 
     # Create DataLoader objects for training and testing data
-    train_loader = DataLoader(dataset=train_dataset, batch_size=args['batch_size'], shuffle=True)
-    test_loader = DataLoader(dataset=test_dataset, batch_size=args['batch_size'], shuffle=True)
+    train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+    test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True)
 
     return train_loader, test_loader

@@ -23,10 +23,10 @@ class NetStruct:
         self.start_layers = ["- "]                                  # Start characters of the layer
         self.conv_sizes  :list[tuple] = [ (3,3), (11,21)]           # convolutional kernel sizes
         self.pool_sizes  :list[tuple] = [(3,3), (5,5)]              # pooling kernel sizes
-        self.pool_types  :list[str]   = ["avgpool", "maxpool"]      # pooling types
-        self.act_types   :list[str]   = [None, 'relu']              # activation functions
+        self.pool_types  :list[str]   = ["maxpool"]      # pooling types
+        self.act_types   :list[str]   = [None]              # activation functions
         self.dim         :list[int]   = [1,64,100]                  # dimensions of the tensor in the CNN -> Channel, Height, Width
-        self.output_dim  :int         = 2                           # number of output dimension
+        self.output_dim  :int         = 2                           # number of output dimensions
         self.linear_dim  :int         = 10                          # number of linear neurons after the first linear layer
         self.filters     :list[tuple] = [(1,16),(16,48),(48,48)]    # Number of filters in the convolutional layers
         self.layers      :list[str]   = []                          # the layers will be saved here
