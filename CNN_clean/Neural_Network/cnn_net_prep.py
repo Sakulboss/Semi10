@@ -94,16 +94,16 @@ def getnextmodel(file_path: str) -> str | None:
     Returns:
         model structure
     """
-    with open(file_path, 'r') as file:
+    with open(os.path.join(file_path, "_netstruct.txt"), 'r') as file:
         lines = file.readlines()
     for i, line in enumerate(lines):
-        if line.startswith('- '):
-            lines[i] = '#' + line[1:]
+        if line.startswith('# '):
+            lines[i] = '-' + line[1:]
             position = i
             break
     else:
         return None
-    with open(file_path, 'w') as file:
+    with open(os.path.join(file_path, "_netstruct.txt"), 'w') as file:
         file.writelines(lines)
     return lines[position][2:]
 
