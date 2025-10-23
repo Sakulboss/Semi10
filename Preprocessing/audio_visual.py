@@ -18,7 +18,7 @@ print(min(data))
 time = np.linspace(0, len(data) / sample_rate, num=len(data))
 
 # Plot the waveform
-plt.figure(figsize=(10, 4))
+plt.figure(figsize=(10, 6))
 plt.plot(time, data, color='blue')
 plt.xlabel('Zeit [s]')
 plt.ylabel('Amplitude')
