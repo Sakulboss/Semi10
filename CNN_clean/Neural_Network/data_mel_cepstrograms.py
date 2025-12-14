@@ -3,6 +3,7 @@ import numpy as np
 import librosa.feature as lf
 import librosa
 from tqdm import tqdm
+import matplotlib.pyplot as pl
 
 
 def setup_logging(args: dict) -> logging.Logger:
@@ -128,6 +129,13 @@ def mel_specs(labels: tuple, setting, logging_args) -> tuple:
     segment_file_id = np.array(segment_file_id)
     segment_file_mod_id = np.mod(segment_file_id, 5)
     segment_class_id = np.array(segment_class_id)
+
+    pl.figure(figsize=(10, 8))
+    pl.imshow(all_mel_specs[2, :, :], origin="lower", aspect="auto", interpolation="None")
+    pl.xticks([], [])
+    pl.yticks([], [])
+    pl.tight_layout()
+    pl.show()
 
     return segment_file_mod_id, segment_list, segment_class_id, data[2], data[5]
 

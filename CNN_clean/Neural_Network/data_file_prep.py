@@ -48,7 +48,7 @@ def use_esc50(args:dict) -> str:
 
 def create_bee_1(args: dict = None) -> str:
     """
-    This function categorizes the bee sounds captured by us. The KNN was trained on this dataset.
+    This function categorizes the bee sounds captured by us. The CNN was trained on this dataset.
     Args:
         args: dict with the settings for the dataset like file storage locations, etc.
     Returns:

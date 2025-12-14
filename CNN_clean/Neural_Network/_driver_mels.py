@@ -88,5 +88,3 @@ def trainingdata(settings:dict, logging_args:dict) -> tuple:
 
     create_trainingdata(settings, logging_args)
     return load_trainingdata(settings.get('size', 'bees_1'))
-
-

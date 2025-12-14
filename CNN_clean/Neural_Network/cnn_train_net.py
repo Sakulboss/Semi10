@@ -146,7 +146,7 @@ def save_model_structure(model: CNN, acc: float, epoch: int, logging_args: dict,
     """
     logger = setup_logging(logging_args)
     path = args.get('save_model_to', None)
-    save_weight = args.get('save_weight', False)
+    save_weight = args.get('save_weight', True)
 
     if path is None:
         move_working_directory()
